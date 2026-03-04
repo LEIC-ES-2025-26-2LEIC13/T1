@@ -10,23 +10,24 @@ This Software Development Report, tailored for LEIC-ES-2025-26, provides compreh
 
 It is organised by the following activities: 
 
-* [Business modeling](#Business-Modelling) 
-  * [Product Vision](#Product-Vision)
-  * [Features and Assumptions](#Features-and-Assumptions)
-* [Requirements](#Requirements)
-  * [User stories](#User-stories)
-  * [Domain model](#Domain-model)
-  * [User interfaces](#User-interfaces)
-* [Architecture and Design](#Architecture-And-Design)
-  * [Logical architecture](#Logical-Architecture)
-  * [Physical architecture](#Physical-Architecture)
-  * [Functional prototype](#Functional-Prototype)
-* [Project management](#Project-Management)
-  * [Sprint 0](#Sprint-0)
-  * [Sprint 1](#Sprint-1)
-  * [Sprint 2](#Sprint-2)
-  * [Sprint 3](#Sprint-3)
-  * [Final Release](#Final-Release)
+- [_\[your product name\]_ Development Report](#your-product-name-development-report)
+  - [Business Modelling](#business-modelling)
+    - [Product Vision](#product-vision)
+    - [Features and Assumptions](#features-and-assumptions)
+  - [Requirements](#requirements)
+    - [User Stories](#user-stories)
+    - [Domain model](#domain-model)
+  - [Architecture and Design](#architecture-and-design)
+    - [Logical architecture](#logical-architecture)
+    - [Physical architecture](#physical-architecture)
+    - [Functional prototype](#functional-prototype)
+  - [Project management](#project-management)
+    - [Sprint 0](#sprint-0)
+    - [Sprint 1](#sprint-1)
+    - [Sprint 2](#sprint-2)
+    - [Sprint 3](#sprint-3)
+    - [Sprint 4](#sprint-4)
+    - [Final Release](#final-release)
 
 Contributions are expected to be made exclusively by the initial team, but we may open them to the community, after the course, in all areas and topics: requirements, technologies, development, experimentation, testing, etc.
 
@@ -46,6 +47,8 @@ Thank you!
 Business modeling in software development involves defining the product's vision, understanding market needs, aligning features with user expectations, and setting the groundwork for strategic planning and execution.
 
 ### Product Vision
+
+This product is designed to help L.EIC students manage their collaborative projects. The app will allow students to create a collaborative workspace with predefined templates desgined specifically for each project they will develop throughout the course, reducing the time spent on planning them.
 
 <!-- 
 Start by defining a clear and concise product vision for your app, to help members of the team, contributors, and users into focusing their often disparate views into a concise, visual, and short textual form. 
@@ -75,7 +78,10 @@ Indicate an  initial/tentative list of high-level features - high-level capabili
 
 Optionally, indicate an initial/tentative list of assumptions that you are doing about the app and dependencies of the app to other systems.
 -->
-
+- Custom template for each project - there will be a specifically-design template, with predefined tasks, conceived to better address each project's needs.
+- Predefined tasks - outline the main tasks that will need to be done in the current project.
+- Creating personalized tasks - in add to the already existing tasks, the user can add his own personalized tasks.
+- 
 ## Requirements
 
 ### User Stories
