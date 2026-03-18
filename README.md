@@ -78,9 +78,20 @@ Indicate an  initial/tentative list of high-level features - high-level capabili
 
 Optionally, indicate an initial/tentative list of assumptions that you are doing about the app and dependencies of the app to other systems.
 -->
-- Custom template for each project - there will be a specifically-design template, with predefined tasks, conceived to better address each project's needs.
-- Predefined tasks - outline the main tasks that will need to be done in the current project.
-- Creating personalized tasks - in add to the already existing tasks, the user can add his own personalized tasks.
+- Create an account - each user of our app must be associated with a personal account, so they can access their projects, boards and tasks
+- Login authentication - to access their personal data, the user ust be able to log into the app
+- Custom template for each project - there will be a specifically-designed template, with predefined tasks, conceived to better address each project's needs.
+- Predefined tasks - each template will have default tasks to guide the workflow of that project.
+- Creating tasks - in addition to the already existing tasks, the user can add his own personalized tasks.
+- Create project board - a user can create his own project board from scratch if he does not want to use the custom template
+- Invite members to project - the user can invite other users to join his collaborative project
+- Assign tasks to users - when in a collaborative project, a user can assign a task to another team member
+- Comment on tasks - a user can add a comment to a task, for example to provide useful information to the assigned person undertaking it
+- View personal tasks - a team member in a project can see all the tasks assigned to them clearly in a list, to better organize themselves
+- Add a deadline - a user can add a deadline to a task so it becomes trackable
+- View deadline-ordered tasks - a user can see all his personal tasks ordered by the upcoming deadlines
+- Add labels to tasks - a user can add a label to a task to be able to filter them by label
+- View tasks ordered by labels - 
 - 
 ## Requirements
 
