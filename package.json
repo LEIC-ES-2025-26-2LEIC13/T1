@@ -1,7 +1,7 @@
 {
   "name": "leico",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "expo": "~55.0.8",
+    "expo-router": "~55.0.7",
     "expo-status-bar": "~55.0.4",
     "react": "19.2.0",
     "react-native": "0.83.2"
