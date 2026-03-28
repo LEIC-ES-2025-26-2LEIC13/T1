@@ -1,6 +1,9 @@
 {
   "expo": {
     "scheme": "leico",
+    "experiments": {
+      "typedRoutes": false
+      },
     "name": "LEICo",
     "slug": "LEICo",
     "version": "1.0.0",
