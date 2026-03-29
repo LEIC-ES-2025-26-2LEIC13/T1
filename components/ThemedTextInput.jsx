@@ -12,7 +12,7 @@ const ThemedTextInput = ({style, ...props}) => { // if no prop is specified, sty
                   backgroundColor: theme.navBackground,
                   color: theme.text,
                   padding: 20,
-                  borderRadius: 6
+                  borderRadius: 10
                 },
                 style
             ]}

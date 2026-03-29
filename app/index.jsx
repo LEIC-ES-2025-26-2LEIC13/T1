@@ -1,21 +1,18 @@
-import { StyleSheet, Text } from 'react-native'
-import { Link } from 'expo-router' 
+import { StyleSheet } from 'react-native'
+import { useUser } from '../hooks/useUser'
 
 // themed components
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
-import Spacer from '../components/Spacer'
-import Login from './(auth)/login'
 
 const Home = () => {
+
+  const { user } = useUser()
+
   return (
     <ThemedView style={styles.container}>
 
-      <ThemedText title={true} style={styles.title}>Home</ThemedText>
-
-      <Link href="/login" style={styles.link}>
-        <ThemedText>Login</ThemedText>
-      </Link>
+      <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
 
     </ThemedView>
   )

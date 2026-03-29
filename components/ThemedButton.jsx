@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     btn: { // the normal, unpressed state of the button
         backgroundColor: Colors.primary,
         padding: 15,
-        borderRadius: 5
+        borderRadius: 10
     },
 
     pressed: { // adds style to the button when pressed
