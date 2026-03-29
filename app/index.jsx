@@ -1,20 +1,18 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Link } from 'expo-router'
+import { StyleSheet } from 'react-native';
 
-const Home = () => {
+export default function index() {
   return (
-    <View style={styles.container}>
-      <Text>Home</Text>
-    </View>
+    <Link href="project" style={styles.container}>
+      Go to Project
+    </Link>
   )
 }
-
-export default Home
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    textAlign: 'center',
+    textAlignVertical: 'center',
   }
-})
+});
