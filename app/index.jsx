@@ -1,40 +1,41 @@
-import { StyleSheet } from 'react-native'
-import { useUser } from '../hooks/useUser'
+import { Link } from "expo-router";
+import { StyleSheet } from "react-native";
 
 // themed components
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
 
-const Home = () => {
+const App = () =>{
 
   const { user } = useUser()
 
-  return (
-    <ThemedView style={styles.container}>
-
-      <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
-      <ThemedText>Here is your personal data.</ThemedText>
-
-    </ThemedView>
+  return(
+      <ThemedView style={styles.container}>
+          <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
+          <Link style={styles.link} href="/projects">
+              Click me
+          </Link>
+      </ThemedView>
   )
 }
 
-export default Home
+export default App;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
+const styles =  StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 
-  title: {
-    fontWeight: 'bold',
-    fontSize: 18
-  },
+    title: {
+      fontWeight: 'bold',
+      fontSize: 18
+    },
 
-  link: {
-    marginVertical: 10,
-    borderBottomWidth: 1
-  }
-})
+    link: {
+      marginVertical: 10,
+      borderBottomWidth: 1
+    }
+});

@@ -5,7 +5,8 @@
       "typedRoutes": true
     },
     "name": "LEICo",
-    "slug": "LEICo",
+    "slug": "leico",
+    "scheme": "leico",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
