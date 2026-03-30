@@ -1,16 +1,22 @@
-import  { View, Text } from "react-native";
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
 
+// themed components
+import ThemedView from '../components/ThemedView'
+import ThemedText from '../components/ThemedText'
+
 const App = () =>{
-    return(
-        <View style={styles.container}>
-            <Text>Hi</Text>
-            <Link href="/projects">
-                click me
-            </Link>
-        </View>
-    )
+
+  const { user } = useUser()
+
+  return(
+      <ThemedView style={styles.container}>
+          <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
+          <Link style={styles.link} href="/projects">
+              Click me
+          </Link>
+      </ThemedView>
+  )
 }
 
 export default App;
@@ -22,4 +28,14 @@ const styles =  StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    title: {
+      fontWeight: 'bold',
+      fontSize: 18
+    },
+
+    link: {
+      marginVertical: 10,
+      borderBottomWidth: 1
+    }
 });

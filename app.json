@@ -1,5 +1,9 @@
 {
   "expo": {
+    "scheme": "leico",
+    "experiments": {
+      "typedRoutes": true
+    },
     "name": "LEICo",
     "slug": "leico",
     "scheme": "leico",
@@ -21,7 +25,8 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "package": "com.anonymous.LEICo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
