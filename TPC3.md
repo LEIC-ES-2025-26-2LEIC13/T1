@@ -72,3 +72,8 @@ How to improve the Android emulator performance?
 
 ## Conclusão
 A utilização do Maestro Studio Desktop para os acceptance tests em React Native mostrou-se eficaz, permitindo simular interações reais do utilizador e validar o comportamento da aplicação. A integração com o processo de build e a configuração adequada do ambiente de desenvolvimento foram essenciais para garantir a fiabilidade dos testes. A GenAI desempenhou um papel importante na resolução de problemas e na otimização do processo, demonstrando ser uma ferramenta valiosa, desde que usada de forma criteriosa e consciente.  
+
+
+## Links para commits e branch
+- Commit do acceptance test: [Commit Link](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/commit/674db3d0610650ad9ec89b3d8227a8d378fec998)
+- Branch do TPC3: [Branch Link](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/tree/pedropires-tpc3)
