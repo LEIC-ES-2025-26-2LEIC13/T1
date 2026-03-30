@@ -1,0 +1,11 @@
+appId: com.leico
+---
+- launchApp:
+    clearState: true
+- tapOn: http://10.0.2.2:8081
+- tapOn: Close
+- tapOn: Go To Project
+- tapOn: Invite user
+- tapOn: Enter username
+- inputText: Pedro Pires
+- tapOn: Send Invite
