@@ -13,6 +13,7 @@ const Home = () => {
     <ThemedView style={styles.container}>
 
       <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
+      <ThemedText>Here is your personal data.</ThemedText>
 
     </ThemedView>
   )
