@@ -1,0 +1,15 @@
+appId: com.anonymous.LEICo
+tags:
+  - login
+---
+- launchApp:
+    clearState: true
+- tapOn: Username
+- inputText: John Doe
+- tapOn: Password
+- inputText: "1234"
+- hideKeyboard
+- tapOn: Login
+- assertVisible: Home
+- assertVisible: Hello, John Doe!
+- assertVisible: Here is your personal data.
