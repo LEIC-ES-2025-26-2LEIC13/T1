@@ -1,30 +1,74 @@
 # Acceptance Testing
 
-## Setup
-Após ter inicializado o projeto e da feature a ser testada estar implementada, o próximo passo é criar os acceptance tests.
-Para criar os acceptance tests, que essencialmente tornam o teste de utilização automatizado, facilitando o desenvolvimento do projeto de software, decidiu-se usar a ferramenta Maestro, na sua versão Studio Desktop, um framework de automação de UI testing de modo a garantir a fiabilidade da aplicação a ser testada. Opera como um black-box testing framework, simulando interações do utilizador ao nível do dispositivo, sem ter acesso ao source code ou internal API's.
+Este documento descreve como preparar o projeto e executar testes de aceitação usando Maestro Studio Desktop.
+
+## 1. Setup
+
+Utilizou-se o tutorial de youtube: Complete React Native Tutorial do youtuber Net Ninja de modo a fazer um setup inicial do projeto, assim como compreender o funcionamento do React Native e do framework Expo:
+
+https://www.youtube.com/watch?v=J2j1yk-34OY&list=PL4cUxeGkcC9hNTz3sxqGTfxAwU-DIHJd2&index=1
 
 
-## Processo de Build
+**Nota:considera-se que o projeto já está inicializado e a funcionalidade a testar está implementada.**
 
-Primeiramente inicializar o diretório responsável pela build do projeto, usando o comando:
-````
+Para este trabalho foi escolhida a ferramenta Maestro (Studio Desktop), um framework de automação de UI testing que ajuda a garantir a fiabilidade da aplicação. O Maestro funciona como black-box testing: simula interações reais do utilizador ao nível do dispositivo, sem acesso ao código-fonte nem a APIs internas.
+
+## 2. Processo de Build
+
+### 2.1 Build Android
+
+No diretório do projeto, executar:
+
+```bash
 npx expo run:android
-````
+```
 
-Ao efetuar uma build local da aplicação, para permitir a execução dos acceptance tests, é necessário garantir que os ficheiros do Android SDK são acesíveis, neste caso foi necessário criar um ficheiro local.properties na pasta android do projeto, com o seguinte conteúdo.
-Caso ocorra um erro com SDK location not found, efetuar este passo.
+### 2.2 Configuração do Android SDK (se necessário)
 
-````
+Para builds locais, é necessário garantir que o Android SDK está acessível.
+
+Se surgir o erro "SDK location not found", criar o ficheiro `android/local.properties` com:
+
+```properties
 sdk.dir=C\:\\Users\\<username>\\AppData\\Local\\Android\\Sdk
+```
+
+Substituir `<username>` pelo utilizador do sistema operativo.
+
+Depois disso, continuar o processo de build até conclusão.
+
+## 3. Execução dos Acceptance Tests
+
+1. Garantir que o emulador Android está em execução.
+2. Após a build, o APK gerado será instalado no emulador.
+3. Abrir o Maestro Studio Desktop.
+4. Criar um projeto dentro do diretório do repositório.
+5. Criar um novo teste .yaml e associá-lo à aplicação (`com.leico`).
+6. Definir o fluxo esperado da aplicação e executar o teste.
+7. Validar se o resultado obtido corresponde ao comportamento esperado.
+
+## 4. Nota de Performance
+Para melhorar o desempenho do emulador durante os testes, pode ser útil:
+- aumentar a RAM alocada (por exemplo 2-3GB);
+- aumentar o número de CPU cores (idealmente 4 cores);
+- usar aceleração gráfica em modo Hardware (evitar Automático ou Software uma vez que afetam claramente o desempenho).
+
+## Utilização de GenAI ao longo do processo
+Durante o desenvolvimento e preparação dos acceptance tests, a GenAI foi utilizada para:
+- Procurar o melhor framework de testing para React Native, resultando na escolha do Maestro.
+- **Prompt utilizado**
+ ````
+ What tools are used for acceptance testing in react native, like for example Selenium or Patrol for Flutter?
+ ````
+ - Sugestão da possível solução para o problema de build, ao não encontrar os ficheiros do Android SDK.
+- **Prompt utilizado**
 ````
-Substituindo <username> pelo nome do utilizador do sistema operativo, para garantir que o caminho para o Android SDK é correto e a build pode ser efetuada com sucesso.
+Simplesmente foi copiada a mensagem de erro, diretamente do terminal.
+````
+- Compreender como a performance do emulador poderia ser melhorada, garantindo uma experiência de desenvolvimento e utilização mais fluida e agradável.
+```` 
+How to improve the Android emulator performance?
+````
 
-De seguida prosseguir com o restante processo de build até estar completa.
-
-## Execução dos Acceptance Tests
-Após ter concluido a build, tendo o emulador Android em execução em segundo plano, o apk resultante da build será instalado neste.
-NOTA: Para obter melhor performance na execução do emulador pode ser útil aumentar a RAM alocada para o mesmo e o número de CPU cores e efetuar graphics acceleration usando o modo Hardware.
-
-No Maestro Studio Desktop, inicializar um novo projeto dentro do diretório do projeto e depois criar um novo teste (documento .yaml) e associá-lo à aplicação (neste caso com.leico).
-Finalmente basta pensar como deveria ser o fluxo de execução da aplicação e escrever o teste de acordo com a especificação desejada e depois executá-lo, verificando se o resultado é o esperado.
+## Conclusão
+A utilização do Maestro Studio Desktop para os acceptance tests em React Native mostrou-se eficaz, permitindo simular interações reais do utilizador e validar o comportamento da aplicação. A integração com o processo de build e a configuração adequada do ambiente de desenvolvimento foram essenciais para garantir a fiabilidade dos testes. A GenAI desempenhou um papel importante na resolução de problemas e na otimização do processo, demonstrando ser uma ferramenta valiosa, desde que usada de forma criteriosa e consciente.  
