@@ -66,6 +66,7 @@ Durante o desenvolvimento e preparação dos acceptance tests, a GenAI foi utili
 Simplesmente foi copiada a mensagem de erro, diretamente do terminal.
 ````
 - Compreender como a performance do emulador poderia ser melhorada, garantindo uma experiência de desenvolvimento e utilização mais fluida e agradável.
+- **Prompt utilizado**
 ```` 
 How to improve the Android emulator performance?
 ````
