@@ -5,14 +5,14 @@ import { useUser } from "../hooks/useUser";
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
 
-const App = () =>{
+const App = () => {
 
   const { user } = useUser()
 
   return(
       <ThemedView style={styles.container}>
           <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
-          <Link style={styles.link} href="/projects">
+          <Link style={styles.link} href="/project_tab">
               Click me
           </Link>
       </ThemedView>

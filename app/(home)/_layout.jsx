@@ -34,7 +34,7 @@ export default function DashboardLayout() {
             }}
         >
             <Tabs.Screen
-                name="projects"
+                name="project_tab"
                 options={{
                     title: "My Projects",
                     tabBarIcon: ({ focused }) => (

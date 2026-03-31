@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, useColorScheme } from 'react-native';
+import { View, StyleSheet, useColorScheme } from 'react-native';
 import { Colors } from '../../constants/Colors';
+import { Link } from 'expo-router';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
@@ -7,8 +8,8 @@ const Projects = () => {
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }]}>
-            <Text style={[styles.heading, { color: theme.title }]}>Project 1</Text>
-            <Text style={[styles.heading, { color: theme.title }]}>Project 2</Text>
+            <Link href="/project" style={[styles.heading, { color: theme.title }]}>Project 1</Link>
+            <Link href="/project" style={[styles.heading, { color: theme.title }]}>Project 2</Link>
         </View>
     )
 }
