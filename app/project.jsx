@@ -1,20 +1,21 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, View, useColorScheme } from 'react-native';
+import { Alert, Pressable, StyleSheet, useColorScheme } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import IconButton from '../components/IconButton';
-import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
+
 import { Colors } from '../constants/Colors';
 import TopBar from '../components/TopBar';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import IconButton from '../components/IconButton';
+import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
  
 export default function Home() {
   const router = useRouter();
   const [modalVisible, setModalVisible] = React.useState(false); // State to control the visibility of the invite modal (popup)
   const [inviteTarget, setInviteTarget] = React.useState(''); // State to hold the username of the user
   const scheme = useColorScheme(); // hook to get the current color scheme
-  const palette = Colors[scheme] ?? Colors.light; // Collor palette based on user's theme
+  const palette = Colors[scheme] ?? Colors.light; // Color palette based on user's theme
   const currentProjectName = 'Programming Project'; // Current project name (could be dynamic)
 
   // Shows the invite modal box

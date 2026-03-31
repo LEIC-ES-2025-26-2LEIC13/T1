@@ -1,26 +1,41 @@
-import { Link } from 'expo-router'
-import { StyleSheet, useColorScheme } from 'react-native';
-import ThemedView from '../components/ThemedView';
-import { Colors } from '../constants/Colors';
+import { Link } from "expo-router";
+import { StyleSheet } from "react-native";
+import { useUser } from "../hooks/useUser";
+// themed components
+import ThemedView from '../components/ThemedView'
+import ThemedText from '../components/ThemedText'
 
-export default function index() {
-  
-  const scheme = useColorScheme();
-  const palette = Colors[scheme] ?? Colors.light;
+const App = () => {
 
-  return (
-    <ThemedView style={styles.container}>
-      <Link href="/project" style={{ color: palette.text, fontSize: 18, textAlign: 'center',
-        textAlignVertical: 'center'
-       }}>
-        Go to Project
-      </Link>
-    </ThemedView>
+  const { user } = useUser()
+
+  return(
+      <ThemedView style={styles.container}>
+          <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
+          <Link style={styles.link} href="/project_tab">
+              Click me
+          </Link>
+      </ThemedView>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  }
+export default App;
+
+const styles =  StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    title: {
+      fontWeight: 'bold',
+      fontSize: 18
+    },
+
+    link: {
+      marginVertical: 10,
+      borderBottomWidth: 1
+    }
 });

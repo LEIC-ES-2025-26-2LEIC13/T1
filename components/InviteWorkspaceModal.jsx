@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Modal,
   Pressable,
@@ -8,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import ThemedButton from './ThemedButton';
 
 export default function InviteWorkspaceModal({
   visible,
@@ -56,19 +56,9 @@ export default function InviteWorkspaceModal({
             ]}
           />
 
-          <Pressable
-            onPress={onInvite}
-            testID="invite-submit"
-            style={({ pressed }) => [
-              styles.inviteButton,
-              { backgroundColor: '#2563eb' },
-              pressed && styles.inviteButtonPressed,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel="Send invite"
-          >
+          <ThemedButton onPress={onInvite} style={{alignItems: 'center', padding: 12}}>
             <Text style={styles.inviteButtonText}>Invite</Text>
-          </Pressable>
+          </ThemedButton>
         </View>
       </View>
     </Modal>
@@ -113,14 +103,6 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     paddingHorizontal: 12,
     marginBottom: 14,
-  },
-  inviteButton: {
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  inviteButtonPressed: {
-    opacity: 0.8,
   },
   inviteButtonText: {
     color: '#ffffff',
