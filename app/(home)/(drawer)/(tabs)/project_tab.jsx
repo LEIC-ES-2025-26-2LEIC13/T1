@@ -1,6 +1,6 @@
 import { View, StyleSheet, useColorScheme } from 'react-native';
-import { Colors } from '../../constants/Colors';
-import ThemedProject from '../../components/ThemedProject';
+import { Colors } from '../../../../constants/Colors';
+import ThemedProject from '../../../../components/ThemedProject';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
