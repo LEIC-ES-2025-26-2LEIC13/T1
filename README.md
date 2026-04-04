@@ -147,6 +147,21 @@ Example:
 
 
 ## Architecture and Design
+
+### Overall architecture
+The system follows a layered architecture, chosen to keep the code modular and easy to evolve while supporting real-time collaborative features.
+
+- Presentation layer: React Native screens and reusable UI components (Login/Register, My Projects, Task Modal, Invites, Calendars, Profile).
+- Application layer: use-case oriented services that coordinate user actions and business rules (create project, invite users, assign tasks, move task across columns, accept/decline invites, filter personal tasks, build global/project calendars).
+- Data layer: map external data to the app's exsiting data model, used by the application layer,by abstracting cloud interactions.
+- External services layer: cloud authentication, cloud database and push notifications used for login, data persistence and synchronization and real-time updates, respectively.
+
+### Architectural Patterns
+As described above, the high-level architecture is organized in layers with clear separation and modularity.
+
+Regarding design patterns....
+
+
 <!--
 The architecture of a software system encompasses the set of key decisions about its organization. 
 
@@ -168,9 +183,51 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 
 ![LogicalView](https://user-images.githubusercontent.com/9655877/160585416-b1278ad7-18d7-463c-b8c6-afa4f7ac7639.png)
 -->
+Logical modules are organized as follows.
+
+#### In-app modules
+- UI module: comprised by screens and UI components to easily interact with Authentication, My Projects, current Project Board, Task Detail/Creation Modal, My Tasks, Global Calendar, Project Calendar, Invites, Profile.
+
+- Application module (use cases): used to fetch, manipulate and coordinate data inbetween layers, implementing the core functionality of the app, such as:
+  - Auth: login, register, logout, session restore.
+  - Project management: create project, load templates, create from template, invite member.
+  - Task creation: create/edit task, assign member, move task between columns, comment, set deadlines and labels.
+  - Calendar and Invites: list personal deadlines, list project deadlines, list pending invites, accept/decline invite.
+  - Establishes rules and permissions between users inside a project.
+
+- Data module
+  - Defines data models for each entity of the app: User, Project, Board, Column, Task, Comment, Invite, Template.
+  - Implements repositories that abstract the interaction with the cloud database, providing a clean API for the application module to fetch and manipulate data.
+  - Access a local database to store user settings and offline data, if no connection is available.
+
+#### External components
+- Cloud auth service: identity management and secure session handling.
+- Cloud database service: stores all data in a real-time cloud database, enabling multi-user synchronization and persistence.
+- Push notification service: used to send real-time notifications to users about project updates, task assignments, and deadlines.
+
+![Logical Architecture Diagram](diagrams/LogicalArchitecture.drawio.svg)
 
 
 ### Physical architecture
+
+The physical architecture includes three main deployment nodes:
+
+- Mobile device (Android/iOS)
+  - Where the app will be installed and used by the students.
+
+- Cloud backend 
+  - Authentication service.
+  - Real-time database service.
+  - Responsibilities: account management, authorization checks, persistent storage, and multi-user synchronization.
+
+- Data:
+  - Cloud: source of truth for all data.
+  - Device: cached session/profile and app data when offline.
+
+![Physical Architecture Diagram](diagrams/DeploymentDiagram.drawio.svg)
+
+
+
 <!--
 The goal of this subsection is to document the high-level physical structure of the software system (machines, connections, software components installed, and their dependencies) using UML deployment diagrams (Deployment View) or component diagrams (Implementation View), separate or integrated, showing the physical structure of the system.
 
