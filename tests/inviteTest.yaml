@@ -1,4 +1,4 @@
-appId: com.leico
+appId: com.anonymous.LEICo
 ---
 - launchApp:
     clearState: true
