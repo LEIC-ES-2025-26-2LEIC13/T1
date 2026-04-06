@@ -53,7 +53,7 @@ export default function TaskModal({
                     <Text style={styles.buttonTextCancel}>Cancel</Text>
                 </ThemedButton>
 
-                <ThemedButton style={[styles.button,styles.create]} onPress={onCreate}>
+                <ThemedButton style={[styles.button]} onPress={onCreate}>
                     <Text style={styles.buttonTextCreate}>Create Task</Text>
                 </ThemedButton>
             </ThemedView>
@@ -87,16 +87,15 @@ const styles = StyleSheet.create({
 
     cancel: {
         backgroundColor: 'white',
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderColor: 'grey',
     },
-    create: {
-        backgroundColor: 'blue',
-    },
+
     buttonTextCancel: {
         color: 'black',
         fontWeight: 'bold',
     },
+
     buttonTextCreate: {
         color: 'white',
         fontWeight: 'bold',

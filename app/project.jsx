@@ -1,29 +1,56 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme } from 'react-native';
+import { Alert, Pressable, StyleSheet, useColorScheme, Text } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Colors } from '../constants/Colors';
-import TopBar from '../components/TopBar';
-import IconButton from '../components/IconButton';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
- 
+import TaskModal from '../components/TaskModal';
+import ThemedButton from "../components/ThemedButton";
+import ThemedText from "../components/ThemedText";
+
 export default function Home() {
   const router = useRouter();
-  const [modalVisible, setModalVisible] = React.useState(false); // State to control the visibility of the invite modal (popup)
-  const [inviteTarget, setInviteTarget] = React.useState(''); // State to hold the username of the user
-  const scheme = useColorScheme(); // hook to get the current color scheme
-  const palette = Colors[scheme] ?? Colors.light; // Color palette based on user's theme
-  const currentProjectName = 'Programming Project'; // Current project name (could be dynamic)
+  const scheme = useColorScheme();
+  const palette = Colors[scheme] ?? Colors.light;
 
-  // Shows the invite modal box
+  const [taskModalVisible, setTaskModalVisible] = React.useState(false);
+  const [taskName, setTaskName] = React.useState('');
+  const [taskDetail, setTaskDetail] = React.useState('');
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [inviteTarget, setInviteTarget] = React.useState('');
+
+  const currentProjectName = 'Programming Project';
+
+  const openTaskModal = () => setTaskModalVisible(true);
+
+  const closeTaskModal = () => {
+    setTaskModalVisible(false);
+    setTaskName('');
+    setTaskDetail('');
+  };
+
+  const handleCreateTask = () => {
+    if (!taskName.trim()) {
+      Alert.alert('Error', 'Please enter a task name');
+      return;
+    }
+
+    closeTaskModal();
+
+    Toast.show({
+      type: 'success',
+      text1: 'Task created',
+      text2: taskName,
+    });
+  };
+
   const handleInvitePress = () => {
     setModalVisible(true);
   };
 
-  // Closes the invite modal box and resets the input field
   const handleCloseModal = () => {
     setModalVisible(false);
     setInviteTarget('');
@@ -63,27 +90,63 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-      <TopBar
-        title={currentProjectName}
-        leftAction={(
-          <Pressable onPress={handleGoBack} hitSlop={10} accessibilityRole="button" accessibilityLabel="Go back">
-            <Ionicons name="arrow-back" size={22} color={palette.title} />
-          </Pressable>
-        )}
-        rightAction={<IconButton id="workspace-invite" onPress={handleInvitePress} color={palette.title} />}
+    <>
+      <Stack.Screen
+        options={{
+          headerTitle: () => (
+            <ThemedText title={true} style={{ fontSize: 18, fontWeight: 'bold' }}>
+              {currentProjectName}
+            </ThemedText>
+          ),
+          headerLeft: () => (
+            <Pressable onPress={handleGoBack} hitSlop={10}>
+              <Ionicons name="arrow-back" size={24} color={palette.title} />
+            </Pressable>
+          ),
+          headerRight: () => (
+            <Pressable onPress={handleInvitePress} hitSlop={10}>
+              <Ionicons name="person-add" size={24} color={palette.title} />
+            </Pressable>
+          ),
+          headerStyle: {
+            backgroundColor: palette.navBackground,
+            borderBottomWidth: 1,
+            borderBottomColor: '#e5e7eb',
+          },
+          headerTintColor: palette.title,
+          headerShadowVisible: false,
+        }}
       />
+      <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+        <InviteWorkspaceModal
+          visible={modalVisible}
+          value={inviteTarget}
+          onChangeText={setInviteTarget}
+          onClose={handleCloseModal}
+          onInvite={handleSendInvite}
+          workspaceName={currentProjectName}
+        />
 
-      <InviteWorkspaceModal
-        visible={modalVisible}
-        value={inviteTarget}
-        onChangeText={setInviteTarget}
-        onClose={handleCloseModal}
-        onInvite={handleSendInvite}
-        palette={palette}
-        workspaceName={currentProjectName}
-      />
-    </SafeAreaView>
+        <ThemedButton
+          onPress={openTaskModal}
+          style={styles.btn}
+        >
+          <Text style={{color: 'white'}}>+</Text>
+          <Text style={{color: 'white'}}>Create Task</Text>
+        </ThemedButton>
+
+        <TaskModal
+          visible={taskModalVisible}
+          onClose={closeTaskModal}
+          onCreate={handleCreateTask}
+          value={taskName}
+          onChangeText={setTaskName}
+          detailValue={taskDetail}
+          onDetailChangeText={setTaskDetail}
+          projectName={currentProjectName}
+        />
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -91,4 +154,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+
+  btn:{
+    width: '85%',
+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    padding: 12,
+
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+
+    marginBottom: 20,
+  }
 });

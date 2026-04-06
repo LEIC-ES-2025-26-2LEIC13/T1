@@ -8,6 +8,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ThemedButton from './ThemedButton';
 import AppModal from './AppModal';
+import ThemedText from './ThemedText';
 import { Colors } from '../constants/Colors';
 import { useColorScheme } from 'react-native';
 
@@ -24,18 +25,22 @@ export default function InviteWorkspaceModal({
 
   return (
     <AppModal visible={visible}>
-      <Pressable
-        onPress={onClose}
-        style={styles.closeButton}
-        testID="invite-modal-close"
-        accessibilityRole="button"
-        accessibilityLabel="Close invite popup"
-      >
-        <Ionicons name="close" size={20} color={palette.iconColor} />
-      </Pressable>
+      <View style={styles.header}>
+        <ThemedText title={true} style={styles.headerTitle}>
+          Invite to Workspace
+        </ThemedText>
+        <Pressable
+          onPress={onClose}
+          style={styles.closeButton}
+          testID="invite-modal-close"
+          accessibilityRole="button"
+          accessibilityLabel="Close invite popup"
+        >
+          <Ionicons name="close" size={24} color={palette.iconColor} />
+        </Pressable>
+      </View>
 
-      <Text style={[styles.title, { color: palette.title }]}>Invite to the Workspace</Text>
-      <Text style={[styles.subtitle, { color: palette.text }]}>{workspaceName}</Text>
+      <ThemedText style={styles.subtitle}>{workspaceName}</ThemedText>
 
       <TextInput
         value={value}
@@ -53,7 +58,7 @@ export default function InviteWorkspaceModal({
         ]}
       />
 
-      <ThemedButton onPress={onInvite} style={{alignItems: 'center', padding: 12}}>
+      <ThemedButton onPress={onInvite} style={styles.inviteButton}>
         <Text style={styles.inviteButtonText}>Invite</Text>
       </ThemedButton>
     </AppModal>
@@ -61,29 +66,39 @@ export default function InviteWorkspaceModal({
 }
 
 const styles = StyleSheet.create({
-  closeButton: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    padding: 4,
-    zIndex: 1,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 4,
-    paddingRight: 26,
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 8,
+    marginRight: -8,
   },
   subtitle: {
     fontSize: 14,
     marginBottom: 16,
+    opacity: 0.7,
   },
   input: {
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 11,
     paddingHorizontal: 12,
-    marginBottom: 14,
+    marginBottom: 16,
+  },
+  inviteButton: {
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
   },
   inviteButtonText: {
     color: '#ffffff',
@@ -91,3 +106,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+
