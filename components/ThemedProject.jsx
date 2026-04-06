@@ -1,4 +1,4 @@
-import {View, StyleSheet, useColorScheme, Pressable} from 'react-native'
+import { StyleSheet, useColorScheme, Pressable} from 'react-native'
 import {Colors} from "../constants/Colors";
 import ThemedText from "./ThemedText";
 import {useRouter} from "expo-router";
@@ -27,13 +27,14 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderLeftWidth: 5,
         justifyContent: "center",
-        backgroundColor: "#fff"
     },
+
     name: {
         fontSize: 18,
         fontWeight: "bold",
         marginBottom: 4,
     },
+
     description: {
         fontSize: 14,
     }

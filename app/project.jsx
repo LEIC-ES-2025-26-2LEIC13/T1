@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, Text } from 'react-native';
+import {Alert, Pressable, StyleSheet, useColorScheme, Text, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,16 +10,19 @@ import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import TaskModal from '../components/TaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
+import Task from "../components/Task";
 
 export default function Home() {
   const router = useRouter();
   const scheme = useColorScheme();
   const palette = Colors[scheme] ?? Colors.light;
 
-  const [taskModalVisible, setTaskModalVisible] = React.useState(false);
+  const [tasks, setTasks] = React.useState([]); // This will have all existing tasks
   const [taskName, setTaskName] = React.useState('');
   const [taskDetail, setTaskDetail] = React.useState('');
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [taskModalVisible, setTaskModalVisible] = React.useState(false);
+
+  const [inviteModalVisible, setInviteModalVisible] = React.useState(false);
   const [inviteTarget, setInviteTarget] = React.useState('');
 
   const currentProjectName = 'Programming Project';
@@ -38,6 +41,14 @@ export default function Home() {
       return;
     }
 
+    const newTask = {
+        // id: Date.now().toString()
+        name: taskName,
+        description: taskDetail,
+    }
+
+    setTasks(prev => [...prev, newTask]);
+
     closeTaskModal();
 
     Toast.show({
@@ -48,11 +59,11 @@ export default function Home() {
   };
 
   const handleInvitePress = () => {
-    setModalVisible(true);
+    setInviteModalVisible(true);
   };
 
   const handleCloseModal = () => {
-    setModalVisible(false);
+    setInviteModalVisible(false);
     setInviteTarget('');
   };
 
@@ -117,9 +128,10 @@ export default function Home() {
           headerShadowVisible: false,
         }}
       />
+
       <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
         <InviteWorkspaceModal
-          visible={modalVisible}
+          visible={inviteModalVisible}
           value={inviteTarget}
           onChangeText={setInviteTarget}
           onClose={handleCloseModal}
@@ -127,20 +139,30 @@ export default function Home() {
           workspaceName={currentProjectName}
         />
 
+        <View style={{ flex: 1 }}>
+          {tasks.map(({name, description }) => (
+              <Task
+                  key={name}
+                  name={name}
+                  description={description}
+              />
+          ))}
+        </View>
+
         <ThemedButton
           onPress={openTaskModal}
           style={styles.btn}
         >
-          <Text style={{color: 'white'}}>+</Text>
-          <Text style={{color: 'white'}}>Create Task</Text>
+          <Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
+          <Text style={styles.btnText}>Create Task</Text>
         </ThemedButton>
 
         <TaskModal
           visible={taskModalVisible}
           onClose={closeTaskModal}
           onCreate={handleCreateTask}
-          value={taskName}
-          onChangeText={setTaskName}
+          nameValue={taskName}
+          onNameChangeText={setTaskName}
           detailValue={taskDetail}
           onDetailChangeText={setTaskDetail}
           projectName={currentProjectName}
@@ -169,5 +191,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
 
     marginBottom: 20,
+  },
+
+  btnText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   }
 });
