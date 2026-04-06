@@ -154,7 +154,7 @@ The system follows a layered architecture, chosen to keep the code modular and e
 - Presentation layer: React Native screens and reusable UI components (Login/Register, My Projects, Task Modal, Invites, Calendars, Profile).
 - Application layer: use-case oriented services that coordinate user actions and business rules (create project, invite users, assign tasks, move task across columns, accept/decline invites, filter personal tasks, build global/project calendars).
 - Data layer: map external data to the app's exsiting data model, used by the application layer,by abstracting cloud interactions.
-- External services layer: cloud authentication, cloud database and push notifications used for login, data persistence and synchronization and real-time updates, respectively.
+- External services layer: cloud authentication, cloud database and push notifications used for login, data persistence and synchronization and real-time notifications, respectively.
 
 ### Architectural Patterns
 As described above, the high-level architecture is organized in layers with clear separation and modularity.
@@ -215,6 +215,7 @@ The physical architecture includes three main deployment nodes:
 - Cloud backend 
   - Authentication service.
   - Real-time database service.
+  - Push notification service.
   - Responsibilities: account management, authorization checks, persistent storage, and multi-user synchronization.
 
 - Data:
