@@ -1,5 +1,4 @@
 import {
-  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -8,6 +7,10 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ThemedButton from './ThemedButton';
+import AppModal from './AppModal';
+import ThemedText from './ThemedText';
+import { Colors } from '../constants/Colors';
+import { useColorScheme } from 'react-native';
 
 export default function InviteWorkspaceModal({
   visible,
@@ -15,94 +18,87 @@ export default function InviteWorkspaceModal({
   onChangeText,
   onClose,
   onInvite,
-  palette,
   workspaceName,
 }) {
+  const colorScheme = useColorScheme();
+  const palette = Colors[colorScheme] ?? Colors.light;
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay} testID="invite-modal-overlay">
-        <View style={[styles.modalCard, { backgroundColor: palette.navBackground }]}>
-          <Pressable
-            onPress={onClose}
-            style={styles.closeButton}
-            testID="invite-modal-close"
-            accessibilityRole="button"
-            accessibilityLabel="Close invite popup"
-          >
-            <Ionicons name="close" size={20} color={palette.iconColor} />
-          </Pressable>
-
-          <Text style={[styles.title, { color: palette.title }]}>Invite to the Workspace</Text>
-          <Text style={[styles.subtitle, { color: palette.text }]}>{workspaceName}</Text>
-
-          <TextInput
-            value={value}
-            onChangeText={onChangeText}
-            testID="invite-username-input"
-            placeholder="Enter username"
-            placeholderTextColor={palette.iconColor}
-            style={[
-              styles.input,
-              {
-                color: palette.title,
-                borderColor: palette.iconColor,
-                backgroundColor: palette.inputTextBackground,
-              },
-            ]}
-          />
-
-          <ThemedButton onPress={onInvite} style={{alignItems: 'center', padding: 12}}>
-            <Text style={styles.inviteButtonText}>Invite</Text>
-          </ThemedButton>
-        </View>
+    <AppModal visible={visible}>
+      <View style={styles.header}>
+        <ThemedText title={true} style={styles.headerTitle}>
+          Invite to Workspace
+        </ThemedText>
+        <Pressable
+          onPress={onClose}
+          style={styles.closeButton}
+          testID="invite-modal-close"
+          accessibilityRole="button"
+          accessibilityLabel="Close invite popup"
+        >
+          <Ionicons name="close" size={24} color={palette.iconColor} />
+        </Pressable>
       </View>
-    </Modal>
+
+      <ThemedText style={styles.subtitle}>{workspaceName}</ThemedText>
+
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        testID="invite-username-input"
+        placeholder="Enter username"
+        placeholderTextColor={palette.iconColor}
+        style={[
+          styles.input,
+          {
+            color: palette.title,
+            borderColor: palette.iconColor,
+            backgroundColor: palette.navBackground,
+          },
+        ]}
+      />
+
+      <ThemedButton onPress={onInvite} style={styles.inviteButton}>
+        <Text style={styles.inviteButtonText}>Invite</Text>
+      </ThemedButton>
+    </AppModal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.45)',
-    justifyContent: 'center',
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
   },
-  modalCard: {
-    width: '100%',
-    maxWidth: 360,
-    borderRadius: 16,
-    padding: 20,
-    position: 'relative',
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   closeButton: {
-    position: 'absolute',
-    right: 12,
-    top: 12,
-    padding: 4,
-    zIndex: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 4,
-    paddingRight: 26,
+    padding: 8,
+    marginRight: -8,
   },
   subtitle: {
     fontSize: 14,
     marginBottom: 16,
+    opacity: 0.7,
   },
   input: {
     borderWidth: 1,
     borderRadius: 10,
     paddingVertical: 11,
     paddingHorizontal: 12,
-    marginBottom: 14,
+    marginBottom: 16,
+  },
+  inviteButton: {
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
   },
   inviteButtonText: {
     color: '#ffffff',
@@ -110,3 +106,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+

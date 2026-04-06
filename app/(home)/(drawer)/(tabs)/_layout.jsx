@@ -1,7 +1,8 @@
 import { Tabs } from "expo-router"
-import { View, Text, useColorScheme } from "react-native"
-import { Colors } from "../../constants/Colors"
+import { useColorScheme } from "react-native"
+import { Colors } from "../../../../constants/Colors"
 import { Ionicons } from "@expo/vector-icons"
+import {DrawerToggleButton} from "@react-navigation/drawer";
 
 export default function DashboardLayout() {
     const colorScheme = useColorScheme()
@@ -31,6 +32,8 @@ export default function DashboardLayout() {
 
                 tabBarActiveTintColor: theme.iconColorFocused,
                 tabBarInactiveTintColor: theme.iconColor,
+
+                headerLeft: () => <DrawerToggleButton/>
             }}
         >
             <Tabs.Screen

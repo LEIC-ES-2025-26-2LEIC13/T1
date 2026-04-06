@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, useColorScheme} from "react-native";
-import {Colors} from "../../constants/Colors";
+import {Colors} from "../../../../constants/Colors";
 
 const Profile = () => {
     const colorScheme = useColorScheme();
