@@ -159,9 +159,6 @@ The system follows a layered architecture, chosen to keep the code modular and e
 ### Architectural Patterns
 As described above, the high-level architecture is organized in layers with clear separation and modularity.
 
-Regarding design patterns....
-
-
 <!--
 The architecture of a software system encompasses the set of key decisions about its organization. 
 
@@ -188,7 +185,7 @@ Logical modules are organized as follows.
 #### In-app modules
 - UI module: comprised by screens and UI components to easily interact with Authentication, My Projects, current Project Board, Task Detail/Creation Modal, My Tasks, Global Calendar, Project Calendar, Invites, Profile.
 
-- Application module (use cases): used to fetch, manipulate and coordinate data inbetween layers, implementing the core functionality of the app, such as:
+- Application module (use cases): used to fetch, manipulate and coordinate data in-between layers, implementing the core functionality of the app, such as:
   - Auth: login, register, logout, session restore.
   - Project management: create project, load templates, create from template, invite member.
   - Task creation: create/edit task, assign member, move task between columns, comment, set deadlines and labels.
