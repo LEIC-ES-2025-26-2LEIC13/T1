@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Update npm dependencies (JavaScript/Node.js)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly # Can be daily, weekly, or monthly
+      day: monday      # Optional: specify the day for weekly updates
+      
+  # Update GitHub Actions in your workflows
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
