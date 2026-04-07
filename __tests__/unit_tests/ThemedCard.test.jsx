@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react-native'
 import { useColorScheme } from 'react-native'
-import { Colors } from '../constants/Colors'
-import ThemedCard from '../components/ThemedCard'
+import { Colors } from '../../constants/Colors'
+import ThemedCard from '../../components/ThemedCard'
 
 // every time the module 'react-native' is imported in tests, the mock implementation will be used instead of the actual module
 jest.mock('react-native', () => {

@@ -3,7 +3,7 @@ import {Alert, Pressable, StyleSheet, useColorScheme, Text, View} from 'react-na
 import Toast from 'react-native-toast-message';
 import { useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';

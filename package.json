@@ -13,14 +13,18 @@
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
+    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|@expo/vector-icons|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ]
   },
   "dependencies": {
     "@react-navigation/drawer": "^7.9.8",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "29.5.14",
     "expo": "~55.0.8",
     "expo-router": "~55.0.7",
     "expo-status-bar": "~55.0.4",
+    "jest": "~29.7.0",
+    "jest-expo": "~55.0.14",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-native": "0.83.2",
