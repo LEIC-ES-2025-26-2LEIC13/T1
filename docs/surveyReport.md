@@ -97,7 +97,7 @@ Although AI tools and also class materials are useful, guidance from students th
 
 ## Frustrations with Current Tools
 
-**Finding:** Most students expressed frustration regarding the lack of features on free versions of tools, essentially limiting their ability to fullfill simple project management needs.
+**Finding:** Most students expressed frustration regarding the lack of features on free versions of tools, essentially limiting their ability to fulfill simple project management needs.
 
 Key features are often locked behind paywalls.
 
