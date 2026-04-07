@@ -104,6 +104,10 @@ Optionally, indicate an initial/tentative list of assumptions that you are doing
 
 ## Requirements
 
+### Requirement validation
+To validate the requirements and idealized features, a survey using the platform Tally was conducted among L.EIC students to understand their needs and preferences regarding the problem that the app aims to solve.
+The full report can be found here: [Survey Report](docs/surveyReport.md).
+
 ### User Stories
 <!-- 
 In this section you should describe all kinds of requirements for your module: functional and non-functional requirements.
