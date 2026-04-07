@@ -91,7 +91,7 @@ Although AI tools and also class materials are useful, guidance from students th
 
 ## What Students Appreciated About Existing Tools
 
-**Finding:** More on the coding side, students appreaciated Github Project for easier board management and direct integration with code repositories, while Trello and Notion were referenced for their user-friendly interfaces and flexibility in organizing tasks and information.
+**Finding:** More on the coding side, students appreciated Github Project for easier board management and direct integration with code repositories, while Trello and Notion were referenced for their user-friendly interfaces and flexibility in organizing tasks and information.
 
 ---
 
