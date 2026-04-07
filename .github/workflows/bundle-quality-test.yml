@@ -1,4 +1,4 @@
-name: CI - Tests & Quality
+name: CI - Bundle, Tests & Quality
 
 on:
   push:
