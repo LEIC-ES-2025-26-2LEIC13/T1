@@ -31,4 +31,5 @@ jobs:
         run: npm run lint --if-present
 
       - name: Run Tests with Coverage
-        run: npm test -- --coverage
+        run: npm test -- --coverage --clearCache
+        

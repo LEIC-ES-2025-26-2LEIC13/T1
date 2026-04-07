@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
-import { UserProvider } from "../contexts/userContext"
-import { useUser } from "../hooks/useUser"
+import { UserProvider } from "../../contexts/userContext"
+import { useUser } from "../../hooks/useUser"
 
 describe("useUser", () => {
 

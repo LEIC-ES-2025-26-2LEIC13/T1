@@ -31,6 +31,7 @@ const Login = () => {
 
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
+              testID="login-username-input"
               placeholder="Username"
               onChangeText={setUsername} // setter function of the state variable
               value={username} // what will be displayed
@@ -38,6 +39,7 @@ const Login = () => {
 
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
+              testID="login-password-input"
               placeholder="Password"
               onChangeText={setPassword}
               value={password}
@@ -46,7 +48,7 @@ const Login = () => {
 
             <Spacer />
 
-            <ThemedButton onPress={handleSubmit} style={{width: '80%', alignItems: 'center'}}>
+            <ThemedButton testID="login-submit-button" onPress={handleSubmit} style={{width: '80%', alignItems: 'center'}}>
                 <Text style={{color: "#ffffff"}}>Login</Text>
             </ThemedButton>
 
