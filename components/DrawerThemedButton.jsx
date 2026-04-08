@@ -1,5 +1,5 @@
 import {useNavigation} from "expo-router";
-import {Pressable, TouchableOpacity, useColorScheme} from "react-native";
+import {Pressable, useColorScheme} from "react-native";
 import {DrawerActions} from "@react-navigation/routers";
 import {Ionicons} from "@expo/vector-icons";
 import {Colors} from "../constants/Colors";

@@ -1,9 +1,7 @@
 import { Drawer } from "expo-router/drawer";
-import {TouchableOpacity, useColorScheme} from "react-native";
+import {useColorScheme} from "react-native";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import {useNavigation} from "expo-router";
-import {DrawerActions} from "@react-navigation/routers";
 import DrawerThemedButton from "../../../components/DrawerThemedButton";
 
 export default function DrawerLayout() {

@@ -1,8 +1,7 @@
-import {Tabs, useNavigation} from "expo-router"
-import {TouchableOpacity, useColorScheme} from "react-native"
+import {Tabs} from "expo-router"
+import {useColorScheme} from "react-native"
 import { Colors } from "../../../../constants/Colors"
 import { Ionicons } from "@expo/vector-icons"
-import {DrawerActions} from "@react-navigation/routers";
 import DrawerThemedButton from "../../../../components/DrawerThemedButton";
 
 export default function DashboardLayout() {

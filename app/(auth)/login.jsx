@@ -90,7 +90,7 @@ const Login = () => {
 
             <Spacer />
 
-            <Text style={{color: '#aaa'}}>Don't have an account? </Text>
+            <Text style={{color: '#aaa'}}>Don&apos;t have an account? </Text>
             <Spacer height={10}/>
             <ThemedButton
               onPress={() => router.push('/(auth)/register')}
