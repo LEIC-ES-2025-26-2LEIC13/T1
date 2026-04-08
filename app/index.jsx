@@ -1,17 +1,14 @@
 import { Link } from "expo-router";
 import { StyleSheet } from "react-native";
-import { useUser } from "../hooks/useUser";
 // themed components
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
 
 const App = () => {
 
-  const { user } = useUser()
-
   return(
       <ThemedView style={styles.container}>
-          <ThemedText title={true} style={styles.title}>Hello, {user}!</ThemedText>
+          <ThemedText title={true} style={styles.title}>Hello!</ThemedText>
           <Link style={styles.link} href="/project_tab">
               Click me
           </Link>

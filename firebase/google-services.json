@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753470140358",
+    "project_id": "leico-53362",
+    "storage_bucket": "leico-53362.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753470140358:android:885a6e99a1610e39d9ccc7",
+        "android_client_info": {
+          "package_name": "com.anonymous.LEICo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVTDkoiOY5T_5sE_cOrL1Sl1deL2U3NNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
