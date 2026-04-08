@@ -4,13 +4,13 @@ import {
   Text,
   TextInput,
   View,
+  useColorScheme
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ThemedButton from './ThemedButton';
 import AppModal from './AppModal';
 import ThemedText from './ThemedText';
 import { Colors } from '../constants/Colors';
-import { useColorScheme } from 'react-native';
 
 export default function InviteWorkspaceModal({
   visible,

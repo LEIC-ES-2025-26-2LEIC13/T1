@@ -1,5 +1,4 @@
-import React from 'react';
-import {Text, TextInput, StyleSheet, useColorScheme} from 'react-native';
+import {Text, StyleSheet} from 'react-native';
 import AppModal from './AppModal';
 import ThemedText from "./ThemedText";
 import Spacer from "./Spacer";
