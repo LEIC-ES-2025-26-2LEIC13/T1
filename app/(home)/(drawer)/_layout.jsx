@@ -1,7 +1,10 @@
 import { Drawer } from "expo-router/drawer";
-import { useColorScheme } from "react-native";
+import {TouchableOpacity, useColorScheme} from "react-native";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import {useNavigation} from "expo-router";
+import {DrawerActions} from "@react-navigation/routers";
+import DrawerThemedButton from "../../../components/DrawerThemedButton";
 
 export default function DrawerLayout() {
     const colorScheme = useColorScheme();
@@ -13,6 +16,7 @@ export default function DrawerLayout() {
                 headerStyle: { backgroundColor: theme.navBackground },
                 headerTintColor: theme.title,
                 headerTitleAlign: "left",
+
                 headerTitleStyle: {
                     color: theme.title,
                     fontWeight: "700",
@@ -20,11 +24,15 @@ export default function DrawerLayout() {
                     lineHeight: 34,
                     marginLeft: 10,
                 },
+
                 drawerActiveTintColor: theme.iconColorFocused,
                 drawerInactiveTintColor: theme.iconColor,
+
                 drawerStyle: {
                     backgroundColor: theme.navBackground,
                 },
+
+                headerLeft: () => <DrawerThemedButton/>
             }}
         >
             <Drawer.Screen
