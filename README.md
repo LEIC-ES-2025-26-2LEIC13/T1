@@ -1,16 +1,16 @@
 <!-- Template file for README.md for LEIC-ES-2025-26 -->
-
+<!--
 > [!NOTE] In this file, you will find the structure you should follow to document your mobile app in the README.md file for LEIC-ES-2025-26. It is a single file with guidelines, as comments, only seen in Edit mode, not in Preview mode. You can add more sections, but for assessment reasons and automation, please make sure to include all sections of this template. Your professors will clarify about specificities of your app.
+-->
+# _LEICo_ Development Report
 
-# _[your product name]_ Development Report
+Welcome to the documentation of _LEICo_!
 
-Welcome to the documentation of _[your product name]_!
-
-This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _[your product name]_, starting from an high-level vision and going into low-level implementation decisions. 
+This Software Development Report, tailored for LEIC-ES-2025-26, provides comprehensive details about _LEICo_, starting from an high-level vision and going into low-level implementation decisions. 
 
 It is organised by the following activities: 
 
-- [_\[your product name\]_ Development Report](#your-product-name-development-report)
+- [_LEICo_ Development Report](#your-product-name-development-report)
   - [Business Modelling](#business-modelling)
     - [Product Vision](#product-vision)
     - [Features and Assumptions](#features-and-assumptions)
@@ -35,11 +35,11 @@ Please contact us!
 
 Thank you!
 
-* team member name and email
-* team member name and email
-* team member name and email
-* team member name and email
-* team member name and email
+* Ana Miguel Moreira Teixeira, up202208672@edu.fe.up.pt
+* Gabriel Nunes Ribeiro de Magalhães, up202405890@edu.fe.up.pt
+* Jorge Guilherme Freire da Cunha, up202405961@edu.fe.up.pt
+* Pedro Afonso Seixas Pires, up202405967@edu.fe.up.pt
+
 
 ---
 ## Business Modelling
@@ -78,29 +78,29 @@ Indicate an  initial/tentative list of high-level features - high-level capabili
 
 Optionally, indicate an initial/tentative list of assumptions that you are doing about the app and dependencies of the app to other systems.
 -->
-- Create an account - each user of our app must be associated with a personal account, so they can access their projects, boards and tasks.
-- Login authentication - to access their personal data, the user ust be able to log into the app.
+- **Create an account** - each user of our app must be associated with a personal account, so they can access their projects, boards and tasks.
+- **Login authentication** - to access their personal data, the user ust be able to log into the app.
 
-- Custom template for each project - there will be a specifically-designed template, with predefined tasks, conceived to better address each project's needs.
-- Create project board - a user can create his own project board from scratch if he does not want to use the custom template
-- Add or edit custom columns - in any project board (template or not), the user may create new columns or edit existing ones to better fit his needs
+- **Custom template for each project** - there will be a specifically-designed template, with predefined tasks, conceived to better address each project's needs.
+- **Create project board** - a user can create his own project board from scratch if he does not want to use the custom template
+- **Add or edit custom columns** - in any project board (template or not), the user may create new columns or edit existing ones to better fit his needs
 
-- Predefined tasks - each template will have default tasks to guide the workflow of that project.
-- Creating tasks - in addition to the already existing tasks, the user can add his own personalized tasks.
-- Move tasks between columns (advanced) - the user may easily change the column of a task by dragging it to the desired column
-- Hints/suggestions in templates - some costum templates will have suggestions that the user may choose or not to follow as he organises his board
+- **Predefined tasks** - each template will have default tasks to guide the workflow of that project.
+- **Creating tasks** - in addition to the already existing tasks, the user can add his own personalized tasks.
+- **Move tasks between columns** (advanced) - the user may easily change the column of a task by dragging it to the desired column
+- **Hints/suggestions in templates** - some costum templates will have suggestions that the user may choose or not to follow as he organises his board
 
-- Invite members to project - the user can invite other users to join his collaborative project
-- Join workspace via invite - an invited user must be able to accept the invitation to collaborate in a given project, so they can start contributing
+- **Invite members to project** - the user can invite other users to join his collaborative project
+- **Join workspace via invite** - an invited user must be able to accept the invitation to collaborate in a given project, so they can start contributing
 
-- Assign tasks to users - when in a collaborative project, a user can assign a task to another team member
-- Comment on tasks - a user can add a comment to a task, for example to provide useful information to the assigned person undertaking it
-- Add a deadline - a user can add a deadline to a task so it becomes trackable
-- Add labels to tasks - a user can add a label to a task to be able to filter them by label
+- **Assign tasks to users** - when in a collaborative project, a user can assign a task to another team member
+- **Comment on tasks** - a user can add a comment to a task, for example to provide useful information to the assigned person undertaking it
+- **Add a deadline** - a user can add a deadline to a task so it becomes trackable
+- **Add labels to tasks** - a user can add a label to a task to be able to filter them by label
 
-- View personal tasks - a team member in a project can see all the tasks assigned to them clearly in a list, to better organize themselves
-- View deadline-ordered tasks - a user can see all his personal tasks ordered by the upcoming deadlines
-- View tasks ordered by labels - a user can choose to view the tasks ordered by labels
+- **View personal tasks** - a team member in a project can see all the tasks assigned to them clearly in a list, to better organize themselves
+- **View deadline-ordered tasks** - a user can see all his personal tasks ordered by the upcoming deadlines
+- **View tasks ordered by labels** - a user can choose to view the tasks ordered by labels
 
 ## Requirements
 
