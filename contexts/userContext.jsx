@@ -1,31 +1,80 @@
-import { createContext, useState } from "react"
+import { createContext, useState, useEffect, useMemo } from "react"
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
+import { auth } from "../firebase/firebaseConfig"
 
 export const UserContext = createContext(null)
 
-// only correct username-password pair, for now
-const VALID_USERNAME = 'John Doe'
-const VALID_PASSWORD = '1234'
+export function UserProvider({ children }) {
+    const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
 
-export function UserProvider({ children }) { // children captures the content placed between opening and closing <UserProvider> tags
-    const [user, setUser] = useState(null) // user will be null in the beginning (not authenticated, because null value is "falsy": see code in _layout.jsx)
-    const [isLoading, setIsLoading] = useState(null)
+    // Listen to auth state changes on component mount
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser)
+            setIsLoading(false)
+        })
+        return () => unsubscribe()
+    }, [])
 
-    async function login(username, password) {
-        setIsLoading(true) // for future API use (useful in loading / spinning buttons so that the user knows smth is happening)
+    async function login(email, password) {
+        setIsLoading(true)
         try {
-            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                setUser(username)
-                return true // successful login
-            }
-            return false // unsuccessful login
+            const userCredential = await signInWithEmailAndPassword(auth, email, password)
+            setUser(userCredential.user)
+            return true
 
-        } finally { // always happens
+        } catch (error) {
+            console.error("Login error:", error.code, error.message)
+            throw error // Pass the error up so the component can handle it
+
+        } finally {
             setIsLoading(false)
         }
     }
 
+    async function register(email, password) {
+        setIsLoading(true)
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+            setUser(userCredential.user)
+            return true
+
+        } catch (error) {
+            console.error("Register error:", error.code, error.message)
+            throw error // Pass the error up so the component can handle it
+
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    async function logout() {
+        setIsLoading(true)
+        try {
+            await signOut(auth)
+            setUser(null)
+            return true
+
+        } catch (error) {
+            console.error("Logout error:", error.message)
+            return false
+
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const value = useMemo(() => ({
+        user,
+        isLoading,
+        login,
+        register,
+        logout
+    }), [user, isLoading])
+
     return (
-        <UserContext.Provider value={{ user, isLoading, login }}>
+        <UserContext.Provider value={value}>
             {children}
         </UserContext.Provider>
     )

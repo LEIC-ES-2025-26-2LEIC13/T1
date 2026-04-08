@@ -1,6 +1,7 @@
 import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, Alert } from 'react-native'
 import { useState } from 'react'
 import { useUser } from '../../hooks/useUser'
+import { useRouter } from 'expo-router'
 
 // themed components
 import ThemedView from '../../components/ThemedView'
@@ -10,14 +11,40 @@ import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
 
 const Login = () => {
-    const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
 
     const { login } = useUser() // destructuring the return value of the useUser custom hook
+    const router = useRouter()
 
     const handleSubmit = async () => {
-        const success = await login(username, password)
-        if (!success) Alert.alert("Invalid credentials", "Please insert correct credentials.")
+        if (!email || !password) {
+            Alert.alert("Missing fields", "Please enter both email and password.")
+            return
+        }
+
+        setLoading(true)
+        try {
+            await login(email, password)
+        } catch (error) {
+            // Handle specific Firebase errors
+            let errorMessage = error.message
+            if (error.code === 'auth/user-not-found') {
+                errorMessage = "No account found with this email. Please register first."
+            } else if (error.code === 'auth/wrong-password') {
+                errorMessage = "Incorrect password. Please try again."
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage = "The email address is invalid."
+            } else if (error.code === 'auth/user-disabled') {
+                errorMessage = "This account has been disabled."
+            } else if (error.code === 'auth/too-many-requests') {
+                errorMessage = "Too many failed login attempts. Please try again later."
+            }
+            Alert.alert("Login Error", errorMessage)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -31,10 +58,13 @@ const Login = () => {
 
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
-              testID="login-username-input"
-              placeholder="Username"
-              onChangeText={setUsername} // setter function of the state variable
-              value={username} // what will be displayed
+              testID="login-email-input"
+              placeholder="Email"
+              onChangeText={setEmail}
+              value={email}
+              editable={!loading}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
 
             <ThemedTextInput
@@ -43,14 +73,33 @@ const Login = () => {
               placeholder="Password"
               onChangeText={setPassword}
               value={password}
+              editable={!loading}
               secureTextEntry
             />
 
             <Spacer />
 
-            <ThemedButton testID="login-submit-button" onPress={handleSubmit} style={{width: '80%', alignItems: 'center'}}>
-                <Text style={{color: "#ffffff"}}>Login</Text>
+            <ThemedButton
+              testID="login-submit-button"
+              onPress={handleSubmit}
+              disabled={loading}
+              style={{width: '80%', alignItems: 'center'}}
+            >
+                <Text style={{color: "#ffffff"}}>{loading ? "Logging in..." : "Login"}</Text>
             </ThemedButton>
+
+            <Spacer />
+
+            <Text style={{color: '#aaa'}}>Don't have an account? </Text>
+            <Spacer height={10}/>
+            <ThemedButton
+              onPress={() => router.push('/(auth)/register')}
+              disabled={loading}
+              style={{paddingVertical: 8}}
+            >
+                <Text style={{color: "#ffffff"}}>Register here</Text>
+            </ThemedButton>
+
 
         </ThemedView>
       </TouchableWithoutFeedback>
