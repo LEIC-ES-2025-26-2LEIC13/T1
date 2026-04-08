@@ -1,0 +1,20 @@
+appId: com.anonymous.LEICo
+tags:
+  - navigation
+---
+- launchApp
+
+# login + navigation
+- tapOn: Username
+- inputText: John Doe
+- tapOn: Password
+- inputText: "1234"
+- tapOn: Login
+- tapOn: Click me
+
+- tapOn:
+    point: 5%,5%
+
+- tapOn: My Tasks
+
+- assertVisible: My Tasks

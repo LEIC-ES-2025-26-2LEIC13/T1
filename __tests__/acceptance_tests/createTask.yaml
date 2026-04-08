@@ -1,0 +1,32 @@
+appId: com.anonymous.LEICo
+tags:
+  - task
+---
+- launchApp
+
+- launchApp
+
+# login + navigation
+- tapOn: Username
+- inputText: John Doe
+- tapOn: Password
+- inputText: "1234"
+- tapOn: Login
+- tapOn: Click me
+- tapOn: Project 1
+
+# open modal
+- tapOn: Create Task
+
+- tapOn: Enter task name
+- inputText: New Task
+
+- tapOn: Enter task description
+- inputText: Task description
+
+- hideKeyboard
+- tapOn: Create Task
+
+- assertVisible: Task created
+- assertVisible: New task
+- assertVisible: Task description

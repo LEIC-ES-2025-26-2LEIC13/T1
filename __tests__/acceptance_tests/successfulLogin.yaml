@@ -12,4 +12,4 @@ tags:
 - tapOn: Login
 - assertVisible: Home
 - assertVisible: Hello, John Doe!
-- assertVisible: Here is your personal data.
+- assertVisible: Click me
