@@ -28,7 +28,7 @@ jobs:
         run: npx expo export --platform android --output-dir /tmp/expo-export
           
       - name: Run Linter
-        run: npx expo lint
+        run: npm run lint
 
       - name: Run Tests with Coverage
         run: npm test -- --coverage --clearCache
