@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDZFVNfCRkt_KFxBCHoUfie64sw4--OLns</string>
+	<string>AIzaSyDiZaJERRWD0aIsS5urpOveLcsGDLK57r0</string>
 	<key>GCM_SENDER_ID</key>
-	<string>753470140358</string>
+	<string>891799791867</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.anonymous.LEICo</string>
 	<key>PROJECT_ID</key>
-	<string>leico-53362</string>
+	<string>leico-test</string>
 	<key>STORAGE_BUCKET</key>
-	<string>leico-53362.firebasestorage.app</string>
+	<string>leico-test.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:753470140358:ios:30e23adbd7b5f4efd9ccc7</string>
+	<string>1:891799791867:ios:5dabf0ff816345bfe3a85e</string>
 </dict>
 </plist>

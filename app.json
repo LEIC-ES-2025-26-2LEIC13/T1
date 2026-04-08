@@ -16,7 +16,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "googleServicesFile": "firebase/GoogleService-Info.plist",
+      "googleServicesFile": "./firebase/GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.LEICo",
       "infoPlist": {
@@ -24,7 +24,7 @@
       }
     },
     "android": {
-      "googleServicesFile": "firebase/google-services.json",
+      "googleServicesFile": "./firebase/google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

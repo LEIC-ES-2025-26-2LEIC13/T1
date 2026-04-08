@@ -1,38 +1,48 @@
-import { Link } from "expo-router";
-import { StyleSheet } from "react-native";
-// themed components
-import ThemedView from '../components/ThemedView'
-import ThemedText from '../components/ThemedText'
+// app/App.js
+import { useEffect } from "react"
+import { ActivityIndicator, StyleSheet } from "react-native"
+import { useUser } from "../hooks/useUser"
+import { useRouter } from "expo-router"
+import ThemedView from "../components/ThemedView"
+import ThemedText from "../components/ThemedText"
 
 const App = () => {
+    const { user, isLoading } = useUser()
+    const router = useRouter()
 
-  return(
-      <ThemedView style={styles.container}>
-          <ThemedText title={true} style={styles.title}>Hello!</ThemedText>
-          <Link style={styles.link} href="/project_tab">
-              Click me
-          </Link>
-      </ThemedView>
-  )
+    useEffect(() => {
+        if (!isLoading) {
+            if (user) {
+                // User is logged in → go to home/project_tab
+                router.replace("/(home)/(tabs)/project_tab")
+            } else {
+                // User is not logged in → go to login screen
+                router.replace("/(auth)/login")
+            }
+        }
+    }, [user, isLoading])
+
+    return (
+        <ThemedView style={styles.container}>
+            <ActivityIndicator size="large" color="#000" />
+            <ThemedText style={styles.text}>
+                {isLoading ? "Checking authentication..." : "Redirecting..."}
+            </ThemedText>
+        </ThemedView>
+    )
 }
 
-export default App;
+export default App
 
-const styles =  StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
-
-    title: {
-      fontWeight: 'bold',
-      fontSize: 18
+    text: {
+        marginTop: 15,
+        fontSize: 16,
+        color: "#555",
     },
-
-    link: {
-      marginVertical: 10,
-      borderBottomWidth: 1
-    }
-});
+})

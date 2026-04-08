@@ -1,28 +1,19 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from "firebase/app"
+import { initializeAuth, getReactNativePersistence } from "firebase/auth"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyChFY5K8ApRn1wtcsXwU3UeJBtV1rxZPrY",
-    authDomain: "leico-53362.firebaseapp.com",
-    projectId: "leico-53362",
-    storageBucket: "leico-53362.firebasestorage.app",
-    messagingSenderId: "753470140358",
-    appId: "1:753470140358:web:763e865479c3164dd9ccc7"
+    apiKey: "AIzaSyA15meIH1cbXBgXra7sJEuyc5-phqyfEM8",
+    authDomain: "leico-test.firebaseapp.com",
+    projectId: "leico-test",
+    storageBucket: "leico-test.firebasestorage.app",
+    messagingSenderId: "891799791867",
+    appId: "1:891799791867:web:ca69803e0a8602aee3a85e"
 };
 
 // Initialize Firebase
-let app;
-let auth;
+const app = initializeApp(firebaseConfig);
 
-try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    console.log("Firebase initialized successfully");
-} catch (error) {
-    console.error("Failed to initialize Firebase:", error.code, error.message);
-}
-
-export { auth };
-export default app;
+export const auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage)
+})
