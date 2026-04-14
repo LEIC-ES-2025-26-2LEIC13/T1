@@ -19,7 +19,7 @@ jobs:
           mkdir -p build
           npx eas-cli build --platform android --profile production \
             --local --non-interactive --output=./build/app.apk
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with: { name: android-apk, path: build/app.apk }
 
   release:
