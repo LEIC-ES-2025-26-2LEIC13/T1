@@ -110,12 +110,22 @@ export default function Home() {
             </ThemedText>
           ),
           headerLeft: () => (
-            <Pressable onPress={handleGoBack} hitSlop={10}>
+            <Pressable onPress={handleGoBack} hitSlop={10} style={{
+              width: 40,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
               <Ionicons name="arrow-back" size={24} color={palette.title} />
             </Pressable>
           ),
           headerRight: () => (
-            <Pressable onPress={handleInvitePress} hitSlop={10}>
+            <Pressable onPress={handleInvitePress} hitSlop={10} style={{
+              width: 40,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
               <Ionicons name="person-add" size={24} color={palette.title} />
             </Pressable>
           ),

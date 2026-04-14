@@ -3,6 +3,7 @@ import {useColorScheme} from "react-native";
 import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import DrawerThemedButton from "../../../components/DrawerThemedButton";
+import CustomDrawerContent from "../../../components/CustomDrawerContent";
 
 export default function DrawerLayout() {
     const colorScheme = useColorScheme();
@@ -10,6 +11,7 @@ export default function DrawerLayout() {
 
     return (
         <Drawer
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={{
                 headerStyle: { backgroundColor: theme.navBackground },
                 headerTintColor: theme.title,
@@ -89,7 +91,7 @@ export default function DrawerLayout() {
                     ),
                 }}
             />
-
+            {/*
             <Drawer.Screen
                 name="settings"
                 options={{
@@ -102,7 +104,7 @@ export default function DrawerLayout() {
                         />
                     ),
                 }}
-            />
+            />*/}
         </Drawer>
     );
 }
