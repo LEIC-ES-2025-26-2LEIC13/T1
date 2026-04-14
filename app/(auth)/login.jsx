@@ -1,4 +1,4 @@
-import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, Alert } from 'react-native'
+import {StyleSheet, Text, Alert, Keyboard, ScrollView} from 'react-native'
 import { useState } from 'react'
 import { useUser } from '../../hooks/useUser'
 import { useRouter } from 'expo-router'
@@ -48,61 +48,63 @@ const Login = () => {
     }
 
     return (
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ThemedView style={styles.container}>
-
-            <ThemedText title={true} style={styles.title}>Welcome Back!</ThemedText>
-            <ThemedText style={styles.subtitle}>Login to continue</ThemedText>
-            
-            <Spacer />
-
-            <ThemedTextInput
-              style={{ width: '80%', marginBottom: 20}}
-              testID="login-email-input"
-              placeholder="Email"
-              onChangeText={setEmail}
-              value={email}
-              editable={!loading}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-
-            <ThemedTextInput
-              style={{ width: '80%', marginBottom: 20}}
-              testID="login-password-input"
-              placeholder="Password"
-              onChangeText={setPassword}
-              value={password}
-              editable={!loading}
-              secureTextEntry
-            />
-
-            <Spacer />
-
-            <ThemedButton
-              testID="login-submit-button"
-              onPress={handleSubmit}
-              disabled={loading}
-              style={{width: '80%', alignItems: 'center'}}
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                scrollEnabled={false}
+                onTouchStart={Keyboard.dismiss}
             >
-                <Text style={{color: "#ffffff"}}>{loading ? "Logging in..." : "Login"}</Text>
-            </ThemedButton>
+                <ThemedText title={true} style={styles.title}>Welcome Back!</ThemedText>
+                <ThemedText style={styles.subtitle}>Login to continue</ThemedText>
 
-            <Spacer />
-
-            <Text style={{color: '#aaa'}}>Don&apos;t have an account? </Text>
-            <Spacer height={10}/>
-            <ThemedButton
-              onPress={() => router.push('/(auth)/register')}
-              disabled={loading}
-              style={{paddingVertical: 8}}
-            >
-                <Text style={{color: "#ffffff"}}>Register here</Text>
-            </ThemedButton>
+                <Spacer />
 
 
+                <ThemedTextInput
+                  style={{ width: '80%', marginBottom: 20}}
+                  testID="login-email-input"
+                  placeholder="Email"
+                  onChangeText={setEmail}
+                  value={email}
+                  editable={!loading}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+
+                <ThemedTextInput
+                  style={{ width: '80%', marginBottom: 20}}
+                  testID="login-password-input"
+                  placeholder="Password"
+                  onChangeText={setPassword}
+                  value={password}
+                  editable={!loading}
+                  secureTextEntry
+                />
+
+                <Spacer />
+
+                <ThemedButton
+                  testID="login-submit-button"
+                  onPress={handleSubmit}
+                  disabled={loading}
+                  style={{width: '80%', alignItems: 'center'}}
+                >
+                    <Text style={{color: "#ffffff"}}>{loading ? "Logging in..." : "Login"}</Text>
+                </ThemedButton>
+
+                <Spacer />
+
+                <Text style={{color: '#aaa'}}>Don&apos;t have an account? </Text>
+                <Spacer height={10}/>
+                <ThemedButton
+                  onPress={() => router.push('/(auth)/register')}
+                  disabled={loading}
+                  style={{paddingVertical: 8}}
+                >
+                    <Text style={{color: "#ffffff"}}>Register here</Text>
+                </ThemedButton>
+            </ScrollView>
         </ThemedView>
-      </TouchableWithoutFeedback>
     )
 }
 
@@ -110,6 +112,10 @@ export default Login
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+    },
+
+    scrollContent: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'

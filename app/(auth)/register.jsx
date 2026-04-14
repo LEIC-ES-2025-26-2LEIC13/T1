@@ -66,6 +66,7 @@ const Register = () => {
 
             <Spacer />
 
+            <ThemedText style={{ width: '80%', marginBottom: 5 }}>Email</ThemedText>
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
               testID="register-email-input"
@@ -77,6 +78,7 @@ const Register = () => {
               autoCapitalize="none"
             />
 
+            <ThemedText style={{ width: '80%', marginBottom: 5 }}>Password</ThemedText>
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
               testID="register-password-input"
@@ -87,6 +89,7 @@ const Register = () => {
               secureTextEntry
             />
 
+            <ThemedText style={{ width: '80%', marginBottom: 5 }}>Confirm Password</ThemedText>
             <ThemedTextInput
               style={{ width: '80%', marginBottom: 20}}
               testID="register-confirm-password-input"

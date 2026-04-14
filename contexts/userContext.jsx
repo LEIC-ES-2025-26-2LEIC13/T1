@@ -56,7 +56,6 @@ export function UserProvider({ children }) {
         setIsLoading(true)
         try {
             await signOut(auth)
-            setUser(null)
             return true
         } catch (error) {
             console.error("Logout error:", error.message)
