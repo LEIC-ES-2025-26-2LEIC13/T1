@@ -2,20 +2,14 @@ appId: com.anonymous.LEICo
 tags:
   - project
 ---
-- launchApp
+# Login and Launch
+- runFlow: login.yaml
 
-# login
-- tapOn: Username
-- inputText: John Doe
-- tapOn: Password
-- inputText: "1234"
-- tapOn: Login
+# Open Modal
+- assertVisible: Project 1, Description 1
+- tapOn: Project 1, Description 1
 
-- tapOn: Click me
-
-# open project
-- assertVisible: Project 1
-- tapOn: Project 1
-
+# Assertions
 - assertVisible: Programming Project
-- assertVisible: Create Task
+- assertVisible: +, Create Task
+

@@ -2,13 +2,12 @@ appId: com.anonymous.LEICo
 tags:
   - navigation
 ---
-- launchApp
-- tapOn: Username
-- inputText: John Doe
-- tapOn: Password
-- inputText: "1234"
-- tapOn: Login
+# Login and Launch
+- runFlow: login.yaml
 
-- tapOn: Click me
+# Drawer navigation
+- tapOn: 
+- tapOn: , Home
 
+# Assertions
 - assertVisible: My Projects

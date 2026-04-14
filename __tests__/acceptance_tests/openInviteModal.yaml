@@ -2,19 +2,14 @@ appId: com.anonymous.LEICo
 tags:
   - invite
 ---
-- launchApp
+# Login and Launch
+- runFlow: login.yaml
 
-# login + navigation
-- tapOn: Username
-- inputText: John Doe
-- tapOn: Password
-- inputText: "1234"
-- tapOn: Login
-- tapOn: Click me
-- tapOn: Project 1
+# Open Modal
+- tapOn: Project 1, Description 1
+- tapOn: 
 
-# open invite
-- tapOn: Invite member
-
+# Assertions
+- assertVisible: Invite to workspace
 - assertVisible: Enter username
 - assertVisible: Invite

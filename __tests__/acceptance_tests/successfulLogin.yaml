@@ -4,12 +4,14 @@ tags:
 ---
 - launchApp:
     clearState: true
-- tapOn: Username
-- inputText: John Doe
-- tapOn: Password
-- inputText: "1234"
-- hideKeyboard
-- tapOn: Login
-- assertVisible: Home
-- assertVisible: Hello, John Doe!
-- assertVisible: Click me
+- tapOn:
+    id: login-email-input
+- inputText: johndoe@gmail.com
+- tapOn: 
+    id: login-password-input
+- inputText: "123456"
+- tapOn:
+    id: login-submit-button
+
+# Assertions 
+- assertVisible: My Projects
