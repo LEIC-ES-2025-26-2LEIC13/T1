@@ -1,4 +1,4 @@
-import { View, StyleSheet, useColorScheme } from 'react-native';
+import { ScrollView, StyleSheet, useColorScheme } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import ThemedProject from '../../../../components/ThemedProject';
 
@@ -17,7 +17,7 @@ const Projects = () => {
     ];
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
             {projectData.map((p, i) => (
                 <ThemedProject
                     key={i}
@@ -27,7 +27,7 @@ const Projects = () => {
                     href="/project"
                 />
             ))}
-        </View>
+        </ScrollView>
     )
 }
 

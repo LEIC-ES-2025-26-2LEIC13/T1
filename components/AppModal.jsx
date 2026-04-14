@@ -1,15 +1,19 @@
 import React from 'react';
-import {Modal, View, StyleSheet} from 'react-native';
+import {Modal, StyleSheet, Keyboard} from 'react-native';
 import ThemedView from './ThemedView';
 
 export default function AppModal({ visible, children }) {
     return (
         <Modal transparent animationType="fade" visible={visible}>
-            <View style={styles.overlay}>
+            <ThemedView
+                style={styles.overlay}
+                onTouchStart={Keyboard.dismiss}
+            >
+                {/* MODAL CONTENT */}
                 <ThemedView style={styles.container}>
                     {children}
                 </ThemedView>
-            </View>
+            </ThemedView>
         </Modal>
     );
 }
