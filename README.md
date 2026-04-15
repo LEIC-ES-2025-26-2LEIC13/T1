@@ -48,7 +48,8 @@ Business modeling in software development involves defining the product's vision
 
 ### Product Vision
 
-This product is designed to help L.EIC students manage their collaborative projects. The app will allow students to create a collaborative workspace with curated templates desgined specifically for each project they will develop throughout the course, reducing the time spent on planning them.
+Vision
+This product helps L.EIC students manage collaborative projects with ease. The app provides dedicated workspaces, project-specific templates, and practical tips to help teams plan faster and work better.
 
 <!-- 
 Start by defining a clear and concise product vision for your app, to help members of the team, contributors, and users into focusing their often disparate views into a concise, visual, and short textual form. 
@@ -148,6 +149,7 @@ Example:
   <img src="https://github.com/FEUP-LEIC-ES-2022-23/templates/blob/main/images/DomainModel.png"/>
 </p>
 -->
+![Domain Model](diagrams/LogicalArchitecture.drawio.svg)
 
 
 ## Architecture and Design
@@ -239,7 +241,8 @@ Example of _UML deployment diagram_ showing a _deployment view_ of the Eletronic
 
 ![DeploymentView](https://user-images.githubusercontent.com/9655877/160592491-20e85af9-0758-4e1e-a704-0db1be3ee65d.png)
 -->
-
+### Mockups
+The mockup design was created using Figma. Mockup [here](https://www.figma.com/make/nR7b7PCmUlPGA51k237Na7/Collaborative-Project-Organizer-UI?p=f&preview-route=%2Fapp%2Fdashboard).
 
 ### Functional prototype
 <!--
