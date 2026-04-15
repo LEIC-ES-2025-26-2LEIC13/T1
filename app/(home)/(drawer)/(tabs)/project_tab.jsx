@@ -5,7 +5,6 @@ import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
-import Toast from 'react-native-toast-message';
 import useProject from '../../../../hooks/useProject';
 import { normalizeProjectData } from '../../../../model/Project';
 
@@ -28,28 +27,8 @@ const Projects = () => {
 
     const handleCreateProject = async (projectData) => {
         const normalizedProjectData = normalizeProjectData(projectData);
-
-        try {
             await createProject(normalizedProjectData);
             closeProjectModal();
-            Toast.show({
-                type: 'success',
-                text1: 'Created project',
-                text2: normalizedProjectData.title,
-                position: 'top',
-                visibilityTime: 1500,
-                topOffset: 100,
-            });
-        } catch (error) {
-            Toast.show({
-                type: 'error',
-                text1: 'Could not create project',
-                text2: error?.message ?? 'Please try again',
-                position: 'top',
-                visibilityTime: 1800,
-                topOffset: 100,
-            });
-        }
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];

@@ -53,10 +53,8 @@ function RootNavigator() {
 const RouteLayout = () => {  
   return (
     <UserProvider>
-      <ProjectProvider>
-        <StatusBar value="auto" />
-        <RootNavigator />
-      </ProjectProvider>
+      <StatusBar value="auto" />
+      <RootNavigator />
     </UserProvider>
   )
 }

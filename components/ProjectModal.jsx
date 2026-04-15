@@ -17,8 +17,6 @@ export default function ProjectModal({
 	descriptionValue,
 	onDescriptionChangeText,
 }) {
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
     const handleProjectCreation = async () => {
 		const normalizedProjectData = normalizeProjectData({
 			title: titleValue,
@@ -30,13 +28,8 @@ export default function ProjectModal({
 			Alert.alert('Error', 'Please enter a project title');
 			return;
 		}
-
-		setIsSubmitting(true);
-		try {
-			await onCreate(normalizedProjectData);
-		} finally {
-			setIsSubmitting(false);
-		}
+		
+		await onCreate(normalizedProjectData);
     }
 
 	return (
@@ -67,12 +60,12 @@ export default function ProjectModal({
 			/>
 
 			<ThemedView style={styles.actions}>
-				<ThemedButton style={[styles.button, styles.cancel]} onPress={onClose} disabled={isSubmitting}>
+				<ThemedButton style={[styles.button, styles.cancel]} onPress={onClose}>
 					<Text style={styles.buttonTextCancel}>Cancel</Text>
 				</ThemedButton>
 
-				<ThemedButton style={styles.button} onPress={handleProjectCreation} disabled={isSubmitting}>
-					<Text style={styles.buttonTextCreate}>{isSubmitting ? 'Creating...' : 'Create Project'}</Text>
+				<ThemedButton style={styles.button} onPress={handleProjectCreation}>
+					<Text style={styles.buttonTextCreate}>Create Project</Text>
 				</ThemedButton>
 			</ThemedView>
 		</AppModal>
