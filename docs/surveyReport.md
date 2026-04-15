@@ -4,9 +4,9 @@ This document presents a detailed analysis of responses collected through a surv
 
 ---
 
-## Executive Summary
+## Summary
 
-The survey results reveal **critical consensus** across the L.EIC student community regarding project management challenges:
+The survey results reveal **consensus** across the L.EIC student community regarding project management challenges:
 
 - **100%** experienced internal disorganization and lack of task clarity
 - **100%** encountered internal communication failures  
