@@ -48,7 +48,6 @@ Business modeling in software development involves defining the product's vision
 
 ### Product Vision
 
-Vision
 This product helps L.EIC students manage collaborative projects with ease. The app provides dedicated workspaces, project-specific templates, and practical tips to help teams plan faster and work better.
 
 <!-- 
