@@ -1,34 +1,94 @@
-import { View, StyleSheet, useColorScheme } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, useColorScheme, FlatList } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
+import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
+import ThemedButton from '../../../../components/ThemedButton';
+import ProjectModal from '../../../../components/ProjectModal';
+import Toast from 'react-native-toast-message';
+import useProject from '../../../../hooks/useProject';
+import { normalizeProjectData } from '../../../../model/Project';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
+    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
+    const [projectTitle, setProjectTitle] = React.useState('');
+    const [projectDescription, setProjectDescription] = React.useState('');
+    const { projects, createProject } = useProject();
+
+    const openProjectModal = () => setProjectModalVisible(true);
+
+    const closeProjectModal = () => {
+        setProjectModalVisible(false);
+        setProjectTitle('');
+        setProjectDescription('');
+    };
+
+    const handleCreateProject = async (projectData) => {
+        const normalizedProjectData = normalizeProjectData(projectData);
+
+        try {
+            await createProject(normalizedProjectData);
+            closeProjectModal();
+            Toast.show({
+                type: 'success',
+                text1: 'Created project',
+                text2: normalizedProjectData.title,
+                position: 'top',
+                visibilityTime: 1500,
+                topOffset: 100,
+            });
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Could not create project',
+                text2: error?.message ?? 'Please try again',
+                position: 'top',
+                visibilityTime: 1800,
+                topOffset: 100,
+            });
+        }
+    };
+
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
 
-    // This must be done by calling API for projects
-    const projectData = [
-        { name: "Project 1", description: "Description 1" },
-        { name: "Project 2", description: "Description 2" },
-        { name: "Project 3", description: "Description 3" },
-        { name: "Project 4", description: "Description 4" }
-    ];
-
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
-            {projectData.map((p, i) => (
-                <ThemedProject
-                    key={i}
-                    name={p.name}
-                    description={p.description}
-                    borderColor={borderColors[i % borderColors.length]} // loop colors
-                    href="/project"
-                />
-            ))}
+        <View style={[styles.container, { backgroundColor: theme.background }] }>
+            <FlatList
+                data={projects ?? []}
+                style={styles.list}
+                contentContainerStyle={styles.listContent}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
+                renderItem={({ item, index }) => (
+                    <ThemedProject
+                        name={item.title}
+                        description={item.description}
+                        borderColor={borderColors[index % borderColors.length]}
+                        href="/project"
+                    />
+                )}
+            />
+            <ThemedButton
+                style={styles.btn}
+                onPress={openProjectModal}>
+                <ThemedText style={[styles.btnText ,{ marginRight: 20 }]}>+</ThemedText>
+                <ThemedText style={styles.btnText}>Create Project</ThemedText>
+            </ThemedButton>
+
+            <ProjectModal
+                visible={projectModalVisible}
+                onClose={closeProjectModal}
+                onCreate={handleCreateProject}
+                titleValue={projectTitle}
+                onTitleChangeText={setProjectTitle}
+                descriptionValue={projectDescription}
+                onDescriptionChangeText={setProjectDescription}
+            />
+
         </View>
-    )
+    );
 }
 
 export default Projects;
@@ -38,4 +98,32 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 20,
     },
+    list: {
+        flex: 1,
+    },
+    listContent: {
+        paddingBottom: 110,
+    },
+    btn:{
+    width: '85%',
+
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    padding: 12,
+
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    marginBottom: 0,
+        zIndex: 10,
+        elevation: 4,
+  },
+
+  btnText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
 })

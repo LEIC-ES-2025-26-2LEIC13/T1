@@ -7,15 +7,15 @@ import ThemedView from "./ThemedView";
 import ThemedTextInput from "./ThemedTextInput";
 
 export default function TaskModal({
-                                      visible,
-                                      onClose,
-                                      onCreate,
-                                      nameValue,
-                                      onNameChangeText,
-                                      detailValue,
-                                      onDetailChangeText,
-                                      projectName,
-                                  }) {
+    visible,
+    onClose,
+    onCreate,
+    nameValue,
+    onNameChangeText,
+    detailValue,
+    onDetailChangeText,
+    projectName,
+}) {
 
     return (
         <AppModal visible={visible}>
