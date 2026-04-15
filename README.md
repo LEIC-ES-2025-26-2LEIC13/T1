@@ -271,7 +271,9 @@ You can find below information and references related with the project managemen
     * list of a few improvements to implement next Sprint;
 
 -->
+Backlog management: [Github Projects board](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2);
 
+ 
 ### Sprint 0
 
 ### Sprint 1
