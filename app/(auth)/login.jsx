@@ -13,9 +13,8 @@ import ThemedTextInput from '../../components/ThemedTextInput'
 const Login = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [loading, setLoading] = useState(false)
 
-    const { login } = useUser() // destructuring the return value of the useUser custom hook
+    const { login, isLoading } = useUser() // destructuring the return value of the useUser custom hook
     const router = useRouter()
 
     const handleSubmit = async () => {
@@ -24,26 +23,37 @@ const Login = () => {
             return
         }
 
-        setLoading(true)
         try {
             await login(email, password)
         } catch (error) {
             // Handle specific Firebase errors
-            let errorMessage = error.message
-            if (error.code === 'auth/user-not-found') {
-                errorMessage = "No account found with this email. Please register first."
-            } else if (error.code === 'auth/wrong-password') {
-                errorMessage = "Incorrect password. Please try again."
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = "The email address is invalid."
-            } else if (error.code === 'auth/user-disabled') {
-                errorMessage = "This account has been disabled."
-            } else if (error.code === 'auth/too-many-requests') {
-                errorMessage = "Too many failed login attempts. Please try again later."
+            let errorMessage
+
+            switch (error.code) {
+                case 'auth/invalid-email':
+                    errorMessage = "The email address is invalid."
+                    break
+                case 'auth/user-disabled':
+                    errorMessage = "This account has been disabled."
+                    break
+                case 'auth/user-not-found': // Legacy (depending on your project's Email Enumeration Protection setting)
+                    errorMessage = "No account found with this email. Please register first."
+                    break
+                case 'auth/wrong-password': // Legacy
+                case 'auth/invalid-credential': // Modern Firebase unified error for wrong email/password
+                    errorMessage = "Incorrect email or password. Please try again."
+                    break
+                case 'auth/too-many-requests':
+                    errorMessage = "Too many failed login attempts. Please try again later."
+                    break
+                case 'auth/network-request-failed':
+                    errorMessage = "Network error. Please check your internet connection."
+                    break
+                default:
+                    errorMessage = error.message // Fallback to raw Firebase message
             }
+            
             Alert.alert("Login Error", errorMessage)
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -66,7 +76,7 @@ const Login = () => {
                   placeholder="Email"
                   onChangeText={setEmail}
                   value={email}
-                  editable={!loading}
+                  editable={!isLoading}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -77,7 +87,7 @@ const Login = () => {
                   placeholder="Password"
                   onChangeText={setPassword}
                   value={password}
-                  editable={!loading}
+                  editable={!isLoading}
                   secureTextEntry
                 />
 
@@ -86,10 +96,10 @@ const Login = () => {
                 <ThemedButton
                   testID="login-submit-button"
                   onPress={handleSubmit}
-                  disabled={loading}
+                  disabled={isLoading}
                   style={{width: '80%', alignItems: 'center'}}
                 >
-                    <Text style={{color: "#ffffff"}}>{loading ? "Logging in..." : "Login"}</Text>
+                    <Text style={{color: "#ffffff"}}>Login</Text>
                 </ThemedButton>
 
                 <Spacer />
@@ -98,7 +108,7 @@ const Login = () => {
                 <Spacer height={10}/>
                 <ThemedButton
                   onPress={() => router.push('/(auth)/register')}
-                  disabled={loading}
+                  disabled={isLoading}
                   style={{paddingVertical: 8}}
                 >
                     <Text style={{color: "#ffffff"}}>Register here</Text>

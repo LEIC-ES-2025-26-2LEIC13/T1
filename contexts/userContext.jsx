@@ -16,6 +16,8 @@ export function UserProvider({ children }) {
 
     // Keep user logged in
     useEffect(() => {
+        setIsLoading(true)
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser)
             setIsLoading(false)
@@ -29,10 +31,10 @@ export function UserProvider({ children }) {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password)
             setUser(userCredential.user)
-            return true
+            return true // needed?
         } catch (error) {
             console.error("Login error:", error.message)
-            return false
+            throw error // instead of return false
         } finally {
             setIsLoading(false)
         }
@@ -43,7 +45,7 @@ export function UserProvider({ children }) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password)
             setUser(userCredential.user)
-            return true
+            return true // needed?
         } catch (error) {
             console.error("Register error:", error.code, error.message)
             throw error
@@ -56,10 +58,10 @@ export function UserProvider({ children }) {
         setIsLoading(true)
         try {
             await signOut(auth)
-            return true
+            return true // needed?
         } catch (error) {
             console.error("Logout error:", error.message)
-            return false
+            throw error
         } finally {
             setIsLoading(false)
         }

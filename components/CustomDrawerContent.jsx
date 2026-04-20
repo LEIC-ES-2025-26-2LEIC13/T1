@@ -1,25 +1,12 @@
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import {useUser} from "../hooks/useUser";
-import {useState} from "react";
 import {View} from "react-native";
 import {Colors} from "../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const CustomDrawerContent = (props) =>{
-    const [loading, setLoading] = useState(false);
     const { logout } = useUser();
 
-    const HandleLogout = async () => {
-        console.log("Logout button pressed"); // 👈 ADD THIS
-        setLoading(true);
-        try {
-            await logout();
-        } catch (error) {
-            console.error("Logout error:", error.message);
-        } finally {
-            setLoading(false);
-        }
-    }
     return (
         <DrawerContentScrollView
             {...props}
@@ -31,8 +18,8 @@ const CustomDrawerContent = (props) =>{
             {/* Bottom section */}
             <View style={styles.bottomContainer}>
                 <DrawerItem
-                    label={loading ? "Logging out..." : "Logout"}
-                    onPress={HandleLogout}
+                    label="Logout"
+                    onPress={logout}
                     labelStyle={{ color: Colors.warning }}
                     // Drawer passes the size automatically to the icon function
                     icon = {({ size }) => (
