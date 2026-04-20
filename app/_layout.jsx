@@ -3,6 +3,7 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
 import { UserProvider } from '../contexts/userContext'
+import { ProjectProvider } from '../contexts/projectContext'
 import { useUser } from '../hooks/useUser'
 
 import AppToast from '../components/Toast';
