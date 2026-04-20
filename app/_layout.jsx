@@ -38,7 +38,7 @@ function RootNavigator() {
               {/* Authenticated: Show drawer-based stack (maybe pass project header logic to here, to avoid overides inside project, which causes inconsistency in its header.*/}
               <Stack.Protected guard={!isLoading && !!user}>
                   <Stack.Screen name='(home)/(drawer)' options={{ headerShown: false }} />
-                  <Stack.Screen name='project' options={{ headerShown: false }} /> 
+                  <Stack.Screen name='project' options={{ headerShown: true }} /> 
               </Stack.Protected>
           </Stack>
           <AppToast />
