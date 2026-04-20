@@ -45,8 +45,8 @@ export default function InviteWorkspaceModal({
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        testID="invite-username-input"
-        placeholder="Enter username"
+        testID="invite-email-input"
+        placeholder="Enter user email"
         placeholderTextColor={palette.iconColor}
         style={[
           styles.input,
@@ -58,7 +58,7 @@ export default function InviteWorkspaceModal({
         ]}
       />
 
-      <ThemedButton onPress={onInvite} style={styles.inviteButton}>
+      <ThemedButton onPress={onInvite} style={styles.inviteButton} disabled={!value.trim()}>
         <Text style={styles.inviteButtonText}>Invite</Text>
       </ThemedButton>
     </AppModal>

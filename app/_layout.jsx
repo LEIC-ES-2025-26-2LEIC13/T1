@@ -3,7 +3,9 @@ import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
 import { UserProvider } from '../contexts/userContext'
+import { UsersProvider } from '../contexts/usersContext'
 import { ProjectProvider } from '../contexts/projectContext'
+import { InviteProvider } from '../contexts/inviteContext'
 import { useUser } from '../hooks/useUser'
 
 import AppToast from '../components/Toast';
@@ -53,8 +55,14 @@ function RootNavigator() {
 const RouteLayout = () => {  
   return (
     <UserProvider>
-      <StatusBar value="auto" />
-      <RootNavigator />
+      <UsersProvider>
+        <ProjectProvider>
+          <InviteProvider>
+            <StatusBar value="auto" />
+            <RootNavigator />
+          </InviteProvider>
+        </ProjectProvider>
+      </UsersProvider>
     </UserProvider>
   )
 }
