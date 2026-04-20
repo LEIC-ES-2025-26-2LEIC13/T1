@@ -36,11 +36,11 @@ const Login = () => {
                 case 'auth/user-disabled':
                     errorMessage = "This account has been disabled."
                     break
-                case 'auth/user-not-found': // Legacy (depending on your project's Email Enumeration Protection setting)
+                case 'auth/user-not-found': // Legacy
                     errorMessage = "No account found with this email. Please register first."
                     break
                 case 'auth/wrong-password': // Legacy
-                case 'auth/invalid-credential': // Modern Firebase unified error for wrong email/password
+                case 'auth/invalid-credential':
                     errorMessage = "Incorrect email or password. Please try again."
                     break
                 case 'auth/too-many-requests':

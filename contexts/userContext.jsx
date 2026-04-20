@@ -31,10 +31,10 @@ export function UserProvider({ children }) {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password)
             setUser(userCredential.user)
-            return true // needed?
+            return true
         } catch (error) {
             console.error("Login error:", error.message)
-            throw error // instead of return false
+            throw error
         } finally {
             setIsLoading(false)
         }
@@ -45,7 +45,7 @@ export function UserProvider({ children }) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password)
             setUser(userCredential.user)
-            return true // needed?
+            return true
         } catch (error) {
             console.error("Register error:", error.code, error.message)
             throw error
@@ -58,7 +58,7 @@ export function UserProvider({ children }) {
         setIsLoading(true)
         try {
             await signOut(auth)
-            return true // needed?
+            return true
         } catch (error) {
             console.error("Logout error:", error.message)
             throw error
