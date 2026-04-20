@@ -4,6 +4,7 @@ import { Colors } from "../../../constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import DrawerThemedButton from "../../../components/DrawerThemedButton";
 import { ProjectProvider } from "../../../contexts/projectContext";
+import CustomDrawerContent from "../../../components/CustomDrawerContent";
 
 export default function DrawerLayout() {
     const colorScheme = useColorScheme();
@@ -11,11 +12,12 @@ export default function DrawerLayout() {
 
     return (
         <ProjectProvider>
-            <Drawer
-                screenOptions={{
-                    headerStyle: { backgroundColor: theme.navBackground },
-                    headerTintColor: theme.title,
-                    headerTitleAlign: "left",
+        <Drawer
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
+            screenOptions={{
+                headerStyle: { backgroundColor: theme.navBackground },
+                headerTintColor: theme.title,
+                headerTitleAlign: "left",
 
                     headerTitleStyle: {
                         color: theme.title,
@@ -65,7 +67,7 @@ export default function DrawerLayout() {
                 />
 
                 <Drawer.Screen
-                    name="calendar"
+                    name="calendar" 
                     options={{
                         title: "Calendar",
                         drawerIcon: ({ focused, color }) => (

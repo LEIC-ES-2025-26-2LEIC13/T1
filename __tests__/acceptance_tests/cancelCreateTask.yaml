@@ -2,22 +2,20 @@ appId: com.anonymous.LEICo
 tags:
   - task
 ---
-- launchApp
+# Login and Launch
+- runFlow: login.yaml
 
-# login + navigation
-- tapOn: Username
-- inputText: John Doe
-- tapOn: Password
-- inputText: "1234"
-- tapOn: Login
-- tapOn: Click me
-- tapOn: Project 1
+# Open modal
+- tapOn: Project 1, Description 1
+- tapOn: +, Create Task
 
-- tapOn: Create Task
-
+# Fill task form
 - tapOn: Enter task name
 - inputText: Should not exist
+- hideKeyboard
 
+# Cancel task
 - tapOn: Cancel
 
+# Assertions
 - assertNotVisible: Should not exist

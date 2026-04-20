@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import { ScrollView, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';

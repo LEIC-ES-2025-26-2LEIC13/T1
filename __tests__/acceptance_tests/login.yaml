@@ -1,0 +1,13 @@
+# used for other tests
+appId: com.anonymous.LEICo
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: login-email-input
+- inputText: johndoe@gmail.com
+- tapOn:
+    id: login-password-input
+- inputText: "123456"
+- tapOn:
+    id: login-submit-button

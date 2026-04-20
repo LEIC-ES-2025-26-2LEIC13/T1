@@ -10,19 +10,26 @@ This Software Development Report, tailored for LEIC-ES-2025-26, provides compreh
 
 It is organised by the following activities: 
 
-- [_LEICo_ Development Report](#your-product-name-development-report)
+- [_LEICo_ Development Report](#leico-development-report)
   - [Business Modelling](#business-modelling)
     - [Product Vision](#product-vision)
     - [Features and Assumptions](#features-and-assumptions)
   - [Requirements](#requirements)
+    - [Requirement validation](#requirement-validation)
     - [User Stories](#user-stories)
     - [Domain model](#domain-model)
   - [Architecture and Design](#architecture-and-design)
+    - [Overall architecture](#overall-architecture)
+    - [Architectural Patterns](#architectural-patterns)
     - [Logical architecture](#logical-architecture)
+      - [In-app modules](#in-app-modules)
+      - [External components](#external-components)
     - [Physical architecture](#physical-architecture)
+    - [Mockups](#mockups)
     - [Functional prototype](#functional-prototype)
   - [Project management](#project-management)
     - [Sprint 0](#sprint-0)
+      - [Log and documentation](#log-and-documentation)
     - [Sprint 1](#sprint-1)
     - [Sprint 2](#sprint-2)
     - [Sprint 3](#sprint-3)
@@ -48,7 +55,7 @@ Business modeling in software development involves defining the product's vision
 
 ### Product Vision
 
-This product is designed to help L.EIC students manage their collaborative projects. The app will allow students to create a collaborative workspace with curated templates desgined specifically for each project they will develop throughout the course, reducing the time spent on planning them.
+This product helps L.EIC students manage collaborative projects with ease. The app provides dedicated workspaces, project-specific templates, and practical tips to help teams plan faster and work better.
 
 <!-- 
 Start by defining a clear and concise product vision for your app, to help members of the team, contributors, and users into focusing their often disparate views into a concise, visual, and short textual form. 
@@ -148,6 +155,7 @@ Example:
   <img src="https://github.com/FEUP-LEIC-ES-2022-23/templates/blob/main/images/DomainModel.png"/>
 </p>
 -->
+![Domain Model](diagrams/DomainModel.drawio.svg)
 
 
 ## Architecture and Design
@@ -239,7 +247,8 @@ Example of _UML deployment diagram_ showing a _deployment view_ of the Eletronic
 
 ![DeploymentView](https://user-images.githubusercontent.com/9655877/160592491-20e85af9-0758-4e1e-a704-0db1be3ee65d.png)
 -->
-
+### Mockups
+The mockup design was created using Figma. Mockup [here](https://www.figma.com/make/nR7b7PCmUlPGA51k237Na7/Collaborative-Project-Organizer-UI?p=f&preview-route=%2Fapp%2Fdashboard).
 
 ### Functional prototype
 <!--
@@ -271,8 +280,54 @@ You can find below information and references related with the project managemen
     * list of a few improvements to implement next Sprint;
 
 -->
+Backlog management: [Github Projects board](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2);
 
+ 
 ### Sprint 0
+
+#### Log and documentation
+
+* To do unit and integration testing, we used Jest, which was installed in the project with the command:
+
+```bash
+`npx expo install @testing-library/react-native --dev`
+```
+* Installed Jest types with 
+
+```bash
+`npm install -D @types/jest`
+```
+
+* Fixed some dependency issues with the commands:
+
+```bash
+rm -rf node_modules
+rm package-lock.json
+npm install
+```
+
+* And added the above commands to a script in package.json, since it was a recurrent issue:
+
+```json
+"scripts": {
+    ...
+    "fix-conflicts": "rm -rf node_modules package-lock.json && npm install"
+    ...
+}
+```
+
+* for the 
+* Added a linter (ESLint)to the project with the command (and following [this](https://docs.expo.dev/guides/using-eslint/) guidelines):
+
+```bash
+npx expo lint
+```
+
+* ...and the corresponding VSCode extension: ESLint
+
+* Added two GitHub Actions workflows: one for bundling, run the tests of the project and running the linter and another one for building the app and realease the .apk file:
+    - `bundle-quality-test.yml`: for pushes in PRs to the main branch and for pushses to the main branch.
+    - `android-ios-build-release.yml`: for pushes to tags beginning with "v".
 
 ### Sprint 1
 
