@@ -4,34 +4,74 @@ import { db } from '../firebase/firebaseConfig';
 
 export const ProjectContext = createContext();
 
+function normalizeProjectPayload(projectData = {}) {
+    return {
+        ...projectData,
+        title: projectData?.title?.trim() ?? '',
+        description: projectData?.description?.trim() ?? '',
+    }
+}
+
+function validateProjectPayload(projectData = {}) {
+    if (!projectData.title) {
+        throw new Error('Please enter a project title')
+    }
+}
+
+function normalizeProjectUpdates(updates = {}) {
+  const normalized = { ...updates }; // Extracts fields
+
+  // Checks if each value is set
+  if (normalized.title !== undefined) {
+    normalized.title = (normalized.title ?? '').trim();
+    if (!normalized.title) throw new Error('Project title cannot be empty');
+  }
+
+  if (normalized.description !== undefined) {
+    normalized.description = (normalized.description ?? '').trim();
+  }
+
+  // Returns the normalized update data
+  return normalized;
+}
+
 export const ProjectProvider = ({ children }) => {
-    const [projects, setProjects] = useState([]);
+    const [projects, setProjects] = useState([])
 
     async function createProject(projectData) {
+        const normalizedProjectData = normalizeProjectPayload(projectData)
+        validateProjectPayload(normalizedProjectData)
+
         await addDoc(collection(db, 'projects'), {
-            ...projectData,
+            ...normalizedProjectData,
         });
     }
 
     async function deleteProject(id){
-        await deleteDoc(doc(db, 'projects', id));
+        await deleteDoc(doc(db, 'projects', id))
     }
 
     async function updateProject(id, updates) {
-        await updateDoc(doc(db, 'projects', id), {...updates});
+        const normalizedUpdates = normalizeProjectUpdates(updates)
+        // In the data from the project is empty, the function returns immediately -> no effect of the update
+        // In future could 
+        if (Object.keys(normalizedUpdates).length === 0) {
+            return
+        }
+        await updateDoc(doc(db, 'projects', id), {...normalizedUpdates})
     }
 
     useEffect(() => {
         const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
             const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setProjects(projects);
+            setProjects(projects)
         });
-        return () => unsub();
+        return () => unsub()
     }, []);
 
 
     return (
-        <ProjectContext.Provider value={{ projects, setProjects, createProject, deleteProject, updateProject }}>
+        <ProjectContext.Provider value={{ projects, setProjects, createProject, deleteProject, updateProject}}>
             {children}
         </ProjectContext.Provider>
     );
