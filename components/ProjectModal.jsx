@@ -1,12 +1,10 @@
-import { Text, StyleSheet, Alert } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import AppModal from './AppModal';
 import ThemedText from './ThemedText';
 import Spacer from './Spacer';
 import ThemedButton from './ThemedButton';
 import ThemedView from './ThemedView';
 import ThemedTextInput from './ThemedTextInput';
-import { useState } from 'react';
-import { normalizeProjectData } from '../model/Project';
 
 export default function ProjectModal({
 	visible,
@@ -17,21 +15,6 @@ export default function ProjectModal({
 	descriptionValue,
 	onDescriptionChangeText,
 }) {
-    const handleProjectCreation = async () => {
-		const normalizedProjectData = normalizeProjectData({
-			title: titleValue,
-			description: descriptionValue,
-		});
-		const cleanedTitle = normalizedProjectData.title;
-
-		if (!cleanedTitle) {
-			Alert.alert('Error', 'Please enter a project title');
-			return;
-		}
-		
-		await onCreate(normalizedProjectData);
-    }
-
 	return (
 		<AppModal visible={visible}>
 			<ThemedText title={true} style={styles.title}>
@@ -64,7 +47,13 @@ export default function ProjectModal({
 					<Text style={styles.buttonTextCancel}>Cancel</Text>
 				</ThemedButton>
 
-				<ThemedButton style={styles.button} onPress={handleProjectCreation}>
+				<ThemedButton
+					style={styles.button}
+					onPress={() => onCreate({
+						title: titleValue,
+						description: descriptionValue,
+					})}
+				>
 					<Text style={styles.buttonTextCreate}>Create Project</Text>
 				</ThemedButton>
 			</ThemedView>

@@ -1,13 +1,11 @@
 import React from 'react';
-import { ScrollView, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import { Alert, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
 import useProject from '../../../../hooks/useProject';
-import { useUser } from '../../../../hooks/useUser';
-import { normalizeProjectData } from '../../../../model/Project';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
@@ -17,7 +15,6 @@ const Projects = () => {
     const [projectTitle, setProjectTitle] = React.useState('');
     const [projectDescription, setProjectDescription] = React.useState('');
     const { projects, createProject } = useProject();
-    const { user } = useUser();
 
     const openProjectModal = () => setProjectModalVisible(true);
 
@@ -28,13 +25,12 @@ const Projects = () => {
     };
 
     const handleCreateProject = async (projectData) => {
-        const normalizedProjectData = normalizeProjectData({
-            ...projectData,
-        });
-
-
-        await createProject(normalizedProjectData);
-        closeProjectModal();
+        try {
+            await createProject(projectData);
+            closeProjectModal();
+        } catch (error) {
+            Alert.alert('Error', error.message || 'Could not create project');
+        }
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
