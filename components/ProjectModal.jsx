@@ -5,7 +5,6 @@ import Spacer from './Spacer';
 import ThemedButton from './ThemedButton';
 import ThemedView from './ThemedView';
 import ThemedTextInput from './ThemedTextInput';
-import { useState } from 'react';
 import { normalizeProjectData } from '../model/Project';
 
 export default function ProjectModal({

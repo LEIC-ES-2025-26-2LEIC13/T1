@@ -1,23 +1,21 @@
-import React from 'react';
-import { ScrollView, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, useColorScheme, FlatList } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
 import useProject from '../../../../hooks/useProject';
-import { useUser } from '../../../../hooks/useUser';
 import { normalizeProjectData } from '../../../../model/Project';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
-    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
-    const [projectTitle, setProjectTitle] = React.useState('');
-    const [projectDescription, setProjectDescription] = React.useState('');
+    const [projectModalVisible, setProjectModalVisible] = useState(false);
+    const [projectTitle, setProjectTitle] = useState('');
+    const [projectDescription, setProjectDescription] = useState('');
     const { projects, createProject } = useProject();
-    const { user } = useUser();
 
     const openProjectModal = () => setProjectModalVisible(true);
 
