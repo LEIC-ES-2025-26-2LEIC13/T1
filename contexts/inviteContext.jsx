@@ -6,8 +6,9 @@ import { useUser } from '../hooks/useUser';
 export const InviteContext = createContext(null);
 
 export function InviteProvider({ children }) {
-  const { user } = useUser();
-  const [invites, setInvites] = useState([]);
+  const { user } = useUser()
+  const [ invites, setInvites ] = useState([])
+  const [ hasNewInvites, setHasNewInvites ] = useState([])
 
   // The use effect creates a listener on the background that updates upon invites query changes
   // Upon component (InviteProvider) deletion or user? change, for example logout, the listener is unsubscribed
@@ -23,6 +24,8 @@ export function InviteProvider({ children }) {
     );
 
     const unsubscribe = onSnapshot(invitesQuery, (snapshot) => {
+      setHasNewInvites(snapshot.docs.length > invites.length) // new invites
+      
       setInvites(snapshot.docs.map((inviteDoc) => ({ id: inviteDoc.id, ...inviteDoc.data() })));
     });
 
@@ -66,10 +69,12 @@ export function InviteProvider({ children }) {
 
   const value = useMemo(() => ({
     invites,
+    hasNewInvites,
+    setHasNewInvites,
     sendInvite,
     acceptInvite,
     ignoreInvite
-  }), [invites]);
+  }), [invites, hasNewInvites]);
 
   return (
     <InviteContext.Provider value={value}>

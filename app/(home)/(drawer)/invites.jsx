@@ -3,9 +3,10 @@ import ThemedView from '../../../components/ThemedView';
 import ThemedText from '../../../components/ThemedText';
 import { useInvite } from '../../../hooks/useInvite';
 import ThemedInvite from '../../../components/ThemedInvite';
+import { useFocusEffect } from 'expo-router';
 
 const Invites = () => {
-    const { invites, acceptInvite, ignoreInvite } = useInvite();
+    const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
 
     const handleAccept = async (invite) => {
         try {
@@ -22,6 +23,12 @@ const Invites = () => {
 				Alert.alert('Error', 'Could not ignore invite')
 			}
 		}
+
+		useFocusEffect( // runs a side effect every time the user navigates to this screen
+			useCallback => {
+				setHasNewInvites(false)
+			}
+		)
 
     return(
         <ThemedView style={styles.container}>
