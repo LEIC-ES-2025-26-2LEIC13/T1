@@ -4,7 +4,6 @@ import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import TaskModal from '../components/TaskModal';
@@ -18,7 +17,8 @@ import { useInvite } from '../hooks/useInvite';
 
 export default function Home() {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams(); // Routing parameters of the current screen
+  // For example: /project?projectId=abc -> params.projectId will be abc
   const scheme = useColorScheme();
   const palette = Colors[scheme] ?? Colors.light;
   const { projects } = useProject();
@@ -34,9 +34,10 @@ export default function Home() {
   const [inviteModalVisible, setInviteModalVisible] = React.useState(false);
   const [inviteTarget, setInviteTarget] = React.useState('');
 
-  const projectId = Array.isArray(params.projectId) ? params.projectId[0] : params.projectId;
-  const currentProject = projects.find((project) => project.id === projectId) ?? projects[0] ?? null;
-  const currentProjectName = currentProject?.title ?? 'Project';
+  const rawProjectId = params.projectId;
+  const projectId = Array.isArray(rawProjectId) ? rawProjectId[0] : rawProjectId; // Stores the project id, useful for querying tasks associated
+  const currentProject = projects.find((project) => project.id === projectId);
+  const currentProjectName = currentProject.title;
 
   const openTaskModal = () => setTaskModalVisible(true);
 
