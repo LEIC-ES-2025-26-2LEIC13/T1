@@ -29,6 +29,7 @@ export function InviteProvider({ children }) {
     return unsubscribe; // unsubscribe returned by onSnapshot
   }, [user?.uid]);
 
+
   async function sendInvite(inviteData) {
     // Check if invite already exists for this receiverId/projectId combo
     const existingInviteQuery = query(
@@ -48,6 +49,7 @@ export function InviteProvider({ children }) {
     });
   }
 
+
   async function acceptInvite(id, projectId, receiverId) {
     await deleteDoc(doc(db, 'invites', id)); // delete the pending invite
 
@@ -58,10 +60,15 @@ export function InviteProvider({ children }) {
           })
   }
 
+  async function ignoreInvite(id) {
+    await deleteDoc(doc(db, 'invites', id)) // delete the pending invite
+  }
+
   const value = useMemo(() => ({
     invites,
     sendInvite,
     acceptInvite,
+    ignoreInvite
   }), [invites]);
 
   return (
