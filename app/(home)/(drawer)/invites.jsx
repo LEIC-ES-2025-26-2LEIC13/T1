@@ -2,16 +2,14 @@ import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import ThemedView from '../../../components/ThemedView';
 import ThemedText from '../../../components/ThemedText';
 import ThemedButton from '../../../components/ThemedButton';
-import { useUser } from '../../../hooks/useUser';
 import { useInvite } from '../../../hooks/useInvite';
 
 const Invites = () => {
-    const { user } = useUser();
     const { invites, acceptInvite } = useInvite();
 
     const handleAccept = async (invite) => {
         try {
-            await acceptInvite(invite.id);
+            await acceptInvite(invite.id, invite.projectId, invite.receiverId);
         } catch {
             Alert.alert('Error', 'Could not accept invite.');
         }

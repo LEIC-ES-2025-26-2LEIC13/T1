@@ -100,11 +100,6 @@ export default function Home() {
       return;
     }
 
-    if (!user || !currentProject) {
-      Alert.alert('Missing data', 'Unable to send invite right now.');
-      return;
-    }
-
     try {
       const receiverUser = await getUserByEmail(trimmedTarget);
 
@@ -135,14 +130,11 @@ export default function Home() {
         visibilityTime: 1500,
         topOffset: 100,
       });
-    } catch (error) {
-      if (error.message.includes('already sent')) {
-        Alert.alert('Duplicate invite', 'You have already sent an invite to this user for this project.');
-      } else {
-        Alert.alert('Invite failed', 'Could not send the invite.');
+      } catch {
+        Alert.alert('Duplicate or invalid invite', 'You have already sent an invite to this user for this project, or this invite is invalid.');
       }
     }
-  };
+  
 
   return (
     <>

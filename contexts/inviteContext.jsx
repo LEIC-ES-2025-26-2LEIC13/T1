@@ -9,8 +9,10 @@ export function InviteProvider({ children }) {
   const { user } = useUser();
   const [invites, setInvites] = useState([]);
 
+  // The use effect creates a listener on the background that updates upon invites query changes
+  // Upon component (InviteProvider) deletion or user? change, for example logout, the listener is unsubscribed
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user?.uid) { // TODO: sometimes user is null when the app opens with cached login session open
       setInvites([]);
       return undefined;
     }
@@ -24,7 +26,7 @@ export function InviteProvider({ children }) {
       setInvites(snapshot.docs.map((inviteDoc) => ({ id: inviteDoc.id, ...inviteDoc.data() })));
     });
 
-    return unsubscribe;
+    return unsubscribe; // unsubscribe returned by onSnapshot
   }, [user?.uid]);
 
   async function sendInvite(inviteData) {
@@ -46,8 +48,14 @@ export function InviteProvider({ children }) {
     });
   }
 
-  async function acceptInvite(inviteId) {
-    await deleteDoc(doc(db, 'invites', inviteId));
+  async function acceptInvite(id, projectId, receiverId) {
+    await deleteDoc(doc(db, 'invites', id)); // delete the pending invite
+
+    // add the project to the receiver's projects
+    await addDoc(collection(db, 'projectMemberships'), {
+            projectId: projectId,
+            userId: receiverId
+          })
   }
 
   const value = useMemo(() => ({

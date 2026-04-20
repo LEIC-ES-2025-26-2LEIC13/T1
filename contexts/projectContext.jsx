@@ -1,16 +1,24 @@
-import { createContext, useState, useEffect} from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore"
 import { db } from '../firebase/firebaseConfig';
+import { useUser } from '../hooks/useUser';
 
 export const ProjectContext = createContext();
 
 export const ProjectProvider = ({ children }) => {
-    const [projects, setProjects] = useState([]);
+    const [projects, setProjects] = useState([])
+    const { user } = useUser()
 
     async function createProject(projectData) {
-        await addDoc(collection(db, 'projects'), {
+        const projectRef = await addDoc(collection(db, 'projects'), {
             ...projectData,
-        });
+            createdBy: user.uid
+        })
+
+        await addDoc(collection(db, 'projectMemberships'), {
+            projectId: projectRef.id,
+            userId: user.uid
+        })
     }
 
     async function deleteProject(id){
@@ -22,11 +30,12 @@ export const ProjectProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
-            const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setProjects(projects);
-        });
-        return () => unsub();
+			const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
+				const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				setProjects(projects);
+			});
+			
+      return () => unsub();
     }, []);
 
 
