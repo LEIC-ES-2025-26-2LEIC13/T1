@@ -2,6 +2,7 @@ import { Keyboard, StyleSheet, Text, TouchableWithoutFeedback, Alert } from 'rea
 import { useState } from 'react'
 import { useUser } from '../../hooks/useUser'
 import { useRouter } from 'expo-router'
+import { doc, setDoc } from 'firebase/firestore'
 
 // themed components
 import ThemedView from '../../components/ThemedView'
@@ -9,6 +10,7 @@ import ThemedText from '../../components/ThemedText'
 import Spacer from '../../components/Spacer'
 import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
+import { auth, db } from '../../firebase/firebaseConfig'
 
 const Register = () => {
     const [email, setEmail] = useState("")
@@ -38,6 +40,14 @@ const Register = () => {
         setLoading(true)
         try {
             await register(email, password)
+            // Upon register, an entry in users collection is created
+            // Used to lookup users by email for invite logic
+            if (auth.currentUser) {
+                const normalizedEmail = email.trim().toLowerCase()
+                await setDoc(doc(db, 'users', auth.currentUser.uid), {
+                    email: normalizedEmail,
+                })
+            }
             Alert.alert("Success", "Account created successfully!")
         } catch (error) {
             // Handle specific Firebase errors

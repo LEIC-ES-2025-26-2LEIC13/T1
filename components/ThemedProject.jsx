@@ -3,14 +3,21 @@ import {Colors} from "../constants/Colors";
 import ThemedText from "./ThemedText";
 import {useRouter} from "expo-router";
 
-const ThemedProject = ({ name, description, borderColor, href, testID }) =>  {
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID }) =>  {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
+    const handlePress = () => {
+        if (projectId) {
+            router.push({ pathname: '/project', params: { projectId } })
+            return
+        }
+    }
+
     return (
         <Pressable
-            onPress={() => href && router.push(href)}
+            onPress={handlePress}
             style={[styles.container, { borderLeftColor: borderColor, backgroundColor: theme.navBackground }]}
             testID={testID}
         >

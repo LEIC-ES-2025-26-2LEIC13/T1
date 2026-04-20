@@ -8,7 +8,9 @@ export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([]);
 
     async function createProject(projectData) {
-        await addDoc(collection(db, 'projects'), projectData);
+        await addDoc(collection(db, 'projects'), {
+            ...projectData,
+        });
     }
 
     async function deleteProject(id){

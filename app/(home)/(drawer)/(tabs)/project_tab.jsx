@@ -6,6 +6,7 @@ import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
 import useProject from '../../../../hooks/useProject';
+import { useUser } from '../../../../hooks/useUser';
 import { normalizeProjectData } from '../../../../model/Project';
 
 const Projects = () => {
@@ -16,6 +17,7 @@ const Projects = () => {
     const [projectTitle, setProjectTitle] = React.useState('');
     const [projectDescription, setProjectDescription] = React.useState('');
     const { projects, createProject } = useProject();
+    const { user } = useUser();
 
     const openProjectModal = () => setProjectModalVisible(true);
 
@@ -26,9 +28,13 @@ const Projects = () => {
     };
 
     const handleCreateProject = async (projectData) => {
-        const normalizedProjectData = normalizeProjectData(projectData);
-            await createProject(normalizedProjectData);
-            closeProjectModal();
+        const normalizedProjectData = normalizeProjectData({
+            ...projectData,
+        });
+
+
+        await createProject(normalizedProjectData);
+        closeProjectModal();
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
@@ -42,10 +48,10 @@ const Projects = () => {
                 keyExtractor={(item, index) => `${item.title}-${index}`}
                 renderItem={({ item, index }) => (
                     <ThemedProject
+                        projectId={item.id}
                         name={item.title}
                         description={item.description}
                         borderColor={borderColors[index % borderColors.length]}
-                        href="/project"
                     />
                 )}
             />
