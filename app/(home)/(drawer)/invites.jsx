@@ -3,6 +3,7 @@ import ThemedView from '../../../components/ThemedView';
 import ThemedText from '../../../components/ThemedText';
 import ThemedButton from '../../../components/ThemedButton';
 import { useInvite } from '../../../hooks/useInvite';
+import ThemedCard from '../../../components/ThemedCard';
 
 const Invites = () => {
     const { invites, acceptInvite } = useInvite();
@@ -27,11 +28,13 @@ const Invites = () => {
                 }
                 renderItem={({ item }) => (
                     <View style={styles.card}>
-                        <ThemedText title={true}>{item.projectName}</ThemedText>
-                        <ThemedText>From: {item.senderEmail}</ThemedText>
-                        <ThemedButton onPress={() => handleAccept(item)} style={styles.button}>
-                            <ThemedText style={styles.buttonText}>Accept</ThemedText>
-                        </ThemedButton>
+                        <ThemedCard>
+                            <ThemedText title={true}>{item.projectName}</ThemedText>
+                            <ThemedText>From: {item.senderEmail}</ThemedText>
+                            <ThemedButton onPress={() => handleAccept(item)} style={styles.button}>
+                                <ThemedText style={styles.buttonText}>Accept</ThemedText>
+                            </ThemedButton>
+                        </ThemedCard>
                     </View>
                 )}
             />

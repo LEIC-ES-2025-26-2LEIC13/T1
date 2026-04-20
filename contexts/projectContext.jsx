@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc, where, documentId } from "firebase/firestore"
 import { db } from '../firebase/firebaseConfig';
 import { useUser } from '../hooks/useUser';
 
@@ -15,6 +15,7 @@ export const ProjectProvider = ({ children }) => {
             createdBy: user.uid
         })
 
+				// The user who created the project has it as one of his projects now
         await addDoc(collection(db, 'projectMemberships'), {
             projectId: projectRef.id,
             userId: user.uid
@@ -28,16 +29,43 @@ export const ProjectProvider = ({ children }) => {
     async function updateProject(id, updates) {
         await updateDoc(doc(db, 'projects', id), {...updates});
     }
-
+		
     useEffect(() => {
-			const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
-				const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-				setProjects(projects);
-			});
-			
-      return () => unsub();
-    }, []);
+        if (!user?.uid) { // TODO: sometimes user is null when the app opens with cached login session open
+            setProjects([]);
+            return;
+        }
 
+        // Gets docs relative to the current user
+        const membershipsQuery = query(
+            collection(db, 'projectMemberships'),
+            where('userId', '==', user.uid)
+        )
+
+        const unsub = onSnapshot(membershipsQuery, async (membershipSnap) => {
+            // Just the projects' ids
+            const projectIds = membershipSnap.docs.map((d) => d.data().projectId)
+
+						// Necessary check because 'in' queries require a non-empty array
+						if (projectIds.length === 0) {
+								setProjects([]);
+								return;
+						}
+
+            // Get entire documents from the projects collection
+            const userProjects = await getDocs(
+                query(
+                    collection(db, 'projects'),
+                    where(documentId(), 'in', projectIds) // warning: Firestore has a 'in' max list size
+                ))
+
+            // Format accordingly
+            const projectsToDisplay = userProjects.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setProjects(projectsToDisplay);
+        });
+
+      return () => unsub();
+    }, [user?.uid]);
 
     return (
         <ProjectContext.Provider value={{ projects, setProjects, createProject, deleteProject, updateProject }}>
