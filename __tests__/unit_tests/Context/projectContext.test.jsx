@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
-import useProject from '../../hooks/useProject';
-import { ProjectProvider } from '../../contexts/projectContext';
+import useProject from '../../../hooks/useProject';
+import { ProjectProvider } from '../../../contexts/projectContext';
 import { addDoc, onSnapshot, updateDoc, doc} from 'firebase/firestore';
 
 
@@ -15,9 +15,9 @@ jest.mock('firebase/firestore', () => ({
   onSnapshot: jest.fn(),
 }));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
+jest.mock('../../../firebase/firebaseConfig', () => ({
   db: {},
-}));
+}))
 
 // Wrapper to provide context for the hook
 const wrapper = ({ children }) => (
@@ -87,7 +87,7 @@ describe('useProject', () => {
   test('updateProject with valid project data calls updateDoc', async () => {
     const { result } = renderHook(() => useProject(), { wrapper })
 
-    // sending valid project data
+    // sending valid project data, act allows waiting until state is finally updated
     await act(async () => {
       await result.current.updateProject('1', { title: ' Updated Title ', description: 'Updated Description' });
     })
