@@ -76,17 +76,17 @@ export const ProjectProvider = ({ children }) => {
         )
 
         const unsub = onSnapshot(membershipsQuery, async (membershipSnap) => {
-						setIsLoadingProjects(true)
+            setIsLoadingProjects(true)
 
             // Just the projects' ids
             const projectIds = membershipSnap.docs.map((d) => d.data().projectId)
 
-						// Necessary check because 'in' queries require a non-empty array
-						if (projectIds.length === 0) {
-								setProjects([]);
-								setIsLoadingProjects(false)
-								return;
-						}
+            // Necessary check because 'in' queries require a non-empty array
+            if (projectIds.length === 0) {
+                setProjects([]);
+                setIsLoadingProjects(false)
+                return;
+            }
 
             // Get entire documents from the projects collection
             const userProjects = await getDocs(
@@ -98,7 +98,7 @@ export const ProjectProvider = ({ children }) => {
             // Format accordingly
             const projectsToDisplay = userProjects.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setProjects(projectsToDisplay);
-						setIsLoadingProjects(false)
+            setIsLoadingProjects(false)
         });
 
       return () => unsub();
@@ -107,14 +107,6 @@ export const ProjectProvider = ({ children }) => {
     async function deleteProject(id){
 		await deleteDoc(doc(db, 'projects', id))
 	}
-
-	useEffect(() => {
-		const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
-			const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-			setProjects(projects)
-		});
-		return () => unsub()
-	}, []);
 
     return (
         <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject }}>

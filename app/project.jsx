@@ -21,7 +21,7 @@ export default function Home() {
   // For example: /project?projectId=abc -> params.projectId will be abc
   const scheme = useColorScheme();
   const palette = Colors[scheme] ?? Colors.light;
-  const { projects } = useProject();
+  const { projects } = useProject(); // user projects
   const { user } = useUser();
   const { getUserByEmail } = useUsers();
   const { sendInvite } = useInvite();
@@ -34,8 +34,8 @@ export default function Home() {
   const [inviteModalVisible, setInviteModalVisible] = React.useState(false);
   const [inviteTarget, setInviteTarget] = React.useState('');
 
-  const rawProjectId = params.projectId;
-  const projectId = Array.isArray(rawProjectId) ? rawProjectId[0] : rawProjectId; // Stores the project id, useful for querying tasks associated
+  // Search for current project in the user's projects
+  const projectId = params.projectId;
   const currentProject = projects.find((project) => project.id === projectId);
   const currentProjectName = currentProject.title;
 

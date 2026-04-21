@@ -40,7 +40,7 @@ export function InviteProvider({ children }) {
       where('receiverId', '==', inviteData.receiverId),
       where('projectId', '==', inviteData.projectId)
     );
-
+    
     const existingSnapshot = await getDocs(existingInviteQuery);
     if (!existingSnapshot.empty) {
       throw new Error('Invite already sent to this user for this project');
