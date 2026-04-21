@@ -1,5 +1,5 @@
-import { UserContext, UserProvider } from "../../contexts/userContext";
-import { useUser } from "../../hooks/useUser"
+import { UserContext, UserProvider } from "../../../contexts/userContext";
+import { useUser } from "../../../hooks/useUser"
 import { Text } from 'react-native'
 import { render, screen, act } from '@testing-library/react-native'
 
