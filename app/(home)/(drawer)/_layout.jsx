@@ -5,11 +5,14 @@ import { Ionicons } from "@expo/vector-icons";
 import DrawerThemedButton from "../../../components/DrawerThemedButton";
 import { ProjectProvider } from "../../../contexts/projectContext";
 import CustomDrawerContent from "../../../components/CustomDrawerContent";
+import { useInvite } from "../../../hooks/useInvite";
 
 export default function DrawerLayout() {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
+    const { hasNewInvites } = useInvite()
+    
     return (
         <ProjectProvider>
         <Drawer
@@ -34,7 +37,7 @@ export default function DrawerLayout() {
                         backgroundColor: theme.navBackground,
                     },
 
-                    headerLeft: () => <DrawerThemedButton/>
+                    headerLeft: () => <DrawerThemedButton showNotification={hasNewInvites}/>
                 }}
             >
                 <Drawer.Screen
@@ -86,7 +89,7 @@ export default function DrawerLayout() {
                         title: "Invites",
                         drawerIcon: ({ focused, color }) => (
                             <Ionicons
-                                name={focused ? "mail" : "mail-outline"}
+                                name={focused ? "mail" : (hasNewInvites ? "mail-unread-outline" : "mail-outline")}
                                 size={24}
                                 color={color}
                             />
