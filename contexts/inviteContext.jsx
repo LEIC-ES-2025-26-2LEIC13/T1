@@ -30,7 +30,7 @@ export function InviteProvider({ children }) {
     });
 
     return unsubscribe; // unsubscribe returned by onSnapshot
-  }, [user?.uid]);
+  }, [user?.uid]); // cannot add invites.length as a dependency, otherwise the callback will be triggered twice
 
 
   async function sendInvite(inviteData) {
