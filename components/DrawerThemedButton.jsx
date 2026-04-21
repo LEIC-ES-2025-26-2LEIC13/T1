@@ -5,18 +5,23 @@ import {Ionicons} from "@expo/vector-icons";
 import {Colors} from "../constants/Colors";
 
 
-const DrawerThemedButton = () =>{
+const DrawerThemedButton = ({ showNotification }) =>{
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
     const navigation = useNavigation();
     return (
-        <Pressable
-            onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-            style={{ marginLeft: 10}}
-        >
-            <Ionicons name="menu" size={28} color={theme.iconColor} />
-        </Pressable>
+        <>
+            <Pressable
+                onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+                style={{ marginLeft: 10}}
+            >
+                <Ionicons name="menu" size={28} color={theme.iconColor} />
+            </Pressable>
+
+            {showNotification ? <Ionicons name="notifications" size={15} color={Colors.warning} /> : <></>}
+        </>
+
     );
 }
 

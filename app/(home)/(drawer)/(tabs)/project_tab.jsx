@@ -1,6 +1,7 @@
-import React from 'react';
-import { Alert, View, StyleSheet, useColorScheme, FlatList, Text } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, useColorScheme, ScrollView, Text, ActivityIndicator } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
+import ThemedView from '../../../../components/ThemedView';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
@@ -12,10 +13,10 @@ const Projects = () => {
     const theme = Colors[colorScheme] ?? Colors.light;
     const isDark = colorScheme === 'dark';
 
-    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
-    const [projectTitle, setProjectTitle] = React.useState('');
-    const [projectDescription, setProjectDescription] = React.useState('');
-    const { projects, createProject } = useProject();
+    const [projectModalVisible, setProjectModalVisible] = useState(false);
+    const [projectTitle, setProjectTitle] = useState('');
+    const [projectDescription, setProjectDescription] = useState('');
+    const { projects, isLoadingProjects, createProject } = useProject();
 
     const openProjectModal = () => setProjectModalVisible(true);
 
@@ -53,30 +54,39 @@ const Projects = () => {
     );
 
     return (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <ThemedView style={styles.container}>
 
-            <FlatList
-                data={projects ?? []}
-                style={styles.list}
-                contentContainerStyle={[
-                    styles.listContent,
-                    (!projects || projects.length === 0) && styles.listContentEmpty
-                ]}
-                keyExtractor={(item, index) => `${item.title}-${index}`}
-                showsVerticalScrollIndicator={false}
-                ListEmptyComponent={<EmptyState />}
-                renderItem={({ item, index }) => (
-                    <ThemedProject
-                        projectId={item.id}
-                        name={item.title}
-                        description={item.description}
-                        borderColor={borderColors[index % borderColors.length]}
-                    />
-                )}
-            />
+            {isLoadingProjects ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={theme.text} />
+                </View>
+            ) : (
+                <ScrollView
+                    style={styles.list}
+                    contentContainerStyle={[
+                        styles.listContent,
+                        (!projects || projects.length === 0) && styles.listContentEmpty
+                    ]}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {(!projects || projects.length === 0)
+                        ? <EmptyState />
+                        : projects.map((item, index) => (
+                            <ThemedProject
+                                key={`${item.title}-${index}`}
+                                projectId={item.id}
+                                name={item.title}
+                                description={item.description}
+                                borderColor={borderColors[index % borderColors.length]}
+                            />
+                        ))
+                    }
+                </ScrollView>
+            )}
 
             <ThemedButton
                 style={styles.fab}
+                disabled={isLoadingProjects}
                 onPress={openProjectModal}
             >
                 <Ionicons name="add" size={20} color="#fff" style={{ marginRight: 8 }} />
@@ -92,7 +102,8 @@ const Projects = () => {
                 descriptionValue={projectDescription}
                 onDescriptionChangeText={setProjectDescription}
             />
-        </View>
+
+        </ThemedView>
     );
 };
 
@@ -103,14 +114,22 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
+    loadingContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
     list: {
         flex: 1,
     },
+
     listContent: {
         paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 110,
     },
+
     listContentEmpty: {
         flex: 1,
     },
