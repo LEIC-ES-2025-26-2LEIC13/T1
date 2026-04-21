@@ -4,23 +4,13 @@ tags:
 ---
 
 # Login and Launch
-- runFlow: login.yaml
-
-# Open modal
-- tapOn: Project 1, Description 1
-- tapOn: +, Create Task
-
-# Fill task form
-- tapOn: Enter task name
-- inputText: New Task
-- tapOn: Enter task description
-- inputText: Task description
+- runFlow: openProject.yaml
+- tapOn: "+, Create Task"
+- tapOn: "Enter task name"
+- inputText: "Task1"
+- tapOn: "Enter task description"
+- inputText: "Task1 Description"
 - hideKeyboard
-
-# Create task
-- tapOn: Create Task
-
-# Assertions
-- assertVisible: Task created
-- assertVisible: New task
-- assertVisible: Task description
+- tapOn: "Create Task"
+- assertVisible: "Task1"
+- assertVisible: "Task1 Description"

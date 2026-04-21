@@ -1,13 +1,14 @@
-# used for other tests
 appId: com.anonymous.LEICo
 ---
 - launchApp:
     clearState: true
 - tapOn:
     id: login-email-input
-- inputText: johndoe@gmail.com
+- inputText: "johndoe@gmail.com"
 - tapOn:
     id: login-password-input
 - inputText: "123456"
+- hideKeyboard          
 - tapOn:
-    id: login-submit-button
+    id: "login-submit-button"
+- assertVisible: "My Projects"

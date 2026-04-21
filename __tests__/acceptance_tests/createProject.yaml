@@ -1,0 +1,15 @@
+appId: com.anonymous.LEICo
+tags:
+  - task
+---
+
+# Login and Launch
+- runFlow: login.yaml
+- tapOn: "+, Create Project"
+- tapOn: "Enter project title"
+- inputText: "Simple Test"
+- tapOn: "Enter project description (optional)"
+- inputText: "Simple Description"
+- tapOn: "\uf103, Create"
+- assertVisible: "Simple Test"
+- assertVisible: "Simple Description"
