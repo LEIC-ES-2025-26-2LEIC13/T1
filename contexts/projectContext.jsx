@@ -1,34 +1,66 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useEffect, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc, where, documentId } from "firebase/firestore"
-import { db } from '../firebase/firebaseConfig';
-import { useUser } from '../hooks/useUser';
+import { db } from "../firebase/firebaseConfig";
+import { useUser } from "../hooks/useUser";
 
 export const ProjectContext = createContext();
 
+function normalizeProjectPayload(projectData = {}) {
+	return {
+		...projectData,
+		title: projectData?.title?.trim() ?? '',
+		description: projectData?.description?.trim() ?? '',
+	}
+}
+
+function validateProjectPayload(projectData = {}) {
+	if (!projectData.title) {
+		throw new Error('Please enter a project title')
+	}
+}
+
+function normalizeProjectUpdates(updates = {}) {
+  const normalized = { ...updates };
+
+  if (normalized.title !== undefined) {
+	normalized.title = (normalized.title ?? '').trim();
+	if (!normalized.title) throw new Error('Project title cannot be empty');
+  }
+
+  if (normalized.description !== undefined) {
+	normalized.description = (normalized.description ?? '').trim();
+  }
+
+  return normalized;
+}
+
 export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([])
-		const [isLoadingProjects, setIsLoadingProjects] = useState(false)
+	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
     const { user } = useUser()
 
     async function createProject(projectData) {
+        const normalizedProjectData = normalizeProjectPayload(projectData)
+		validateProjectPayload(normalizedProjectData)
+
         const projectRef = await addDoc(collection(db, 'projects'), {
-            ...projectData,
+            ...normalizedProjectData,
             createdBy: user.uid
         })
 
-				// The user who created the project has it as one of his projects now
+        // The user who created the project has it as one of his projects now
         await addDoc(collection(db, 'projectMemberships'), {
             projectId: projectRef.id,
             userId: user.uid
         })
-    }
-
-    async function deleteProject(id){
-        await deleteDoc(doc(db, 'projects', id));
-    }
+	}
 
     async function updateProject(id, updates) {
-        await updateDoc(doc(db, 'projects', id), {...updates});
+        const normalizedUpdates = normalizeProjectUpdates(updates)
+		if (Object.keys(normalizedUpdates).length === 0) {
+			return
+		}
+		await updateDoc(doc(db, 'projects', id), {...normalizedUpdates})
     }
 		
     useEffect(() => {
@@ -72,6 +104,17 @@ export const ProjectProvider = ({ children }) => {
       return () => unsub();
     }, [user?.uid]);
 
+    async function deleteProject(id){
+		await deleteDoc(doc(db, 'projects', id))
+	}
+
+	useEffect(() => {
+		const unsub = onSnapshot(collection(db, 'projects'), (snapshot) => {
+			const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+			setProjects(projects)
+		});
+		return () => unsub()
+	}, []);
 
     return (
         <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject }}>

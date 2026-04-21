@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, FlatList } from 'react-native';
-
+import { Alert, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
@@ -8,7 +7,6 @@ import ProjectModal from '../../../../components/ProjectModal';
 import ThemedView from '../../../../components/ThemedView';
 
 import useProject from '../../../../hooks/useProject';
-import { normalizeProjectData } from '../../../../model/Project';
 
 
 const Projects = () => {
@@ -27,13 +25,12 @@ const Projects = () => {
     };
 
     const handleCreateProject = async (projectData) => {
-        const normalizedProjectData = normalizeProjectData({
-            ...projectData,
-        });
-
-
-        await createProject(normalizedProjectData);
-        closeProjectModal();
+        try {
+            await createProject(projectData);
+            closeProjectModal();
+        } catch (error) {
+            Alert.alert('Error', error.message || 'Could not create project');
+        }
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
