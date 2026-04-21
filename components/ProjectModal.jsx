@@ -1,102 +1,192 @@
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, View, useColorScheme } from 'react-native';
 import AppModal from './AppModal';
 import ThemedText from './ThemedText';
-import Spacer from './Spacer';
 import ThemedButton from './ThemedButton';
-import ThemedView from './ThemedView';
 import ThemedTextInput from './ThemedTextInput';
+import { Colors } from '../constants/Colors';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProjectModal({
-	visible,
-	onClose,
-	onCreate,
-	titleValue,
-	onTitleChangeText,
-	descriptionValue,
-	onDescriptionChangeText,
+    visible,
+    onClose,
+    onCreate,
+    titleValue,
+    onTitleChangeText,
+    descriptionValue,
+    onDescriptionChangeText,
 }) {
-	return (
-		<AppModal visible={visible}>
-			<ThemedText title={true} style={styles.title}>
-				Create Project
-			</ThemedText>
+    const colorScheme = useColorScheme();
+    const theme = Colors[colorScheme] ?? Colors.light;
+    const isDark = colorScheme === 'dark';
 
-			<ThemedText title={true}>Project Title</ThemedText>
-			<Spacer height={10} />
+    return (
+        <AppModal visible={visible}>
 
-			<ThemedTextInput
-				style={{ width: '100%', marginBottom: 15 }}
-				placeholder="Enter project title"
-				value={titleValue}
-				onChangeText={onTitleChangeText}
-			/>
+            {/* Header */}
+            <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                    <View style={[styles.iconWrap, { backgroundColor: isDark ? 'rgba(70,148,251,0.15)' : 'rgba(70,148,251,0.1)' }]}>
+                        <Ionicons name="folder-open-outline" size={20} color="#4694fb" />
+                    </View>
+                    <Text style={[styles.title, { color: theme.text }]}>New Project</Text>
+                </View>
+                <ThemedButton style={styles.closeBtn} onPress={onClose}>
+                    <Ionicons name="close" size={20} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
+                </ThemedButton>
+            </View>
 
-			<ThemedText title={true}>Description</ThemedText>
-			<Spacer height={10} />
+            {/* Divider */}
+            <View style={[styles.divider, {
+                backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
+            }]} />
 
-			<ThemedTextInput
-				style={{ width: '100%', marginBottom: 15, height: 100, textAlignVertical: 'top' }}
-				placeholder="Enter project description"
-				multiline={true}
-				value={descriptionValue}
-				onChangeText={onDescriptionChangeText}
-			/>
+            {/* Fields */}
+            <View style={styles.body}>
+                <Text style={[styles.label, { color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.5)' }]}>
+                    PROJECT TITLE
+                </Text>
+                <ThemedTextInput
+                    containerStyle={styles.input}
+                    placeholder="Enter project title"
+                    value={titleValue}
+                    onChangeText={onTitleChangeText}
+                />
 
-			<ThemedView style={styles.actions}>
-				<ThemedButton style={[styles.button, styles.cancel]} onPress={onClose}>
-					<Text style={styles.buttonTextCancel}>Cancel</Text>
-				</ThemedButton>
+                <Text style={[styles.label, { color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.5)' }]}>
+                    DESCRIPTION
+                </Text>
+                <ThemedTextInput
+                    containerStyle={[styles.input, styles.textArea]}
+                    placeholder="Enter project description (optional)"
+                    multiline={true}
+                    value={descriptionValue}
+                    onChangeText={onDescriptionChangeText}
+                />
+            </View>
 
-				<ThemedButton
-					style={styles.button}
-					onPress={() => onCreate({
-						title: titleValue,
-						description: descriptionValue,
-					})}
-				>
-					<Text style={styles.buttonTextCreate}>Create Project</Text>
-				</ThemedButton>
-			</ThemedView>
-		</AppModal>
-	);
+            {/* Actions */}
+            <View style={styles.actions}>
+                <ThemedButton
+                    style={[styles.button, styles.cancelBtn, {
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)',
+                    }]}
+                    onPress={onClose}
+                >
+                    <Text style={[styles.cancelText, { color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }]}>
+                        Cancel
+                    </Text>
+                </ThemedButton>
+
+                <ThemedButton
+                    style={[styles.button, styles.createBtn]}
+                    onPress={() => onCreate({ title: titleValue, description: descriptionValue })}
+                >
+                    <Ionicons name="add" size={16} color="#fff" style={{ marginRight: 6 }} />
+                    <Text style={styles.createText}>Create</Text>
+                </ThemedButton>
+            </View>
+
+        </AppModal>
+    );
 }
 
 const styles = StyleSheet.create({
-	title: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		marginBottom: 12,
-	},
+    // Header
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 14,
+    },
+    headerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    iconWrap: {
+        width: 36,
+        height: 36,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: 17,
+        fontWeight: '700',
+        letterSpacing: 0.2,
+    },
+    closeBtn: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        padding: 0,
+    },
 
-	actions: {
-		flexDirection: 'row',
-		justifyContent: 'space-evenly',
-		marginTop: 20,
-	},
+    // Divider
+    divider: {
+        height: 1,
+        marginHorizontal: 0,
+    },
 
-	button: {
-		flex: 1,
-		paddingVertical: 14,
-		paddingHorizontal: 10,
-		borderRadius: 8,
-		minWidth: 100,
-		alignItems: 'center',
-		marginHorizontal: 5,
-	},
+    // Body
+    body: {
+        paddingHorizontal: 20,
+        paddingTop: 18,
+    },
+    label: {
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.8,
+        marginBottom: 7,
+    },
+    input: {
+        width: '100%',
+        marginBottom: 18,
+    },
+    textArea: {
+        height: 90,
+        textAlignVertical: 'top',
+    },
 
-	cancel: {
-		backgroundColor: 'white',
-		borderWidth: 0.5,
-		borderColor: 'grey',
-	},
-
-	buttonTextCancel: {
-		color: 'black',
-		fontWeight: 'bold',
-	},
-
-	buttonTextCreate: {
-		color: 'white',
-		fontWeight: 'bold',
-	},
+    // Actions
+    actions: {
+        flexDirection: 'row',
+        gap: 10,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        paddingTop: 4,
+    },
+    button: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingVertical: 13,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cancelBtn: {
+        // background set inline for theme support
+    },
+    createBtn: {
+        backgroundColor: '#4694fb',
+        shadowColor: '#4694fb',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 4,
+    },
+    cancelText: {
+        fontWeight: '600',
+        fontSize: 15,
+    },
+    createText: {
+        color: '#ffffff',
+        fontWeight: '600',
+        fontSize: 15,
+    },
 });
