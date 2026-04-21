@@ -1,0 +1,12 @@
+appId: com.example.app
+---
+- launchApp:
+    clearState: true
+
+- runFlow: openProject.yaml
+- tapOn: "\uf4a6"
+- tapOn: "Enter user email"
+- inputText: "pedro19@gmail.com"
+- hideKeyboard
+
+- runFlow: ""

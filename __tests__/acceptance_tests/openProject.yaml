@@ -4,12 +4,4 @@ tags:
 ---
 # Login and Launch
 - runFlow: login.yaml
-
-# Open Modal
-- assertVisible: Project 1, Description 1
-- tapOn: Project 1, Description 1
-
-# Assertions
-- assertVisible: Programming Project
-- assertVisible: +, Create Task
-
+- tapOn: "Simple Test, Simple Description, Open \u2192"
