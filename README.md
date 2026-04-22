@@ -336,7 +336,8 @@ Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 
 ### Sprint 1
 
-* Responsible use of AI: available [here](docs/MisterAIUsage.md)
+* Responsible use of AI: available [here](docs/MisterAIUsage.md).
+  - Used AI tools to improve UI of the app in the development of [this](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2/views/1?pane=issue&itemId=178740336&issue=LEIC-ES-2025-26-2LEIC13%7CT1%7C104) issue.
 * Tools and database setup: available [here](docs/firebaseSetup.md)
 
 #### Release
