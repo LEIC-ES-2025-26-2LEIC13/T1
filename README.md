@@ -339,6 +339,7 @@ Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 * Responsible use of AI: available [here](docs/MisterAIUsage.md).
   - Used AI tools to improve UI of the app in the development of [this](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2/views/1?pane=issue&itemId=178740336&issue=LEIC-ES-2025-26-2LEIC13%7CT1%7C104) issue.
 * Tools and database setup: available [here](docs/firebaseSetup.md)
+* Change log: available [here](docs/changeLogSprint1.md)
 
 #### Database Modelling and Integration
 To integrate our app with a database, in this case, we had to redesign the database model, from a more SQL centric approach to a NoSQL approach (Firestore is inherently NoSQL so the first idea didn't make any sense).
