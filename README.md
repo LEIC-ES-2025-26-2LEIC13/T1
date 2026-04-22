@@ -392,13 +392,14 @@ The UI was improved during this sprint: modals, screens, layout.
 
 
 #### Defects / Further Improvements
-1. Create "Classes" to better structure data that is sent/recieved to/from Firestore
-2. Create high level functions to abstract repeated behaviour when interacting with database
-3. Improve icon positioning and layout (inside the emulator was good but when testing on a real device those problems were identified)
-4. Improve the color palette file `Colors.js` to create a more even coloring layout troughout the app without magic constants (colors only related to a certain file)
-5. Need for stricter validation on text input: length bounds, invalid characters, duplicate naming policy.
-6. Refactor logic to delete projects, currently incorrect
-7. Partial writes risk (if the first one occurs and the second one fails, there will be missing data in the database), verify need for transaction
+1. Create "Classes" to better structure data that is sent/recieved to/from Firestore;
+2. Create high level functions to abstract repeated behaviour when interacting with database;
+3. Improve icon positioning and layout (inside the emulator was good but when testing on a real device those problems were identified);
+4. Improve the color palette file `Colors.js` to create a more even coloring layout troughout the app without magic constants (colors only related to a certain file);
+5. Need for stricter validation on text input: length bounds, invalid characters, duplicate naming policy;
+6. Refactor logic to delete projects, currently incorrect;
+7. Partial writes risk (if the first one occurs and the second one fails, there will be missing data in the database), verify need for transaction;
+8. Code cleanup and refactor inside some of the core files (e.g. app/project.jsx);
 
 #### Release
 
