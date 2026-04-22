@@ -1,20 +1,4 @@
 appId: com.anonymous.LEICo
-tags:
-  - invite
 ---
-# Login and Launch
-- runFlow: login.yaml
-
-# Open modal
-- tapOn: Project 1, Description 1
-- tapOn: 
-
-# Fill invite form
-- tapOn: Enter username
-- inputText: Jane Doe
-
-# Send invite
-- tapOn: Invite
-
-# Asserions 
-- assertVisible: Invite Sent
+- launchApp:
+    clearState: true

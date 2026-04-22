@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { Alert, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { Alert, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import { Colors } from '../../../../constants/Colors';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import ProjectModal from '../../../../components/ProjectModal';
-import ThemedView from '../../../../components/ThemedView';
-
 import useProject from '../../../../hooks/useProject';
 
-
 const Projects = () => {
+    const colorScheme = useColorScheme();
+    const theme = Colors[colorScheme] ?? Colors.light;
 
-    const [projectModalVisible, setProjectModalVisible] = useState(false);
-    const [projectTitle, setProjectTitle] = useState('');
-    const [projectDescription, setProjectDescription] = useState('');
-    const { projects, isLoadingProjects, createProject } = useProject();
+    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
+    const [projectTitle, setProjectTitle] = React.useState('');
+    const [projectDescription, setProjectDescription] = React.useState('');
+    const { projects, createProject } = useProject();
 
     const openProjectModal = () => setProjectModalVisible(true);
 
@@ -36,23 +36,12 @@ const Projects = () => {
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
 
     return (
-        <ThemedView style={ styles.container }>
-            {
-            isLoadingProjects? 
-            <ActivityIndicator size="large" color="#000" />
-            
-            :
-
+        <View style={[styles.container, { backgroundColor: theme.background }] }>
             <FlatList
                 data={projects ?? []}
                 style={styles.list}
                 contentContainerStyle={styles.listContent}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
-
-                ListEmptyComponent={
-                    <ThemedText style={styles.blankText}>No projects yet!</ThemedText>
-                }
-
                 renderItem={({ item, index }) => (
                     <ThemedProject
                         projectId={item.id}
@@ -62,11 +51,8 @@ const Projects = () => {
                     />
                 )}
             />
-            }
-            
             <ThemedButton
                 style={styles.btn}
-                disabled={isLoadingProjects}
                 onPress={openProjectModal}>
                 <ThemedText style={[styles.btnText ,{ marginRight: 20 }]}>+</ThemedText>
                 <ThemedText style={styles.btnText}>Create Project</ThemedText>
@@ -82,7 +68,7 @@ const Projects = () => {
                 onDescriptionChangeText={setProjectDescription}
             />
 
-        </ThemedView>
+        </View>
     );
 }
 
@@ -93,44 +79,32 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 20,
     },
-
     list: {
         flex: 1,
     },
-
     listContent: {
         paddingBottom: 110,
     },
-
     btn:{
-        width: '85%',
+    width: '85%',
 
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
 
-        padding: 12,
+    padding: 12,
 
-        position: 'absolute',
-        bottom: 20,
-        alignSelf: 'center',
-        marginBottom: 0,
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    marginBottom: 0,
         zIndex: 10,
         elevation: 4,
-    },
+  },
 
-    btnText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-
-    blankText: {
-        textAlign: 'center',
-        marginTop: 20,
-
-        fontSize: 16,
-        fontWeight: 'bold',
-        opacity: 0.7
-    }
+  btnText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  }
 })

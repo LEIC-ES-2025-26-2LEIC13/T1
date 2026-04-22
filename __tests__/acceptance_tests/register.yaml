@@ -1,0 +1,15 @@
+appId: com.anonymous.LEICo
+---
+- launchApp:
+    clearState: true
+- tapOn: "Register here"
+- tapOn: "Email"
+- inputText: "test@gmail.com"
+- tapOn: "Password"
+- inputText: 123456
+- tapOn: "Confirm Password"
+- inputText: "123456"
+- hideKeyboard
+- tapOn: "Register"
+- tapOn: "OK"
+- assertVisible: "My Projects"
