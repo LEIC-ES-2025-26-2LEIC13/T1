@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc, where, documentId } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig";
 import { useUser } from "../hooks/useUser";
 
@@ -48,10 +48,18 @@ export const ProjectProvider = ({ children }) => {
             createdBy: user.uid
         })
 
-        // The user who created the project has it as one of his projects now
-        await addDoc(collection(db, 'projectMemberships'), {
+        // Create a document in a subcolletion 'users' inside the respective project document
+        await addDoc(collection(projectRef, 'users'), {
+            email: user.email // possible (from Auth context)
+        })
+
+        const userRef = doc(db, 'users', user.uid)
+
+        // Create a document in a subcolletion 'projects' inside the respective user document
+        await addDoc(collection(userRef, 'projects'), { 
             projectId: projectRef.id,
-            userId: user.uid
+            title: normalizedProjectData.title,
+            description: normalizedProjectData.description
         })
 	}
 
@@ -69,35 +77,21 @@ export const ProjectProvider = ({ children }) => {
             return;
         }
 
-        // Gets docs relative to the current user
-        const membershipsQuery = query(
-            collection(db, 'projectMemberships'),
-            where('userId', '==', user.uid)
+        const userRef = doc(db, 'users', user.uid)
+        // Gets projects in which the current user is envolved
+        const userProjects = query(
+            collection(userRef, 'projects'),
         )
 
-        const unsub = onSnapshot(membershipsQuery, async (membershipSnap) => {
+        const unsub = onSnapshot(userProjects, async (userProjectsSnap) => {
             setIsLoadingProjects(true)
-
-            // Just the projects' ids
-            const projectIds = membershipSnap.docs.map((d) => d.data().projectId)
-
-            // Necessary check because 'in' queries require a non-empty array
-            if (projectIds.length === 0) {
-                setProjects([]);
-                setIsLoadingProjects(false)
-                return;
-            }
-
-            // Get entire documents from the projects collection
-            const userProjects = await getDocs(
-                query(
-                    collection(db, 'projects'),
-                    where(documentId(), 'in', projectIds) // warning: Firestore has a 'in' max list size
-                ))
-
-            // Format accordingly
-            const projectsToDisplay = userProjects.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setProjects(projectsToDisplay);
+            
+            const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
+                id: doc.data().projectId, // true project ID 
+                ...doc.data(),
+            }));
+            
+            setProjects(projectsToDisplay)
             setIsLoadingProjects(false)
         });
 
