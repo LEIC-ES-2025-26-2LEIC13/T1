@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
-import TaskModal from '../components/TaskModal';
+import TaskModal from '../components/CreateTaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/Task";
@@ -14,6 +14,7 @@ import useProject from '../hooks/useProject';
 import { useUser } from '../hooks/useUser';
 import { useUsers } from '../hooks/useUsers';
 import { useInvite } from '../hooks/useInvite';
+import { useTask } from '../hooks/useTask';
 
 export default function Home() {
   const router = useRouter();
@@ -26,10 +27,11 @@ export default function Home() {
   const { getUserByEmail } = useUsers();
   const { sendInvite } = useInvite();
 
-  const [tasks, setTasks] = React.useState([]); // This will have all existing tasks
-  const [taskName, setTaskName] = React.useState('');
-  const [taskDetail, setTaskDetail] = React.useState('');
-  const [taskModalVisible, setTaskModalVisible] = React.useState(false);
+  const [ taskName, setTaskName] = React.useState('');
+  const [ taskDetail, setTaskDetail ] = React.useState('');
+  const [ taskLabel, setTaskLabel ] = React.useState('');
+  const [ taskModalVisible, setTaskModalVisible ] = React.useState(false);
+  const { tasks, createTask } = useTask(params.projectId);
 
   const [inviteModalVisible, setInviteModalVisible] = React.useState(false);
   const [inviteTarget, setInviteTarget] = React.useState('');
@@ -47,27 +49,13 @@ export default function Home() {
     setTaskDetail('');
   };
 
-  const handleCreateTask = () => {
-    if (!taskName.trim()) {
-      Alert.alert('Error', 'Please enter a task name');
-      return;
+  const handleCreateTask = async (taskData) => {
+    try{
+      await createTask(taskData, projectId);
+      closeTaskModal();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create task');
     }
-
-    const newTask = {
-        // id: Date.now().toString()
-        name: taskName,
-        description: taskDetail,
-    }
-
-    setTasks(prev => [...prev, newTask]);
-
-    closeTaskModal();
-
-    Toast.show({
-      type: 'success',
-      text1: 'Task created',
-      text2: taskName,
-    });
   };
 
   const handleInvitePress = () => {
@@ -184,16 +172,20 @@ export default function Home() {
           onInvite={handleSendInvite}
           workspaceName={currentProjectName}
         />
-
-        <View style={{ flex: 1 }}>
-          {tasks.map(({name, description }) => (
+        
+        <FlatList
+          data={tasks ?? []}
+          style={styles.list}
+          contentContainerStyle={styles.listContent}
+          keyExtractor={(item, index) => `${item.name}-${index}`}
+          renderItem={({ item }) => (
               <Task
-                  key={name}
-                  name={name}
-                  description={description}
+                  name={item.name}
+                  description={item.description}
+                  label={item.label}
               />
-          ))}
-        </View>
+          )}
+        />
 
         <ThemedButton
           onPress={openTaskModal}
@@ -203,14 +195,16 @@ export default function Home() {
           <Text style={styles.btnText}>Create Task</Text>
         </ThemedButton>
 
-        <TaskModal
-          visible={taskModalVisible}
+        <CreateTaskModal
+          isVisible={taskModalVisible}
           onClose={closeTaskModal}
           onCreate={handleCreateTask}
-          nameValue={taskName}
-          onNameChangeText={setTaskName}
-          detailValue={taskDetail}
-          onDetailChangeText={setTaskDetail}
+          titleValue={taskName}
+          onTitleChangeText={setTaskName}
+          descriptionValue={taskDetail}
+          onDescriptionChangeText={setTaskDetail}
+          labelValue={taskLabel}
+          onLabelChangeText={setTaskLabel}
           projectName={currentProjectName}
         />
       </SafeAreaView>

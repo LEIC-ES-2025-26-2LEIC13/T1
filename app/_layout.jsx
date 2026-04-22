@@ -9,6 +9,7 @@ import { InviteProvider } from '../contexts/inviteContext'
 import { useUser } from '../hooks/useUser'
 
 import AppToast from '../components/Toast';
+import { TaskProvider } from '../contexts/taskContext'
 
 
 // This component was defined explicity, because useUser hook can only be used inside descendents of UserProvider, not inside itself
@@ -52,8 +53,10 @@ const RouteLayout = () => {
       <UsersProvider>
         <ProjectProvider>
           <InviteProvider>
-            <StatusBar value="auto" />
-            <RootNavigator />
+            <TaskProvider>
+              <StatusBar value="auto" />
+              <RootNavigator />
+            </TaskProvider>
           </InviteProvider>
         </ProjectProvider>
       </UsersProvider>
