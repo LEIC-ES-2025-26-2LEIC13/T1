@@ -330,7 +330,8 @@ npx expo lint
     - `android-ios-build-release.yml`: for pushes to tags beginning with "v".
 
 ### Sprint 1
-
+Responsible use of AI: available [here](docs/MisterAIUsage.md)
+Tools and database setup: available [here](docs/firebaseSetup.md)
 ### Sprint 2
 
 ### Sprint 3
