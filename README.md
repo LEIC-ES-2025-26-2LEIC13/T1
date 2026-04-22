@@ -258,6 +258,7 @@ In this subsection please describe which feature, or part of it, you have implem
 
 At this phase, instead of a complete user story, you can simply implement a small part of a feature that demonstrates thay you can use the technology, for example, show a screen with the app credits (name and authors).
 -->
+Most recent release [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.1.0).
 
 ## Project management
 <!--
@@ -329,9 +330,19 @@ npx expo lint
     - `bundle-quality-test.yml`: for pushes in PRs to the main branch and for pushses to the main branch.
     - `android-ios-build-release.yml`: for pushes to tags beginning with "v".
 
+#### Release
+
+Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.0.0).
+
 ### Sprint 1
-Responsible use of AI: available [here](docs/MisterAIUsage.md)
-Tools and database setup: available [here](docs/firebaseSetup.md)
+
+* Responsible use of AI: available [here](docs/MisterAIUsage.md)
+* Tools and database setup: available [here](docs/firebaseSetup.md)
+
+#### Release
+
+Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.1.0).
+
 ### Sprint 2
 
 ### Sprint 3
