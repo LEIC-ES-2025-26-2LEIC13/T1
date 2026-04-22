@@ -50,6 +50,7 @@ export const ProjectProvider = ({ children }) => {
 
         // Create a document in a subcolletion 'users' inside the respective project document
         await addDoc(collection(projectRef, 'users'), {
+            userId: user.uid,
             email: user.email // possible (from Auth context)
         })
 

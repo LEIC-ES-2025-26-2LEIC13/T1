@@ -94,8 +94,6 @@ export function InviteProvider({ children }) {
 		await deleteDoc(doc(db, 'invites', invite.id)) // delete the pending invite globally
 		await deleteDoc(doc(receiverRef, 'invites', invite.id)) // delete the pending invite in the user's invites
 
-
-		
 		// Creates a document for one more project inside the 'projects' subcollection inside receiver document
 		await addDoc(collection(receiverRef, 'projects'), {
 				projectId: projectSnap.id, // id is obtained from the snapshot
@@ -105,6 +103,7 @@ export function InviteProvider({ children }) {
 
 		// Creates a document for one more user (email only) inside the 'users' subcollection inside project document
 		await addDoc(collection(projectRef, 'users'), {
+				userId: user.uid,
 				email: user.email
 			})
   }

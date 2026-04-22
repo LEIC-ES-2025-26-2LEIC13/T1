@@ -130,8 +130,8 @@ export default function Home() {
         visibilityTime: 1500,
         topOffset: 100,
       });
-      } catch {
-        Alert.alert('Duplicate or invalid invite', 'You have already sent an invite to this user for this project, or this invite is invalid.');
+      } catch (error) {
+        Alert.alert('Invalid invite', error.message);
       }
     }
   

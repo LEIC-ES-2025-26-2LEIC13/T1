@@ -11,16 +11,16 @@ const Invites = () => {
     const handleAccept = async (invite) => {
         try {
           	await acceptInvite(invite)
-        } catch {
-          	Alert.alert('Error', 'Could not accept invite.')
+        } catch  (error) {
+          	Alert.alert('Error', error)
         }
     };
 
 		const handleIgnore = async (invite) => {
 			try {
 				await ignoreInvite(invite)
-			} catch {
-				Alert.alert('Error', 'Could not ignore invite')
+			} catch (error) {
+				Alert.alert('Error', error)
 			}
 		}
 
