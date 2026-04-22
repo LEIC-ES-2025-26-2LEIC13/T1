@@ -427,6 +427,10 @@ The UI was improved during this sprint: modals, screens, layout.
 * Due to team dynamics and changes we couldn't achieve the goals defined at the start of the sprint. 
 * Despite that the end result was pretty good. We learned a lot especially how to use NoSQL databases and how to maximize their efficiency and reduce the number of reads.
 
+#### Teamwork Assessment
+
+* The work was evenly distributed accross the team members.
+* Since the tasks were very interdependent, we communicated a lot with each other, so everyone was aboard with the ongoing development process.
 
 #### Release
 
