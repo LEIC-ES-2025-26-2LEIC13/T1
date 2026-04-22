@@ -374,7 +374,7 @@ The final model is the follwing:
 
 #### Defect Log, Tracking and Verification
 
-#### Scope
+##### Scope
 - Files inside the contexts folder: `contexts/inviteContext.jsx` and `contexts/projectContext.jsx`.
 
 #### InviteContext and ProjectContext
@@ -384,14 +384,14 @@ The final model is the follwing:
 - Duplicate invite prevention is implemented via query filters (where) on `receiverId` and `projectId` before creating a new invite.
 - User-already-in-project validation is implemented before creating an invite (inviting a user that already is inside the project wouldn't make a lot of sense).
 
-#### Verification Status
+##### Verification Status
 Tests were created for a previous version of the code. Currently a refactor is needed.
 
-#### UI improvements
+##### UI improvements
 The UI was improved during this sprint: modals, screens, layout.
 
 
-#### Defects / Further Improvements
+##### Defects / Further Improvements
 1. Create "Classes" to better structure data that is sent/recieved to/from Firestore;
 2. Create high level functions to abstract repeated behaviour when interacting with database;
 3. Improve icon positioning and layout (inside the emulator was good but when testing on a real device those problems were identified);
@@ -400,6 +400,33 @@ The UI was improved during this sprint: modals, screens, layout.
 6. Refactor logic to delete projects, currently incorrect;
 7. Partial writes risk (if the first one occurs and the second one fails, there will be missing data in the database), verify need for transaction;
 8. Code cleanup and refactor inside some of the core files (e.g. app/project.jsx);
+9. Change the App Logo
+
+#### Sprint Review
+##### Did well:
+- Database Integration 
+- Authentication
+- Invites to project
+- Join project via invite
+- Project creation
+- Task labelling
+- Collective effort and resilience
+
+##### Do differently:
+- Investing more time in databse modelling from the beginning since many of the implemented features depend on that. Because of that we had to remodel and refactor a lot of code, which is not ideal.
+- Refactor code more often, instead of waiting for a big refactor at the end of the sprint, which is more work and more difficult to do.
+- Define a priority order for the features implemented. Because a lot of features in this Sprint were interdependent, it would be good to have a clear priority order to implement them, so we can focus on the most important ones first and avoid having a lot of unfinished features at the end of the sprint.
+- Divide work evenly thorought the sprint, instead of having a lot of work concentrated in the last days, which is more stressful and less efficient.
+
+##### Puzzles:
+- How to remove numerous hooks that are currently in the code.
+- When to write tests during the development process.
+- Database related code refactor (atomicity, transactions, high level functions to simplify logic).
+
+##### Final Thoughts
+* Due to team dynamics and changes we couldn't achieve the goals defined at the start of the sprint. 
+* Despite that the end result was pretty good. We learned a lot especially how to use NoSQL databases and how to maximize their efficiency and reduce the number of reads.
+
 
 #### Release
 
