@@ -1,4 +1,5 @@
-The tool used was Claude Sonnet 4.6 Thinking model from Perplexity Pro.
+The tool used was Claude Sonnet 4.6 Thinking model from Perplexity Pro and also AI chat from Github inside VScode.
+All code that is generated is reviewed before being fully integrated, to minimize errors and guarantee that the codebase is understood by all team members, facilitating the implementation of new features while maintaining the code modular, sound and with the desired quality. Below are two examples of usage of AI tools when asking for improvements in the UI design.
 **Prompt for improving the Login Page:**
 
 - Sent the previous code that already existed and asked for the follwing: **Update the code with good gradient colors (around blueish)**
