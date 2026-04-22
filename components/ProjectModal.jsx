@@ -1,6 +1,5 @@
 import { Text, StyleSheet, View, useColorScheme } from 'react-native';
 import AppModal from './AppModal';
-import ThemedText from './ThemedText';
 import ThemedButton from './ThemedButton';
 import ThemedTextInput from './ThemedTextInput';
 import { Colors } from '../constants/Colors';

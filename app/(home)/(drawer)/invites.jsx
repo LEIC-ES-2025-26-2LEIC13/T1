@@ -1,6 +1,5 @@
 import { Alert, FlatList, StyleSheet, View, Text, useColorScheme } from 'react-native';
 import ThemedView from '../../../components/ThemedView';
-import ThemedText from '../../../components/ThemedText';
 import { useInvite } from '../../../hooks/useInvite';
 import ThemedInvite from '../../../components/ThemedInvite';
 import { useFocusEffect } from 'expo-router';
@@ -15,19 +14,19 @@ const Invites = () => {
 
     const handleAccept = async (invite) => {
         try {
-            await acceptInvite(invite.id, invite.projectId, invite.receiverId)
-        } catch {
-            Alert.alert('Error', 'Could not accept invite.')
+          	await acceptInvite(invite)
+        } catch  (error) {
+          	Alert.alert('Error', error.message)
         }
     };
 
-    const handleIgnore = async (invite) => {
-        try {
-            await ignoreInvite(invite.id)
-        } catch {
-            Alert.alert('Error', 'Could not ignore invite')
-        }
-    };
+		const handleIgnore = async (invite) => {
+			try {
+				await ignoreInvite(invite)
+			} catch (error) {
+				Alert.alert('Error', error.message)
+			}
+		}
 
     useFocusEffect(
         useCallback => {
@@ -85,12 +84,12 @@ const Invites = () => {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={<EmptyState />}
                 renderItem={({ item }) => (
-                    <ThemedInvite
-                        projectName={item.projectName}
-                        sender={item.senderEmail}
-                        onAccept={() => handleAccept(item)}
-                        onIgnore={() => handleIgnore(item)}
-                    />
+					<ThemedInvite
+						projectName={item.projectName}
+						sender={item.senderEmail}
+						onAccept={() => handleAccept(item)}
+						onIgnore={() => handleIgnore(item)}
+					/>
                 )}
             />
         </ThemedView>
