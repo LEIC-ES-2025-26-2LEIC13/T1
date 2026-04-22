@@ -10,15 +10,15 @@ const Invites = () => {
 
     const handleAccept = async (invite) => {
         try {
-          await acceptInvite(invite.id, invite.projectId, invite.receiverId)
+          	await acceptInvite(invite)
         } catch {
-          Alert.alert('Error', 'Could not accept invite.')
+          	Alert.alert('Error', 'Could not accept invite.')
         }
     };
 
 		const handleIgnore = async (invite) => {
 			try {
-				await ignoreInvite(invite.id)
+				await ignoreInvite(invite)
 			} catch {
 				Alert.alert('Error', 'Could not ignore invite')
 			}
@@ -41,12 +41,12 @@ const Invites = () => {
                     <ThemedText style={styles.blankText}>No pending invites.</ThemedText>
                 }
                 renderItem={({ item }) => (
-									<ThemedInvite
-										projectName={item.projectName}
-										sender={item.senderEmail}
-										onAccept={() => handleAccept(item)}
-										onIgnore={() => handleIgnore(item)}
-									/>
+					<ThemedInvite
+						projectName={item.projectName}
+						sender={item.senderEmail}
+						onAccept={() => handleAccept(item)}
+						onIgnore={() => handleIgnore(item)}
+					/>
                 )}
             />
         </ThemedView>
