@@ -1,5 +1,4 @@
 import { db } from '../firebase/firebaseConfig'
-import { useUser } from '../hooks/useUser'
 import { doc, collection, addDoc, Timestamp } from "firebase/firestore";
 import { createContext, useState, useEffect } from "react";
 import { onSnapshot } from "firebase/firestore";
@@ -15,17 +14,18 @@ function normalizeTaskData(taskData = {}) {
     }
 }
 
-export const TaskProvider = ({ children, projectId }) => {
-    const [ tasks, setTasks ] = useState([]);
-    const { user } = useUser();
+export const TaskProvider = ({ children }) => {
+    const [tasks, setTasks] = useState([]);
+    const [activeProjectId, setActiveProjectId] = useState('');
 
-    async function createTask(taskData, projectId) {
-        // need to add a doc to projects 
-        // id of the project is passed via route
-        const normalizedTaskData = normalizeTaskData(taskData);
+    async function createTask(taskData) {
+        if (!activeProjectId) {
+            throw new Error('Project ID is required to create a task');
+        }
+        const normalizedTaskData = normalizeTaskData({ ...taskData });
         
         // Reference to the project document
-        const projectRef = doc(db, 'projects', projectId);
+        const projectRef = doc(db, 'projects', activeProjectId);
         
         // Reference to the tasks subcollection that will be created
         const taskRef = collection(projectRef, 'tasks');
@@ -38,9 +38,12 @@ export const TaskProvider = ({ children, projectId }) => {
 
     // updates the tasks
     useEffect(() => {
-        if(!projectId) return;
+        if(!activeProjectId) {
+            setTasks([]);
+            return;
+        }
         
-        const projectRef = doc(db, 'projects', projectId);
+        const projectRef = doc(db, 'projects', activeProjectId);
         const taskRef = collection(projectRef, 'tasks');
 
         const unsub = onSnapshot(taskRef, (snapshot) => {
@@ -54,10 +57,10 @@ export const TaskProvider = ({ children, projectId }) => {
 
         return () => unsub();
 
-    }, [projectId])
+    }, [activeProjectId])
 
     return (
-        <TaskContext.Provider value={{ tasks, createTask }}>
+        <TaskContext.Provider value={{ tasks, createTask, activeProjectId, setActiveProjectId }}>
             {children}
         </TaskContext.Provider>
     )

@@ -1,8 +1,8 @@
-import { useContetx } from "react";
+import { useContext } from "react";
 import { TaskContext } from "../contexts/taskContext";
 
-export default function useTask() {
-    const context = useContetx(TaskContext);
+export const useTask = () =>{
+    const context = useContext(TaskContext);
 
     if (!context) {
         throw new Error("useTask must be used within a TaskProvider");

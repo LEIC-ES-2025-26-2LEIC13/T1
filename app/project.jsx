@@ -1,15 +1,16 @@
 import React from 'react';
-import {Alert, Pressable, StyleSheet, useColorScheme, Text, View} from 'react-native';
+import { useEffect } from 'react';
+import { Alert, Pressable, StyleSheet, useColorScheme, Text, FlatList} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
-import TaskModal from '../components/CreateTaskModal';
+import CreateTaskModal from '../components/CreateTaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
-import Task from "../components/Task";
+import Task from "../components/ThemedTask";
 import useProject from '../hooks/useProject';
 import { useUser } from '../hooks/useUser';
 import { useUsers } from '../hooks/useUsers';
@@ -31,7 +32,7 @@ export default function Home() {
   const [ taskDetail, setTaskDetail ] = React.useState('');
   const [ taskLabel, setTaskLabel ] = React.useState('');
   const [ taskModalVisible, setTaskModalVisible ] = React.useState(false);
-  const { tasks, createTask } = useTask(params.projectId);
+  const { tasks, createTask, setActiveProjectId } = useTask();
 
   const [inviteModalVisible, setInviteModalVisible] = React.useState(false);
   const [inviteTarget, setInviteTarget] = React.useState('');
@@ -39,7 +40,16 @@ export default function Home() {
   // Search for current project in the user's projects
   const projectId = params.projectId;
   const currentProject = projects.find((project) => project.id === projectId);
-  const currentProjectName = currentProject.title;
+  const currentProjectName = currentProject?.title ?? 'Project';
+
+  // sets projectId for Task context
+  useEffect(() => {
+    setActiveProjectId(projectId ?? '');
+
+    return () => {
+      setActiveProjectId('');
+    };
+  }, [projectId, setActiveProjectId]);
 
   const openTaskModal = () => setTaskModalVisible(true);
 
@@ -47,11 +57,12 @@ export default function Home() {
     setTaskModalVisible(false);
     setTaskName('');
     setTaskDetail('');
+    setTaskLabel('');
   };
 
   const handleCreateTask = async (taskData) => {
     try{
-      await createTask(taskData, projectId);
+      await createTask(taskData);
       closeTaskModal();
     } catch (error) {
       Alert.alert('Error', 'Failed to create task');
@@ -98,6 +109,11 @@ export default function Home() {
 
       if (receiverUser.id === user.uid) {
         Alert.alert('Invalid invite', 'You cannot invite yourself.');
+        return;
+      }
+
+      if (!currentProject?.id) {
+        Alert.alert('Project unavailable', 'Unable to find this project.');
         return;
       }
 

@@ -1,4 +1,4 @@
-import { Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet, View, Pressable } from 'react-native';
 import AppModal from './AppModal';
 import ThemedText from "./ThemedText";
 import Spacer from "./Spacer";
@@ -21,6 +21,7 @@ export default function CreateTaskModal({
     onLabelChangeText,
     projectName,
 }) {
+    const isPreset = LABELS.includes(labelValue);
 
     return (
         <AppModal visible={isVisible}>
@@ -77,6 +78,17 @@ export default function CreateTaskModal({
                     );
                 })}
             </View>
+
+            {/* Custom Label Input, will change in the future*/}
+            <ThemedTextInput
+                style={[
+                    styles.customInput,
+                    !isPreset && labelValue !== "" && styles.customInputActive
+                ]}
+                placeholder="Or type custom label..."
+                value={isPreset ? "" : labelValue}
+                onChangeText={onLabelChangeText}
+            />
 
             <ThemedView style={styles.actions}>
                 <ThemedButton style={[styles.button,styles.cancel]} onPress={onClose}>
@@ -161,5 +173,16 @@ const styles = StyleSheet.create({
     labelTextSelected: {
         color: "white",
         fontWeight: "600",
+    },
+
+    customInput: {
+        width: '100%',
+        marginBottom: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+
+    customInputActive: {
+        borderColor: '#4F46E5',
     },
 });

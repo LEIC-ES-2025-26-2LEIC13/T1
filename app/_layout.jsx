@@ -6,10 +6,10 @@ import { UserProvider } from '../contexts/userContext'
 import { UsersProvider } from '../contexts/usersContext'
 import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
+import { TaskProvider } from '../contexts/taskContext'
 import { useUser } from '../hooks/useUser'
 
 import AppToast from '../components/Toast';
-import { TaskProvider } from '../contexts/taskContext'
 
 
 // This component was defined explicity, because useUser hook can only be used inside descendents of UserProvider, not inside itself
