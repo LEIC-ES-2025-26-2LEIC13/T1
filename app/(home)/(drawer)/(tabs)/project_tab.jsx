@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
-import ProjectModal from '../../../../components/ProjectModal';
+import CreateProjectModal from '../../../../components/CreateProjectModal';
 import useProject from '../../../../hooks/useProject';
 
 const Projects = () => {
@@ -19,17 +19,29 @@ const Projects = () => {
     const { projects, createProject, isLoadingProjects } = useProject();
 
 
+    const [ project, setProject ] = React.useState({
+        title: '',
+        description: '',
+    });
+
+    const handleProjectChange = (field, value) => {
+        setProject((prev) => ({ ...prev, [field]: value }))
+    };
+
+    // Project modal
     const openProjectModal = () => setProjectModalVisible(true);
 
     const closeProjectModal = () => {
         setProjectModalVisible(false);
-        setProjectTitle('');
-        setProjectDescription('');
+        setProject({
+            title: '',
+            description: '',
+        });
     };
 
-    const handleCreateProject = async (projectData) => {
+    const handleCreateProject = async (project) => {
         try {
-            await createProject(projectData);
+            await createProject(project);
             closeProjectModal();
         } catch (error) {
             Alert.alert('Error', error.message);
@@ -90,14 +102,12 @@ const Projects = () => {
                 <ThemedText style={styles.btnText}>Create Project</ThemedText>
             </ThemedButton>
 
-            <ProjectModal
+            <CreateProjectModal
                 visible={projectModalVisible}
                 onClose={closeProjectModal}
                 onCreate={handleCreateProject}
-                titleValue={projectTitle}
-                onTitleChangeText={setProjectTitle}
-                descriptionValue={projectDescription}
-                onDescriptionChangeText={setProjectDescription}
+                project={project}
+                onChange={handleProjectChange}
             />
 
         </View>

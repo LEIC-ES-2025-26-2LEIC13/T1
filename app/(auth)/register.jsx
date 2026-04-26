@@ -1,6 +1,6 @@
 import { Keyboard, StyleSheet, Text, Alert, ScrollView, View, useColorScheme } from 'react-native'
 import { useState } from 'react'
-import { useUser } from '../../hooks/useUser'
+import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
 import { doc, setDoc } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -23,7 +23,7 @@ const Register = () => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
-    const { register } = useUser()
+    const { register } = useAuth()
     const router = useRouter()
 
     const handleSubmit = async () => {
@@ -159,10 +159,10 @@ const Register = () => {
 
                 <Spacer />
 
-                <Text style={{ color: '#aaa' }}>Already have an account? </Text>
+                <ThemedText style={{ color: '#aaa' }}>Already have an account? </ThemedText>
                 <Spacer height={10} />
                 <ThemedButton
-                    onPress={() => router.back()}
+                    onPress={() => router.push('/(auth)/login')}
                     disabled={loading}
                     style={{ paddingVertical: 8 }}
                 >

@@ -19,8 +19,8 @@ jest.mock('../../firebase/firebaseConfig', () => ({
   db: {},
 }))
 
-jest.mock('../../hooks/useUser', () => ({
-  useUser: () => ({
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: () => ({
     user: { uid: 'test-user-id' }, // Mocked user with a uid
   }),
 }))

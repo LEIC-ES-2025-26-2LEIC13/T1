@@ -1,11 +1,11 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
-import { useUser } from '../hooks/useUser';
 import { inviteService } from '../api/inviteService';
+import { useAuth } from '../hooks/useAuth';
 
 export const InviteContext = createContext(null);
 
 export function InviteProvider({ children }) {
-	const { user } = useUser()
+	const { user } = useAuth()
 	const [ invites, setInvites ] = useState([])
 	const [ hasNewInvites, setHasNewInvites ] = useState(false)
 
@@ -47,7 +47,7 @@ export function InviteProvider({ children }) {
 		sendInvite,
 		acceptInvite,
 		ignoreInvite
-	}), [invites, hasNewInvites, ignoreInvite, acceptInvite]);
+	}), [invites, hasNewInvites]);
 
 	return (
 		<InviteContext.Provider value={value}>

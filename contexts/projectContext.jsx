@@ -1,16 +1,16 @@
 import { createContext, useEffect, useState } from "react";
-import { useUser } from "../hooks/useUser";
 import { projectService } from "../api/projectService";
+import { useAuth } from "../hooks/useAuth";
 
 export const ProjectContext = createContext();
 
 export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([]) // user projects
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
-    const { user } = useUser()
+    const { user } = useAuth()
 
     useEffect(() => {
-        if (!user?.uid) { // TODO: sometimes user is null when the app opens with cached login session open
+        if (!user?.uid) {
             setProjects([]);
             return
         }

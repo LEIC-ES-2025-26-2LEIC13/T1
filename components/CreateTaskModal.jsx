@@ -13,15 +13,11 @@ export default function CreateTaskModal({
     isVisible,
     onClose,
     onCreate,
-    titleValue,
-    onTitleChangeText,
-    descriptionValue,
-    onDescriptionChangeText,
-    labelValue,
-    onLabelChangeText,
+    task,
+    onChange,
     projectName,
 }) {
-    const isPreset = LABELS.includes(labelValue);
+    const isPreset = LABELS.includes(task.label);
 
     return (
         <AppModal visible={isVisible}>
@@ -37,8 +33,8 @@ export default function CreateTaskModal({
                 style={{width: '100%', marginBottom: 15}}
                 placeholder="Enter task name"
 
-                value={titleValue}
-                onChangeText={onTitleChangeText}
+                value={task.name}
+                onChangeText={(value) => onChange('name', value)}
             />
 
             <ThemedText title={true}>Description</ThemedText>
@@ -49,18 +45,19 @@ export default function CreateTaskModal({
                 placeholder="Enter task description"
                 multiline={true}
 
-                value={descriptionValue}
-                onChangeText={onDescriptionChangeText}
+                value={task.description}
+                onChangeText={(value) => onChange('description', value)}
             />
 
             {/* Label input */}
             <View style={styles.labelContainer}>
                 {LABELS.map((label) => {
-                    const selected = labelValue === label
+                    const selected = task.label === label
+
                     return (
                         <Pressable
                             key={label}
-                            onPress={() => onLabelChangeText(label)}
+                            onPress={() => onChange('label', label)}
                             style={[
                                 styles.labelChip,
                                 selected && styles.labelChipSelected
@@ -83,11 +80,11 @@ export default function CreateTaskModal({
             <ThemedTextInput
                 style={[
                     styles.customInput,
-                    !isPreset && labelValue !== "" && styles.customInputActive
+                    !isPreset && task.label !== "" && styles.customInputActive
                 ]}
                 placeholder="Or type custom label..."
-                value={isPreset ? "" : labelValue}
-                onChangeText={onLabelChangeText}
+                value={isPreset ? "" : task.label}
+                onChangeText={(text) => onChange('label', text)}
             />
 
             <ThemedView style={styles.actions}>
@@ -96,7 +93,7 @@ export default function CreateTaskModal({
                 </ThemedButton>
 
                 <ThemedButton style={[styles.button]} 
-                    onPress={() => onCreate({ name: titleValue, description: descriptionValue, label: labelValue })}
+                    onPress={() => onCreate(task)}
                 >
                     <Text style={styles.buttonTextCreate}>Create Task</Text>
                 </ThemedButton>
