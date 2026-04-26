@@ -11,6 +11,8 @@ const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
+    const { projects, createProject } = useProject();
+
     const [ project, setProject ] = React.useState({
         title: '',
         description: '',
@@ -20,14 +22,7 @@ const Projects = () => {
         setProject((prev) => ({ ...prev, [field]: value }))
     };
 
-    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
-
-    // Remove this 
-    const [projectTitle, setProjectTitle] = React.useState('');
-    const [projectDescription, setProjectDescription] = React.useState('');
-    //
-
-    const { projects, createProject } = useProject();
+    const [ projectModalVisible, setProjectModalVisible ] = React.useState(false);
 
     // Project modal
     const openProjectModal = () => setProjectModalVisible(true);
