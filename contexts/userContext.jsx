@@ -1,12 +1,5 @@
 import { createContext, useState, useEffect, useMemo } from "react"
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from "firebase/auth"
-
-import { auth } from "../firebase/firebaseConfig.js"
+import { authService } from "../api/authService"
 
 export const UserContext = createContext(null)
 
@@ -18,21 +11,19 @@ export function UserProvider({ children }) {
     useEffect(() => {
         setIsLoading(true)
 
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        
+        const unsub = authService.subscribeAuthState((currentUser) => {
             setUser(currentUser)
-            if (currentUser) {
-                setIsLoading(false)
-            }
+            setIsLoading(false)
         })
 
-        return unsubscribe
+        return unsub
     }, [])
 
     async function login(email, password) {
         setIsLoading(true)
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password)
-            setUser(userCredential.user)
+            await authService.login(email, password, setUser)
             return true
         } catch (error) {
             console.error("Login error:", error.message)
@@ -45,8 +36,7 @@ export function UserProvider({ children }) {
     async function register(email, password) {
         setIsLoading(true)
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-            setUser(userCredential.user)
+            await authService.register(email, password, setUser)
             return true
         } catch (error) {
             console.error("Register error:", error.code, error.message)
@@ -59,7 +49,7 @@ export function UserProvider({ children }) {
     async function logout() {
         setIsLoading(true)
         try {
-            await signOut(auth)
+            authService.logout()
             return true
         } catch (error) {
             console.error("Logout error:", error.message)
