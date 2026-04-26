@@ -22,17 +22,15 @@ function RootNavigator() {
 
   return (
       <>
-          <Stack screenOptions={{
-              headerStyle: { backgroundColor: theme.navBackground },
-              headerTintColor: theme.title
+          <Stack 
+            initialRouteName='index'
+            screenOptions={{
+                headerStyle: { backgroundColor: theme.navBackground },
+                headerTintColor: theme.title
           }}>
-              
-              <Stack.Protected guard={isLoading}>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-              </Stack.Protected>
-
-              {/* Unauthenticated: Only show auth stack */}
+              {/* Unauthenticated: show intro screen and auth stack */}
               <Stack.Protected guard={!isLoading && !user}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name='(auth)' options={{ headerShown: false }} /> 
               </Stack.Protected>
 
