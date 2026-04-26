@@ -1,5 +1,5 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { useUser } from '../hooks/useUser';
 
@@ -8,7 +8,7 @@ export const InviteContext = createContext(null);
 export function InviteProvider({ children }) {
 	const { user } = useUser()
 	const [ invites, setInvites ] = useState([])
-	const [ hasNewInvites, setHasNewInvites ] = useState([])
+	const [ hasNewInvites, setHasNewInvites ] = useState(false)
 
 	// The use effect creates a listener on the background that updates upon invites query changes
 	// Upon component (InviteProvider) deletion or user? change, for example logout, the listener is unsubscribed
@@ -20,7 +20,7 @@ export function InviteProvider({ children }) {
 
 		const userRef = doc(db, 'users', user.uid)
 		const invitesQuery = query(
-			collection(userRef, 'invites')
+			collection(userRef, 'userInvites')
 		);
 
 		const unsubscribe = onSnapshot(invitesQuery, (snapshot) => {
@@ -34,49 +34,39 @@ export function InviteProvider({ children }) {
 
 
 	async function sendInvite({ senderId, senderEmail, receiverId, projectId, projectName }) {
-		// Check if invite already exists for this receiverId/projectId combo
+		const receiverRef = doc(db, 'users', receiverId)
+
+		// Checking if an invite was already sent to that user
 		const existingInviteQuery = query(
-			collection(db, 'invites'), 
-			where('receiverId', '==', receiverId),
+			collection(receiverRef, 'userInvites'),
 			where('projectId', '==', projectId)
 		)
 
-		const projectRef = doc(db, 'projects', projectId)
-		const userAlreadyInProjectQuery = query(
-			collection(projectRef, 'users'),
-			where('userId', '==', receiverId)
-		)
-		
-		// Checking if an invite was already sent to that user
 		const existingSnapshot = await getDocs(existingInviteQuery)
 		if (!existingSnapshot.empty) {
 			throw new Error('Invite already sent to this user for this project')
 		}
 
 		// Checking if the user is already in that project
+		const projectRef = doc(db, 'projects', projectId)
+		const userAlreadyInProjectQuery = query(
+			collection(projectRef, 'users'),
+			where('userId', '==', receiverId)
+		)
+		
 		const inProjectSnapshot = await getDocs(userAlreadyInProjectQuery)
 		if (!inProjectSnapshot.empty) {
 			throw new Error('This user is already in this project')
 		}
-
-		const receiverRef = doc(db, 'users', receiverId)
-
-		// Create a reference for the global invite to generate a unique ID
-		const globalInviteRef = doc(collection(db, 'invites'))
-		const inviteObject = { // do not store receiverId (it is the id of the current user)
+	
+		// Add a document to the userInvites subcollection
+		await addDoc(collection(receiverRef, 'userInvites'), {
 			senderId: senderId,
 			senderEmail: senderEmail,
-			receiverId: receiverId,
 			projectId: projectId,
 			projectName: projectName,
 			createdAt: new Date(),
-		}
-
-		// Add document to the (global) collection 'invites'
-		await setDoc(globalInviteRef, inviteObject)
-
-		// Add document to the subcollection 'invites' of the receiver document using the SAME ID
-		await setDoc(doc(receiverRef, 'invites', globalInviteRef.id), inviteObject)
+		})
   	}
 
 
@@ -89,11 +79,14 @@ export function InviteProvider({ children }) {
 		// Actual documents (snapshots of them)
 		const projectSnap = await getDoc(projectRef)
 
-		// Get their data as an object and destructure it
+		if (!projectSnap.exists()) {
+			throw new Error('This project no longer exists. Project may have been deleted after the invite was sent.')
+		}
+
+		// Get their data as an object
 		const { title, description } = projectSnap.data()
 
-		await deleteDoc(doc(db, 'invites', id)) // delete the pending invite globally
-		await deleteDoc(doc(receiverRef, 'invites', id)) // delete the pending invite in the user's invites
+		await deleteDoc(doc(receiverRef, 'userInvites', id)) // delete the pending invite in the user's invites
 
 		// Creates a document for one more project inside the 'projects' subcollection inside receiver document
 		await addDoc(collection(receiverRef, 'projects'), {
@@ -112,8 +105,7 @@ export function InviteProvider({ children }) {
   async function ignoreInvite({ id }) {
 		const receiverRef = doc(db, 'users', user.uid) // respective document of the user in the users collection
 
-		await deleteDoc(doc(db, 'invites', id)) // delete the pending invite globally
-		await deleteDoc(doc(receiverRef, 'invites', id)) // delete the pending invite in the user's invites
+		await deleteDoc(doc(receiverRef, 'userInvites', id)) // delete the pending invite in the user's invites
   }
 
   const value = useMemo(() => ({
