@@ -6,7 +6,6 @@ import { AuthProvider } from '../contexts/authContext'
 import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
 import { TaskProvider } from '../contexts/taskContext'
-import { UsersProvider } from '../contexts/usersContext'
 import { useAuth } from '../hooks/useAuth'
 import AppToast from '../components/Toast';
 import ThemedView from '../components/ThemedView'
@@ -30,7 +29,7 @@ function RootNavigator() {
             </ThemedText>
         </ThemedView>
 	)}
-  
+
   return (
       <>
           <Stack 
@@ -58,16 +57,14 @@ function RootNavigator() {
 const RouteLayout = () => {  
   return (
     <AuthProvider>
-      <UsersProvider>
-        <ProjectProvider>
-          <InviteProvider>
-            <TaskProvider>
-              <StatusBar value="auto" />
-              <RootNavigator />
-            </TaskProvider>
-          </InviteProvider>
-        </ProjectProvider>
-      </UsersProvider>
+      <ProjectProvider>
+        <InviteProvider>
+          <TaskProvider>
+            <StatusBar value="auto" />
+            <RootNavigator />
+          </TaskProvider>
+        </InviteProvider>
+      </ProjectProvider>
     </AuthProvider>
   )
 }

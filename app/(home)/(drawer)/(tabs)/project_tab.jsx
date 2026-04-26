@@ -14,8 +14,6 @@ const Projects = () => {
     const isDark = colorScheme === 'dark';
 
     const [projectModalVisible, setProjectModalVisible] = useState(false);
-    const [projectTitle, setProjectTitle] = useState('');
-    const [projectDescription, setProjectDescription] = useState('');
     const { projects, createProject, isLoadingProjects } = useProject();
 
 
