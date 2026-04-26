@@ -1,7 +1,7 @@
 import { addDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
-function normalizeTaskData({ taskData, description, label }) {
+function normalizeTaskData({ name, description, label }) {
     return {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
