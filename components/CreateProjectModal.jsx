@@ -5,14 +5,12 @@ import ThemedTextInput from './ThemedTextInput';
 import { Colors } from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function ProjectModal({
+export default function CreateProjectModal({
     visible,
     onClose,
     onCreate,
-    titleValue,
-    onTitleChangeText,
-    descriptionValue,
-    onDescriptionChangeText,
+    project,
+    onChange,
 }) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
@@ -47,8 +45,9 @@ export default function ProjectModal({
                 <ThemedTextInput
                     containerStyle={styles.input}
                     placeholder="Enter project title"
-                    value={titleValue}
-                    onChangeText={onTitleChangeText}
+
+                    value={project.title}
+                    onChangeText={(value) => onChange('title', value)}
                 />
 
                 <Text style={[styles.label, { color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.5)' }]}>
@@ -58,8 +57,9 @@ export default function ProjectModal({
                     containerStyle={[styles.input, styles.textArea]}
                     placeholder="Enter project description (optional)"
                     multiline={true}
-                    value={descriptionValue}
-                    onChangeText={onDescriptionChangeText}
+
+                    value={project.description}
+                    onChangeText={(value) => onChange('description', value)}
                 />
             </View>
 
@@ -78,7 +78,7 @@ export default function ProjectModal({
 
                 <ThemedButton
                     style={[styles.button, styles.createBtn]}
-                    onPress={() => onCreate({ title: titleValue, description: descriptionValue })}
+                    onPress={() => onCreate(project)}
                 >
                     <Ionicons name="add" size={16} color="#fff" style={{ marginRight: 6 }} />
                     <Text style={styles.createText}>Create</Text>

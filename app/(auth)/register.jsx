@@ -159,10 +159,10 @@ const Register = () => {
 
                 <Spacer />
 
-                <Text style={{ color: '#aaa' }}>Already have an account? </Text>
+                <ThemedText style={{ color: '#aaa' }}>Already have an account? </ThemedText>
                 <Spacer height={10} />
                 <ThemedButton
-                    onPress={() => router.back()}
+                    onPress={() => router.push('/(auth)/login')}
                     disabled={loading}
                     style={{ paddingVertical: 8 }}
                 >

@@ -40,7 +40,7 @@ const Intro = () => {
                         style={styles.primaryButton}
                         onPress={() => router.push("/(auth)/login")}
                     >
-                        <ThemedText style={styles.buttonText}>Sign In</ThemedText>
+                        <ThemedText style={styles.buttonText}>Login</ThemedText>
                     </ThemedButton>
 
                     <ThemedButton

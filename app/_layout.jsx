@@ -1,4 +1,4 @@
-import { useColorScheme } from 'react-native'
+import { useColorScheme, StyleSheet, ActivityIndicator } from 'react-native'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
@@ -10,6 +10,8 @@ import { TaskProvider } from '../contexts/taskContext'
 import { useUser } from '../hooks/useUser'
 
 import AppToast from '../components/Toast';
+import ThemedView from '../components/ThemedView'
+import ThemedText from '../components/ThemedText'
 
 
 // This component was defined explicity, because useUser hook can only be used inside descendents of UserProvider, not inside itself
@@ -20,10 +22,19 @@ function RootNavigator() {
 
   const { user, isLoading } = useUser() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
 
+  if (isLoading) {
+	return (
+		<ThemedView style={styles.container}>
+            <ActivityIndicator size="large" color="#000" />
+            <ThemedText style={styles.text}>
+                Loading...
+            </ThemedText>
+        </ThemedView>
+	)
+  }
   return (
       <>
           <Stack 
-            initialRouteName='index'
             screenOptions={{
                 headerStyle: { backgroundColor: theme.navBackground },
                 headerTintColor: theme.title
@@ -63,3 +74,16 @@ const RouteLayout = () => {
 }
 
 export default RouteLayout
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    text: {
+        marginTop: 15,
+        fontSize: 16,
+        color: "#555",
+    },
+})
