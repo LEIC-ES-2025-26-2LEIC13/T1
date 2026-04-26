@@ -5,17 +5,28 @@ import { onSnapshot } from "firebase/firestore";
 
 export const TaskContext = createContext();
 
+const normalizeTaskPayload = (task = {}) => {
+    return {
+        ...task,
+        name: task?.name?.trim() ?? '',
+        description: task?.description?.trim() ?? '',
+        label: task?.label?.trim() ?? '',
+    }
+}
+
+const validateTaskPayload = (task = {}) => {
+    if (!task.name) {
+        throw new Error('Please enter a task name');
+    }
+}
+
 export const TaskProvider = ({ children }) => {
     const [tasks, setTasks] = useState([]);
     const [activeProjectId, setActiveProjectId] = useState('');
 
-    // this receiver an object
     async function createTask(task) {
-        // Task already arrives as an object and trimmed
-    
-        if (!activeProjectId) {
-            throw new Error('Project ID is required to create a task');
-        }
+        const cleanedTask = normalizeTaskPayload(task);
+        validateTaskPayload(cleanedTask);     
         
         // Reference to the project document
         const projectRef = doc(db, 'projects', activeProjectId);
@@ -24,7 +35,7 @@ export const TaskProvider = ({ children }) => {
         const taskRef = collection(projectRef, 'tasks');
 
         await addDoc(taskRef, {
-            ...task,
+            ...cleanedTask,
             createdAt: Timestamp.now(),
         })
     }

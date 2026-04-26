@@ -39,8 +39,8 @@ export const ProjectProvider = ({ children }) => {
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
     const { user } = useUser()
 
-    async function createProject(projectData) {
-        const normalizedProjectData = normalizeProjectPayload(projectData)
+    async function createProject(project) {
+        const normalizedProjectData = normalizeProjectPayload(project)
 		validateProjectPayload(normalizedProjectData)
 
         const projectRef = await addDoc(collection(db, 'projects'), {

@@ -73,23 +73,11 @@ export default function Home() {
   };
 
   const handleCreateTask = async (task) => {
-	const cleanedTask = {
-		name: task.name?.trim() || '',
-		description: task.description?.trim() || '',
-		label: task.label?.trim() || '',
-	};
-
-	if(!cleanedTask.name){
-	  Alert.error('Error', 'Task name is required');
-	  return;
-	}
-
 	try{
 	  await createTask(cleanedTask);
-
 	  closeTaskModal();
 	} catch (error) {
-	  Alert.alert('Error', 'Failed to create task');
+	  Alert.alert('Error', error.message || 'Could not create task');
 	}
   };
 
