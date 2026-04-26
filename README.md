@@ -49,7 +49,6 @@ It is organised by the following activities:
       - [Release](#release-1)
     - [Sprint 2](#sprint-2)
       - [Log and documentation](#log-and-documentation-1)
-        - [New database organization](#new-database-organization)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -458,13 +457,7 @@ Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 
 #### Log and documentation
 
-##### New database organization
-
-* Separate database logic into a new module (`api/` directory), to better organize the code and reduce the amount of code in the contexts.
-* Now there are 3 layers of database interaction:
-  - **Service Layer** (`api/`): provides high level functions to interact with the database.
-  - **State Layer** (`contexts/`): manages the state of the app and provides caching across the whole app.
-  - **Consumption Layer** (`hooks/`): provides custom hooks to consume the state and functions provided by the contexts.
+Improvements for Sprint 2 are documented in [this](docs/sprint2improvements.md) file.
 
 ### Sprint 3
 
