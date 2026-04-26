@@ -12,9 +12,9 @@ import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
 import useProject from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
-import { useUsers } from '../hooks/useUsers';
 import { useInvite } from '../hooks/useInvite';
 import { useTask } from '../hooks/useTask';
+import { userService } from '../api/userService';
 
 export default function Home() {
   const router = useRouter();
@@ -26,7 +26,6 @@ export default function Home() {
 
   const { projects } = useProject(); // user projects
   const { user } = useAuth();
-  const { getUserByEmail } = useUsers();
 
   const { sendInvite } = useInvite();
   const { tasks, createTask, setActiveProjectId } = useTask();
@@ -72,13 +71,13 @@ export default function Home() {
 	});
   };
 
-  const handleCreateTask = async (task) => {
-	try{
-	  await createTask(cleanedTask);
-	  closeTaskModal();
-	} catch (error) {
-	  Alert.alert('Error', error.message || 'Could not create task');
-	}
+  const handleCreateTask = async (taskData) => {
+    try{
+      await createTask(taskData);
+      closeTaskModal();
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
   };
 
 
@@ -112,7 +111,7 @@ export default function Home() {
 	}
 
 	try {
-	  const receiverUser = await getUserByEmail(trimmedTarget);
+	  const receiverUser = await userService.getUserByEmail(trimmedTarget);
 
 	  if (!receiverUser) {
 		Alert.alert('User not found', 'No registered user matches that email.');

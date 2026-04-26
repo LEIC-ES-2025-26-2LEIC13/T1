@@ -30,8 +30,25 @@ It is organised by the following activities:
   - [Project management](#project-management)
     - [Sprint 0](#sprint-0)
       - [Log and documentation](#log-and-documentation)
+      - [Release](#release)
     - [Sprint 1](#sprint-1)
+      - [Database Modelling and Integration](#database-modelling-and-integration)
+      - [Defect Log, Tracking and Verification](#defect-log-tracking-and-verification)
+        - [Scope](#scope)
+      - [InviteContext and ProjectContext](#invitecontext-and-projectcontext)
+        - [Fixes / Improvements Implemented in Code](#fixes--improvements-implemented-in-code)
+        - [Verification Status](#verification-status)
+        - [UI improvements](#ui-improvements)
+        - [Defects / Further Improvements](#defects--further-improvements)
+      - [Sprint Review](#sprint-review)
+        - [Did well:](#did-well)
+        - [Do differently:](#do-differently)
+        - [Puzzles:](#puzzles)
+        - [Final Thoughts](#final-thoughts)
+      - [Teamwork Assessment](#teamwork-assessment)
+      - [Release](#release-1)
     - [Sprint 2](#sprint-2)
+      - [Log and documentation](#log-and-documentation-1)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -437,6 +454,10 @@ The UI was improved during this sprint: modals, screens, layout.
 Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.1.0).
 
 ### Sprint 2
+
+#### Log and documentation
+
+Improvements for Sprint 2 are documented in [this](docs/sprint2improvements.md) file.
 
 ### Sprint 3
 

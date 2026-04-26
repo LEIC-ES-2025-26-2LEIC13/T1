@@ -9,3 +9,11 @@ Even when the user was not logged in, without the conditional check, the app als
 ### Solution
 In this case, a solution was not implemented simply because it would complicate even more the Route Navigation inside `app/_layout.tsx`. We would need to create an extra layer of security that would simply difficult the understanding and also take too much effort to implement. For now, we will keep as it is.
 
+
+## New database organization
+
+* Separate database logic into a new module (`api/` directory), to better organize the code and reduce the amount of code in the contexts.
+* Now there are 3 layers of database interaction:
+  - **Service Layer** (`api/`): provides high level functions to interact with the database.
+  - **State Layer** (`contexts/`): manages the state of the app and provides caching across the whole app.
+  - **Consumption Layer** (`hooks/`): provides custom hooks to consume the state and functions provided by the contexts.

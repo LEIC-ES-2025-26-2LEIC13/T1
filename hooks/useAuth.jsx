@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { AuthContext } from "../contexts/AuthContext"
+import { AuthContext } from "../contexts/authContext"
 
 export function useAuth() { // custom hook, that can only be used in descendants of the UserProvider component
     const context = useContext(AuthContext) // the variable context will be the object passed in the Provider's value prop (see userContext.jsx)

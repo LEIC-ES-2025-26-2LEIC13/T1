@@ -1,6 +1,7 @@
-import React from 'react';
-import { Alert, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, View, StyleSheet, useColorScheme, FlatList, ActivityIndicator } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
+import { Ionicons } from '@expo/vector-icons';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
@@ -10,8 +11,11 @@ import useProject from '../../../../hooks/useProject';
 const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
+    const isDark = colorScheme === 'dark';
 
-    const { projects, createProject } = useProject();
+    const [projectModalVisible, setProjectModalVisible] = useState(false);
+    const { projects, createProject, isLoadingProjects } = useProject();
+
 
     const [ project, setProject ] = React.useState({
         title: '',
@@ -21,8 +25,6 @@ const Projects = () => {
     const handleProjectChange = (field, value) => {
         setProject((prev) => ({ ...prev, [field]: value }))
     };
-
-    const [ projectModalVisible, setProjectModalVisible ] = React.useState(false);
 
     // Project modal
     const openProjectModal = () => setProjectModalVisible(true);
@@ -40,19 +42,45 @@ const Projects = () => {
             await createProject(project);
             closeProjectModal();
         } catch (error) {
-            Alert.alert('Error', error.message || 'Could not create project');
+            Alert.alert('Error', error.message);
         }
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
+    const EmptyState = () => (
+        <View style={styles.emptyContainer}>
+            <Ionicons
+                name="folder-open"
+                size={64}
+                color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
+            />
+            <ThemedText style={styles.emptyTitle}>
+                No projects
+            </ThemedText>
+            <ThemedText style={[styles.emptySubtitle, { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }]}>
+                When you create a project or accept an invite to one, it will appear here
+            </ThemedText>
+        </View>
+    )
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }] }>
-            <FlatList
-                data={projects ?? []}
+            {
+                isLoadingProjects ?
+
+                <ActivityIndicator size="large" color={Colors.primary} style={{marginTop: 15, fontSize: 16}}/>
+
+                :
+
+                <FlatList
+                data={projects}
                 style={styles.list}
-                contentContainerStyle={styles.listContent}
+                contentContainerStyle={[
+                    styles.list,
+                    (!projects || projects.length === 0) && styles.listEmpty
+                ]}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
+                ListEmptyComponent={<EmptyState />}
                 renderItem={({ item, index }) => (
                     <ThemedProject
                         projectId={item.id}
@@ -61,10 +89,12 @@ const Projects = () => {
                         borderColor={borderColors[index % borderColors.length]}
                     />
                 )}
-            />
-
+                />
+            }
+            
             <ThemedButton
                 style={styles.btn}
+                disabled={isLoadingProjects}
                 onPress={openProjectModal}>
                 <ThemedText style={[styles.btnText ,{ marginRight: 20 }]}>+</ThemedText>
                 <ThemedText style={styles.btnText}>Create Project</ThemedText>
@@ -95,26 +125,49 @@ const styles = StyleSheet.create({
     listContent: {
         paddingBottom: 110,
     },
+    listEmpty: {
+        flex: 1,
+    },
+
     btn:{
-    width: '85%',
+        width: '85%',
 
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
 
-    padding: 12,
+        padding: 12,
 
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
-    marginBottom: 0,
-        zIndex: 10,
-        elevation: 4,
-  },
+        position: 'absolute',
+        bottom: 20,
+        alignSelf: 'center',
+        marginBottom: 0,
+            zIndex: 10,
+            elevation: 4,
+    },
 
   btnText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  }
+  },
+
+  emptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 80,
+        gap: 10,
+    },
+    emptyTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginTop: 8,
+    },
+    emptySubtitle: {
+        fontSize: 14,
+        textAlign: 'center',
+        maxWidth: 240,
+        lineHeight: 20,
+    }
 })

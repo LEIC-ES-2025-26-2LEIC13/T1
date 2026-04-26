@@ -2,11 +2,10 @@ import { useColorScheme, StyleSheet, ActivityIndicator } from 'react-native'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
-import { AuthProvider } from '../contexts/AuthContext'
+import { AuthProvider } from '../contexts/authContext'
 import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
 import { TaskProvider } from '../contexts/taskContext'
-import { UsersProvider } from '../contexts/usersContext'
 import { useAuth } from '../hooks/useAuth'
 import AppToast from '../components/Toast';
 import ThemedView from '../components/ThemedView'
@@ -24,13 +23,13 @@ function RootNavigator() {
   if (isLoading) {
 	return (
 		<ThemedView style={styles.container}>
-            <ActivityIndicator size="large" color="#000" />
+            <ActivityIndicator size="large" color={Colors.primary} />
             <ThemedText style={styles.text}>
                 Loading...
             </ThemedText>
         </ThemedView>
-	)
-  }
+	)}
+
   return (
       <>
           <Stack 
@@ -39,13 +38,13 @@ function RootNavigator() {
                 headerTintColor: theme.title
           }}>
               {/* Unauthenticated: show intro screen and auth stack */}
-              <Stack.Protected guard={!isLoading && !user}>
+              <Stack.Protected guard={!user}>
                 <Stack.Screen name="index" options={{ headerShown: false }} />
                 <Stack.Screen name='(auth)' options={{ headerShown: false }} /> 
               </Stack.Protected>
 
               {/* Authenticated: Show drawer-based stack (maybe pass project header logic to here, to avoid overides inside project, which causes inconsistency in its header.*/}
-              <Stack.Protected guard={!isLoading && !!user}>
+              <Stack.Protected guard={!!user}>
                   <Stack.Screen name='(home)/(drawer)' options={{ headerShown: false }} />
                   <Stack.Screen name='project' options={{ headerShown: true, title:''}} /> 
               </Stack.Protected>
@@ -58,16 +57,14 @@ function RootNavigator() {
 const RouteLayout = () => {  
   return (
     <AuthProvider>
-      <UsersProvider>
-        <ProjectProvider>
-          <InviteProvider>
-            <TaskProvider>
-              <StatusBar value="auto" />
-              <RootNavigator />
-            </TaskProvider>
-          </InviteProvider>
-        </ProjectProvider>
-      </UsersProvider>
+      <ProjectProvider>
+        <InviteProvider>
+          <TaskProvider>
+            <StatusBar value="auto" />
+            <RootNavigator />
+          </TaskProvider>
+        </InviteProvider>
+      </ProjectProvider>
     </AuthProvider>
   )
 }

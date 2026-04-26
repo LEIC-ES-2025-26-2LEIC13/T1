@@ -15,18 +15,18 @@ const Invites = () => {
     const handleAccept = async (invite) => {
         try {
           	await acceptInvite(invite)
-        } catch  (error) {
+        } catch (error) {
           	Alert.alert('Error', error.message)
         }
     };
 
-		const handleIgnore = async (invite) => {
-			try {
-				await ignoreInvite(invite)
-			} catch (error) {
-				Alert.alert('Error', error.message)
-			}
-		}
+    const handleIgnore = async (invite) => {
+        try {
+            await ignoreInvite(invite)
+        } catch (error) {
+            Alert.alert('Error', error.message)
+        }
+    }
 
     useFocusEffect(
         useCallback => {

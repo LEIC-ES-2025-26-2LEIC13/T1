@@ -1,106 +1,42 @@
 import { createContext, useEffect, useState } from "react";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc } from "firebase/firestore"
-import { db } from "../firebase/firebaseConfig";
+import { projectService } from "../api/projectService";
 import { useAuth } from "../hooks/useAuth";
 
 export const ProjectContext = createContext();
 
-function normalizeProjectPayload(projectData = {}) {
-	return {
-		...projectData,
-		title: projectData?.title?.trim() ?? '',
-		description: projectData?.description?.trim() ?? '',
-	}
-}
-
-function validateProjectPayload(projectData = {}) {
-	if (!projectData.title) {
-		throw new Error('Please enter a project title')
-	}
-}
-
-function normalizeProjectUpdates(updates = {}) {
-  const normalized = { ...updates };
-
-  if (normalized.title !== undefined) {
-	normalized.title = (normalized.title ?? '').trim();
-	if (!normalized.title) throw new Error('Project title cannot be empty');
-  }
-
-  if (normalized.description !== undefined) {
-	normalized.description = (normalized.description ?? '').trim();
-  }
-
-  return normalized;
-}
-
 export const ProjectProvider = ({ children }) => {
-    const [projects, setProjects] = useState([])
+    const [projects, setProjects] = useState([]) // user projects
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
     const { user } = useAuth()
 
-    async function createProject(project) {
-        const normalizedProjectData = normalizeProjectPayload(project)
-		validateProjectPayload(normalizedProjectData)
-
-        const projectRef = await addDoc(collection(db, 'projects'), {
-            ...normalizedProjectData,
-            createdBy: user.uid
-        })
-
-        // Create a document in a subcolletion 'users' inside the respective project document
-        await addDoc(collection(projectRef, 'users'), {
-            userId: user.uid,
-            email: user.email // possible (from Auth context)
-        })
-
-        const userRef = doc(db, 'users', user.uid)
-
-        // Create a document in a subcolletion 'projects' inside the respective user document
-        await addDoc(collection(userRef, 'projects'), { 
-            projectId: projectRef.id,
-            title: normalizedProjectData.title,
-            description: normalizedProjectData.description
-        })
-	}
-
-    async function updateProject(id, updates) {
-        const normalizedUpdates = normalizeProjectUpdates(updates)
-		if (Object.keys(normalizedUpdates).length === 0) {
-			return
-		}
-		await updateDoc(doc(db, 'projects', id), {...normalizedUpdates})
-    }
-		
     useEffect(() => {
         if (!user?.uid) {
             setProjects([]);
-            return;
+            return
         }
 
-        const userRef = doc(db, 'users', user.uid)
-        // Gets projects in which the current user is envolved
-        const userProjects = query(
-            collection(userRef, 'projects'),
-        )
-
-        const unsub = onSnapshot(userProjects, async (userProjectsSnap) => {
-            setIsLoadingProjects(true)
-            
-            const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
-                id: doc.data().projectId, // true project ID 
-                ...doc.data(),
-            }));
-            
-            setProjects(projectsToDisplay)
-            setIsLoadingProjects(false)
+        setIsLoadingProjects(true);
+        const unsub = projectService.subscribeToUserProjects(user.uid, (projectsToDisplay) => {
+            setProjects(projectsToDisplay);
+            setIsLoadingProjects(false);
         });
 
       return () => unsub();
     }, [user?.uid]);
 
+
+    async function createProject(projectData) {
+        await projectService.createProject(user.uid, user.email, projectData)
+	}
+
+
+    async function updateProject(id, updates) {
+        await projectService.updateProject(id, updates)
+    }
+
+
     async function deleteProject(id){
-		await deleteDoc(doc(db, 'projects', id))
+		await projectService.deleteProject(id)
 	}
 
     return (
