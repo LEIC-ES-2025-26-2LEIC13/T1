@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, View, StyleSheet, useColorScheme, FlatList } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import ThemedText from '../../../../components/ThemedText';
@@ -11,9 +11,9 @@ const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
-    const [projectModalVisible, setProjectModalVisible] = React.useState(false);
-    const [projectTitle, setProjectTitle] = React.useState('');
-    const [projectDescription, setProjectDescription] = React.useState('');
+    const [projectModalVisible, setProjectModalVisible] = useState(false);
+    const [projectTitle, setProjectTitle] = useState('');
+    const [projectDescription, setProjectDescription] = useState('');
     const { projects, createProject } = useProject();
 
     const openProjectModal = () => setProjectModalVisible(true);
@@ -29,7 +29,7 @@ const Projects = () => {
             await createProject(projectData);
             closeProjectModal();
         } catch (error) {
-            Alert.alert('Error', error.message || 'Could not create project');
+            Alert.alert('Error', error.message);
         }
     };
 
