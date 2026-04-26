@@ -1,12 +1,12 @@
 import { createContext, useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
-import { useUser } from '../hooks/useUser';
+import { useAuth } from '../hooks/useAuth';
 
 export const InviteContext = createContext(null);
 
 export function InviteProvider({ children }) {
-	const { user } = useUser()
+	const { user } = useAuth()
 	const [ invites, setInvites ] = useState([])
 	const [ hasNewInvites, setHasNewInvites ] = useState([])
 

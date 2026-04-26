@@ -12,7 +12,7 @@ import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
 import useProject from '../hooks/useProject';
-import { useUser } from '../hooks/useUser';
+import { useAuth } from '../hooks/useAuth';
 import { useUsers } from '../hooks/useUsers';
 import { useInvite } from '../hooks/useInvite';
 import { useTask } from '../hooks/useTask';
@@ -24,7 +24,7 @@ export default function Home() {
   const scheme = useColorScheme();
   const palette = Colors[scheme] ?? Colors.light;
   const { projects } = useProject(); // user projects
-  const { user } = useUser();
+  const { user } = useAuth();
   const { getUserByEmail } = useUsers();
   const { sendInvite } = useInvite();
 
@@ -41,7 +41,7 @@ export default function Home() {
   const projectId = params.projectId;
   const currentProject = projects.find((project) => project.id === projectId);
   const currentProjectName = currentProject?.title ?? 'Project';
-
+  
   // sets projectId for Task context
   useEffect(() => {
     setActiveProjectId(projectId ?? '');

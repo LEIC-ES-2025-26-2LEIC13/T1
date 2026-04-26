@@ -1,11 +1,11 @@
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import {useUser} from "../hooks/useUser";
+import {useAuth} from "../hooks/useAuth";
 import {View} from "react-native";
 import {Colors} from "../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const CustomDrawerContent = (props) =>{
-    const { logout } = useUser();
+    const { logout } = useAuth();
 
     return (
         <DrawerContentScrollView

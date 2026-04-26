@@ -2,23 +2,22 @@ import { useColorScheme } from 'react-native'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
-import { UserProvider } from '../contexts/userContext'
-import { UsersProvider } from '../contexts/usersContext'
+import { AuthProvider } from '../contexts/AuthContext'
 import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
 import { TaskProvider } from '../contexts/taskContext'
-import { useUser } from '../hooks/useUser'
-
+import { UsersProvider } from '../contexts/usersContext'
+import { useAuth } from '../hooks/useAuth'
 import AppToast from '../components/Toast';
 
 
-// This component was defined explicity, because useUser hook can only be used inside descendents of UserProvider, not inside itself
+// This component was defined explicity, because useAuth hook can only be used inside descendents of UserProvider, not inside itself
 function RootNavigator() {
 
   const colorScheme = useColorScheme() // this is either 'dark' or 'light'
   const theme = Colors[colorScheme] ?? Colors.light
 
-  const { user, isLoading } = useUser() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
+  const { user, isLoading } = useAuth() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
 
   return (
       <>
@@ -49,7 +48,7 @@ function RootNavigator() {
 
 const RouteLayout = () => {  
   return (
-    <UserProvider>
+    <AuthProvider>
       <UsersProvider>
         <ProjectProvider>
           <InviteProvider>
@@ -60,7 +59,7 @@ const RouteLayout = () => {
           </InviteProvider>
         </ProjectProvider>
       </UsersProvider>
-    </UserProvider>
+    </AuthProvider>
   )
 }
 

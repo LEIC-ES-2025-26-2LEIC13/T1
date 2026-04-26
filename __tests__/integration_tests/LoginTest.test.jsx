@@ -4,11 +4,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react-nativ
 
 import Login from '../../app/(auth)/login'
 import { UserProvider } from '../../contexts/userContext'
-import { useUser } from '../../hooks/useUser'
+import { useAuth } from '../../hooks/useAuth'
 
 // Component used to check the authentication
 const AuthStateProbe = () => {
-	const { user } = useUser()
+	const { user } = useAuth()
 
     // Renders different text based on the authentication state of the user
 	return user ? (

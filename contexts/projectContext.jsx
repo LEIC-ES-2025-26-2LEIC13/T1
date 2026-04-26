@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc } from "firebase/firestore"
 import { db } from "../firebase/firebaseConfig";
-import { useUser } from "../hooks/useUser";
+import { useAuth } from "../hooks/useAuth";
 
 export const ProjectContext = createContext();
 
@@ -37,7 +37,7 @@ function normalizeProjectUpdates(updates = {}) {
 export const ProjectProvider = ({ children }) => {
     const [projects, setProjects] = useState([])
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
-    const { user } = useUser()
+    const { user } = useAuth()
 
     async function createProject(projectData) {
         const normalizedProjectData = normalizeProjectPayload(projectData)
@@ -73,7 +73,7 @@ export const ProjectProvider = ({ children }) => {
     }
 		
     useEffect(() => {
-        if (!user?.uid) { // TODO: sometimes user is null when the app opens with cached login session open
+        if (!user?.uid) {
             setProjects([]);
             return;
         }
