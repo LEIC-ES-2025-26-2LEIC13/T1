@@ -5,43 +5,41 @@ import { useUser } from "../hooks/useUser";
 
 export const ProjectContext = createContext();
 
-function normalizeProjectPayload(projectData = {}) {
+function normalizeProjectData({ title, description }) {
 	return {
-		...projectData,
-		title: projectData?.title?.trim() ?? '',
-		description: projectData?.description?.trim() ?? '',
+		title: title?.trim() ?? '',
+		description: description?.trim() ?? '',
 	}
 }
 
-function validateProjectPayload(projectData = {}) {
-	if (!projectData.title) {
+function validateProjectTitle({ title }) {
+	if (!title) {
 		throw new Error('Please enter a project title')
 	}
 }
 
-function normalizeProjectUpdates(updates = {}) {
-  const normalized = { ...updates };
+function normalizeProjectUpdates( { title, description }) {
 
-  if (normalized.title !== undefined) {
-	normalized.title = (normalized.title ?? '').trim();
-	if (!normalized.title) throw new Error('Project title cannot be empty');
+  if (title !== undefined) {
+	title = (title ?? '').trim();
+	if (!title) throw new Error('Project title cannot be empty');
   }
 
-  if (normalized.description !== undefined) {
-	normalized.description = (normalized.description ?? '').trim();
+  if (description !== undefined) {
+	description = (description ?? '').trim();
   }
 
-  return normalized;
+  return { title, description };
 }
 
 export const ProjectProvider = ({ children }) => {
-    const [projects, setProjects] = useState([])
+    const [projects, setProjects] = useState([]) // user projects
 	const [isLoadingProjects, setIsLoadingProjects] = useState(false)
     const { user } = useUser()
 
     async function createProject(projectData) {
-        const normalizedProjectData = normalizeProjectPayload(projectData)
-		validateProjectPayload(normalizedProjectData)
+        const normalizedProjectData = normalizeProjectData(projectData)
+		validateProjectTitle(normalizedProjectData)
 
         const projectRef = await addDoc(collection(db, 'projects'), {
             ...normalizedProjectData,
@@ -65,11 +63,16 @@ export const ProjectProvider = ({ children }) => {
 	}
 
     async function updateProject(id, updates) {
-        const normalizedUpdates = normalizeProjectUpdates(updates)
-		if (Object.keys(normalizedUpdates).length === 0) {
-			return
+        const { title, description } = normalizeProjectUpdates(updates)
+		if (!title && !description) {
+			return // no updates
 		}
-		await updateDoc(doc(db, 'projects', id), {...normalizedUpdates})
+		
+        const dataToUpdate = {}
+        if (title !== undefined) dataToUpdate.title = title
+        if (description !== undefined) dataToUpdate.description = description
+        
+		await updateDoc(doc(db, 'projects', id), dataToUpdate)
     }
 		
     useEffect(() => {

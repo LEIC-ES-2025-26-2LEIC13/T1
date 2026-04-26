@@ -20,7 +20,9 @@ export function UserProvider({ children }) {
 
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser)
-            setIsLoading(false)
+            if (currentUser) {
+                setIsLoading(false)
+            }
         })
 
         return unsubscribe

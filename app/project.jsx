@@ -65,7 +65,7 @@ export default function Home() {
       await createTask(taskData);
       closeTaskModal();
     } catch (error) {
-      Alert.alert('Error', 'Failed to create task');
+      Alert.alert('Error', error.message);
     }
   };
 
