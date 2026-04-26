@@ -8,9 +8,9 @@ import {
 
 import { auth } from "../firebase/firebaseConfig.js"
 
-export const UserContext = createContext(null)
+export const AuthContext = createContext(null)
 
-export function UserProvider({ children }) {
+export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -76,8 +76,8 @@ export function UserProvider({ children }) {
     }), [user, isLoading])
 
     return (
-        <UserContext.Provider value={value}>
+        <AuthContext.Provider value={value}>
             {children}
-        </UserContext.Provider>
+        </AuthContext.Provider>
     )
 }

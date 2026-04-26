@@ -1,5 +1,5 @@
 import { UserContext, UserProvider } from "../../../contexts/userContext";
-import { useUser } from "../../../hooks/useUser"
+import { useAuth } from "../../../hooks/useAuth"
 import { Text } from 'react-native'
 import { render, screen, act } from '@testing-library/react-native'
 
@@ -7,7 +7,7 @@ import { render, screen, act } from '@testing-library/react-native'
 // this has to be a descendent of UserProvider
 const TestConsumer = ({ username, password }) => {
     // to obtain access to the data provided by the context
-    const { user, isLoading, login } = useUser(UserContext)
+    const { user, isLoading, login } = useAuth(UserContext)
     
     // return a "pressable" so that testing is possible (calling .onPress() function in the tests)
     return (

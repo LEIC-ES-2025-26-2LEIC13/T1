@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Alert, Keyboard, ScrollView, View, useColorScheme } from 'react-native'
 import { useState } from 'react'
-import { useUser } from '../../hooks/useUser'
+import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
 import { Colors } from '../../constants/Colors'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -18,7 +18,7 @@ const Login = () => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
-    const { login, isLoading } = useUser()
+    const { login, isLoading } = useAuth()
     const router = useRouter()
 
     const handleSubmit = async () => {

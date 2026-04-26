@@ -22,8 +22,8 @@ jest.mock('../../../firebase/firebaseConfig', () => ({
   db: {},
 }))
 
-jest.mock('../../../hooks/useUser', () => ({
-  useUser: () => ({
+jest.mock('../../../hooks/useAuth', () => ({
+  useAuth: () => ({
     user: { uid: 'user1' }, // User must not be null, to bypass the first check
   }),
 }));
@@ -72,9 +72,9 @@ describe('InviteContext', () => {
     })
 
     test('does not load invites if user is not logged in', async () => {
-        // Mock useUser to return null user, to simulate a user that is not logged in 
-        jest.mock('../../../hooks/useUser', () => ({
-            useUser: () => ({
+        // Mock useAuth to return null user, to simulate a user that is not logged in 
+        jest.mock('../../../hooks/useAuth', () => ({
+            useAuth: () => ({
                 user: { uid: null },
             }),
         }))
