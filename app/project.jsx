@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import CreateTaskModal from '../components/CreateTaskModal';
+import TaskModal from '../components/TaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
@@ -42,7 +43,11 @@ export default function Home() {
 
   const [ inviteTarget, setInviteTarget ] = useState('');
 
-  const [ taskModalVisible, setTaskModalVisible ] = useState(false);
+  const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
+
+  const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
+  const [ selectedTask, setSelectedTask ] = useState(null);
+
   const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
 
   // Search for current project in the user's projects
@@ -59,11 +64,11 @@ export default function Home() {
 	};
   }, [projectId, setActiveProjectId]);
 
-  // Task modal
-  const openTaskModal = () => setTaskModalVisible(true);
+  // Task Creation Modal
+  const openTaskCreationModal = () => setTaskModalCreationVisible(true);
 
-  const closeTaskModal = () => {
-	setTaskModalVisible(false);
+  const closeTaskCreationModal = () => {
+	setTaskModalCreationVisible(false);
 	setTask({
 	  name: '',
 	  description: '',
@@ -71,10 +76,22 @@ export default function Home() {
 	});
   };
 
+  // Task Details Modal
+
+  const openTaskDetails = (taskItem) => {
+	setSelectedTask(taskItem);
+	setTaskDetailsVisible(true);
+  };
+
+  const closeTaskDetails = () => {
+	setTaskDetailsVisible(false);
+	setSelectedTask(null);
+  };
+
   const handleCreateTask = async (taskData) => {
     try{
       await createTask(taskData);
-      closeTaskModal();
+      closeTaskCreationModal();
     } catch (error) {
       Alert.alert('Error', error.message);
     }
@@ -206,15 +223,14 @@ export default function Home() {
 		  keyExtractor={(item, index) => `${item.name}-${index}`}
 		  renderItem={({ item }) => (
 			  <Task
-				  name={item.name}
-				  description={item.description}
-				  label={item.label}
+				  task={item}
+				  onPress={() => openTaskDetails(item)}
 			  />
 		  )}
 		/>
 
 		<ThemedButton
-		  onPress={openTaskModal}
+		  onPress={openTaskCreationModal}
 		  style={styles.btn}
 		>
 		  <Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
@@ -222,12 +238,18 @@ export default function Home() {
 		</ThemedButton>
 
 		<CreateTaskModal
-		  isVisible={taskModalVisible}
-		  onClose={closeTaskModal}
+		  isVisible={taskModalCreationVisible}
+		  onClose={closeTaskCreationModal}
 		  onCreate={handleCreateTask}
 		  task={task}
 		  onChange={handleTaskChange}
 		  projectName={currentProjectName}
+		/>
+
+		<TaskModal
+		  visible={taskDetailsVisible}
+		  onClose={closeTaskDetails}
+		  task={selectedTask}
 		/>
 	  </SafeAreaView>
 	</>
