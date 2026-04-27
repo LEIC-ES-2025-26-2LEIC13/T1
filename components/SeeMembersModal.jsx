@@ -67,6 +67,7 @@ export default function SeeMembersModal({
                 <Pressable
                     onPress={onClose}
                     style={styles.closeBtn}
+                    testID="see-members-close"
                 >
                     <Ionicons
                         name="close"

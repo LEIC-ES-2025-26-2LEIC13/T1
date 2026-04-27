@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
 function normalizeProjectData({ title, description }) {

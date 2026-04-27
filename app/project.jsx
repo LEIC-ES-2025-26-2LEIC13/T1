@@ -19,245 +19,249 @@ import SeeMembersModal from '../components/SeeMembersModal';
 import { projectService } from '../api/projectService';
 
 export default function Home() {
-  const router = useRouter();
-  const params = useLocalSearchParams(); // Routing parameters of the current screen
-  // For example: /project?projectId=abc -> params.projectId will be abc
+  	const router = useRouter();
+	const params = useLocalSearchParams(); // Routing parameters of the current screen
+	// For example: /project?projectId=abc -> params.projectId will be abc
 
-  const scheme = useColorScheme();
-  const palette = Colors[scheme] ?? Colors.light;
+	const scheme = useColorScheme();
+	const palette = Colors[scheme] ?? Colors.light;
 
-  const { projects } = useProject(); // user projects
-  const { user } = useAuth();
+	const { projects } = useProject(); // user projects
+	const { user } = useAuth();
 
-  const { sendInvite } = useInvite();
-  const { tasks, createTask, setActiveProjectId } = useTask();
+	const { sendInvite } = useInvite();
+	const { tasks, createTask, setActiveProjectId } = useTask();
 
-  const [task, setTask] = useState({
-	name: '',
-	description: '',
-	label: '',
-  });
+	const [task, setTask] = useState({
+		name: '',
+		description: '',
+		label: '',
+  	});
 
-  const handleTaskChange = (field, value) => {
-	setTask((prev) => ({ ...prev, [field]: value }));
-  };
+	const handleTaskChange = (field, value) => {
+		setTask((prev) => ({ ...prev, [field]: value }));
+	};
 
-  const [ inviteTarget, setInviteTarget ] = useState('');
+	const [ inviteTarget, setInviteTarget ] = useState('');
 
-  const [ taskModalVisible, setTaskModalVisible ] = useState(false);
-  const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
+	const [ taskModalVisible, setTaskModalVisible ] = useState(false);
+	const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false);
 
 
-  // Search for current project in the user's projects
-  const projectId = params.projectId;
-  const currentProject = projects.find((project) => project.id === projectId);
-  const currentProjectName = currentProject?.title ?? 'Project';
-  
-  // sets projectId for Task context
-  useEffect(() => {
-	setActiveProjectId(projectId ?? '');
+	// Search for current project in the user's projects
+	const projectId = params.projectId;
+	const currentProject = projects.find((project) => project.id === projectId);
+	const currentProjectName = currentProject?.title ?? 'Project';
+	
+	// sets projectId for Task context
+	useEffect(() => {
+		setActiveProjectId(projectId ?? '');
 
-	return () => {
-	  setActiveProjectId('');
-	};
-  }, [projectId, setActiveProjectId]);
+		return () => {
+		setActiveProjectId('');
+		};
+	}, [projectId, setActiveProjectId]);
 
-  // Task modal
-  const openTaskModal = () => setTaskModalVisible(true);
+	// Task modal
+	const openTaskModal = () => setTaskModalVisible(true);
 
-  const closeTaskModal = () => {
-	setTaskModalVisible(false);
-	setTask({
-	  name: '',
-	  description: '',
-	  label: '',
-	});
-  };
-
-  const handleCreateTask = async (taskData) => {
-    try{
-      await createTask(taskData);
-      closeTaskModal();
-    } catch (error) {
-      Alert.alert('Error', error.message);
-    }
-  };
-
-
-  // Invite modal
-  const handleInvitePress = () => setInviteModalVisible(true);
-
-  const handleCloseModal = () => {
-	setInviteModalVisible(false);
-	setInviteTarget('');
-  };
-
-  // See members modal
-  const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
-  const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
-
-
-  const handleGoBack = () => {
-	try {
-	  if (router.canGoBack()) {
-		router.back();
-		return;
-	  }
-
-	  router.replace('/');
-	} catch {
-	  router.replace('/');
-	}
-  };
-
-  const handleSendInvite = async () => {
-	const trimmedTarget = inviteTarget.trim().toLowerCase();
-
-	if (!trimmedTarget) {
-	  Alert.alert('Missing user', 'Please enter a valid email.');
-	  return;
-	}
-
-	try {
-	  const receiverUser = await userService.getUserByEmail(trimmedTarget);
-
-	  if (!receiverUser) {
-		Alert.alert('User not found', 'No registered user matches that email.');
-		return;
-	  }
-
-	  if (receiverUser.id === user.uid) {
-		Alert.alert('Invalid invite', 'You cannot invite yourself.');
-		return;
-	  }
-
-	  if (!currentProject?.id) {
-		Alert.alert('Project unavailable', 'Unable to find this project.');
-		return;
-	  }
-
-	  await sendInvite({
-		senderId: user.uid,
-		senderEmail: user.email,
-		receiverId: receiverUser.id,
-		projectId: currentProject.id,
-		projectName: currentProject.title,
-	  });
-
-	  handleCloseModal();
-	  Toast.show({
-		type: 'success',
-		text1: 'Invite sent',
-		text2: `Invitation sent to ${trimmedTarget}.`,
-		position: 'top',
-		visibilityTime: 1500,
-		topOffset: 100,
-	  });
-	  } catch (error) {
-		Alert.alert('Invalid invite', error.message);
-	  }
+	const closeTaskModal = () => {
+		setTaskModalVisible(false);
+		setTask({
+		name: '',
+		description: '',
+		label: '',
+		});
 	};
 
-  return (
+	const handleCreateTask = async (taskData) => {
+		try{
+			await createTask(taskData);
+			closeTaskModal();
+		} catch (error) {
+			Alert.alert('Error', error.message);
+		}
+	};
+
+
+  	// Invite modal
+  	const handleInvitePress = () => setInviteModalVisible(true);
+
+  	const handleCloseInviteModal = () => {
+		setInviteModalVisible(false);
+		setInviteTarget('');
+	};
+
+	// See members modal
+	const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
+	const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
+
+
+	const handleGoBack = () => {
+		try {
+		if (router.canGoBack()) {
+			router.back();
+			return;
+		}
+
+		router.replace('/');
+		} catch {
+		router.replace('/');
+		}
+  	};
+
+
+	const handleSendInvite = async () => {
+		const trimmedTarget = inviteTarget.trim().toLowerCase();
+
+		if (!trimmedTarget) {
+		Alert.alert('Missing user', 'Please enter a valid email.');
+		return;
+		}
+
+		try {
+		const receiverUser = await userService.getUserByEmail(trimmedTarget);
+
+		if (!receiverUser) {
+			Alert.alert('User not found', 'No registered user matches that email.');
+			return;
+		}
+
+		if (receiverUser.id === user.uid) {
+			Alert.alert('Invalid invite', 'You cannot invite yourself.');
+			return;
+		}
+
+		if (!currentProject?.id) {
+			Alert.alert('Project unavailable', 'Unable to find this project.');
+			return;
+		}
+
+		await sendInvite({
+			senderId: user.uid,
+			senderEmail: user.email,
+			receiverId: receiverUser.id,
+			projectId: currentProject.id,
+			projectName: currentProject.title,
+		});
+
+		handleCloseInviteModal();
+		Toast.show({
+			type: 'success',
+			text1: 'Invite sent',
+			text2: `Invitation sent to ${trimmedTarget}.`,
+			position: 'top',
+			visibilityTime: 1500,
+			topOffset: 100,
+		});
+		} catch (error) {
+			Alert.alert('Invalid invite', error.message);
+		}
+	};
+
+  	return (
 	<>
-	  <Stack.Screen
-		options={{
-		  headerTitle: () => (
-			<ThemedText title={true} style={{ fontSize: 18, fontWeight: 'bold' }}>
-			  {currentProjectName}
-			</ThemedText>
-		  ),
-		  headerLeft: () => (
-			<Pressable onPress={handleGoBack} hitSlop={10} style={{
-			  width: 40,
-			  height: 40,
-			  justifyContent: 'center',
-			  alignItems: 'center',
-			}}>
-			  <Ionicons name="arrow-back" size={24} color={palette.title} />
-			</Pressable>
-		  ),
-		  headerRight: () => (
-			<>
-				<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
-				width: 40,
-				height: 40,
-				justifyContent: 'center',
-				alignItems: 'center',
-				}}>
-					<Ionicons name="people" size={24} color={palette.title} />
-				</Pressable>
+	  	<Stack.Screen
+			options={{
 
-				<Pressable onPress={handleInvitePress} hitSlop={10} style={{
+		  	headerTitle: () => (
+				<ThemedText title={true} style={{ fontSize: 18, fontWeight: 'bold' }}>
+					{currentProjectName}
+				</ThemedText>
+			),
+
+		  	headerLeft: () => (
+				<Pressable onPress={handleGoBack} hitSlop={10} style={{
 				width: 40,
 				height: 40,
 				justifyContent: 'center',
 				alignItems: 'center',
 				}}>
-					<Ionicons name="person-add" size={24} color={palette.title} />
+			  		<Ionicons name="arrow-back" size={24} color={palette.title} />
 				</Pressable>
-			</>
-		  ),
-		  headerStyle: {
-			backgroundColor: palette.navBackground,
-			borderBottomWidth: 1,
-			borderBottomColor: '#e5e7eb',
-		  },
-		  headerTintColor: palette.title,
-		  headerShadowVisible: false,
+			),
+
+			headerRight: () => (
+				<>
+					<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
+					width: 40,
+					height: 40,
+					justifyContent: 'center',
+					alignItems: 'center',
+					}}>
+						<Ionicons name="people" size={24} color={palette.title} />
+					</Pressable>
+
+					<Pressable onPress={handleInvitePress} hitSlop={10} style={{
+					width: 40,
+					height: 40,
+					justifyContent: 'center',
+					alignItems: 'center',
+					}}>
+						<Ionicons name="person-add" size={24} color={palette.title} />
+					</Pressable>
+				</>
+			),
+			headerStyle: {
+				backgroundColor: palette.navBackground,
+				borderBottomWidth: 1,
+				borderBottomColor: '#e5e7eb',
+			},
+			headerTintColor: palette.title,
+			headerShadowVisible: false,
 		}}
-	  />
-
-	  <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-		<InviteWorkspaceModal
-		  visible={inviteModalVisible}
-		  value={inviteTarget}
-		  onChangeText={setInviteTarget}
-		  onClose={handleCloseModal}
-		  onInvite={handleSendInvite}
-		  workspaceName={currentProjectName}
 		/>
 
-		<SeeMembersModal
-		  visible={seeMembersModalVisible}
-		  getProjectUsers={() => projectService.getProjectUsers(projectId)}
-		  onClose={handleCloseMembersModal}
-		/>
-		
-		<FlatList
-		  data={tasks ?? []}
-		  style={styles.list}
-		  contentContainerStyle={styles.listContent}
-		  keyExtractor={(item, index) => `${item.name}-${index}`}
-		  renderItem={({ item }) => (
-			  <Task
-				  name={item.name}
-				  description={item.description}
-				  label={item.label}
-			  />
-		  )}
-		/>
+		<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+			<InviteWorkspaceModal
+			visible={inviteModalVisible}
+			value={inviteTarget}
+			onChangeText={setInviteTarget}
+			onClose={handleCloseInviteModal}
+			onInvite={handleSendInvite}
+			workspaceName={currentProjectName}
+			/>
 
-		<ThemedButton
-		  onPress={openTaskModal}
-		  style={styles.btn}
-		>
-		  <Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
-		  <Text style={styles.btnText}>Create Task</Text>
-		</ThemedButton>
+			<SeeMembersModal
+			visible={seeMembersModalVisible}
+			getProjectUsers={() => projectService.getProjectUsers(projectId)}
+			onClose={handleCloseMembersModal}
+			/>
+			
+			<FlatList
+			data={tasks ?? []}
+			style={styles.list}
+			contentContainerStyle={styles.listContent}
+			keyExtractor={(item, index) => `${item.name}-${index}`}
+			renderItem={({ item }) => (
+				<Task
+					name={item.name}
+					description={item.description}
+					label={item.label}
+				/>
+			)}
+			/>
 
-		<CreateTaskModal
-		  isVisible={taskModalVisible}
-		  onClose={closeTaskModal}
-		  onCreate={handleCreateTask}
-		  task={task}
-		  onChange={handleTaskChange}
-		  projectName={currentProjectName}
-		/>
-	  </SafeAreaView>
-	</>
-  );
+			<ThemedButton
+			onPress={openTaskModal}
+			style={styles.btn}
+			>
+			<Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
+			<Text style={styles.btnText}>Create Task</Text>
+			</ThemedButton>
+
+			<CreateTaskModal
+			isVisible={taskModalVisible}
+			onClose={closeTaskModal}
+			onCreate={handleCreateTask}
+			task={task}
+			onChange={handleTaskChange}
+			projectName={currentProjectName}
+			/>
+		</SafeAreaView>
+		</>
+	);
 }
 
 const styles = StyleSheet.create({
