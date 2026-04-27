@@ -48,7 +48,8 @@ It is organised by the following activities:
       - [Teamwork Assessment](#teamwork-assessment)
       - [Release](#release-1)
     - [Sprint 2](#sprint-2)
-      - [Log and documentation](#log-and-documentation-1)
+      - [Logs and documentation](#logs-and-documentation)
+      - [AI usage documentation](#ai-usage-documentation)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -455,10 +456,13 @@ Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 
 ### Sprint 2
 
-#### Log and documentation
+#### Logs and documentation
 
-Improvements for Sprint 2 are documented in [this](docs/sprint2improvements.md) file.
-AI Usage is documented in [this](docs/sprint2AIUsage.md) file.
+* Documentation of bugs, defects, fixes, and improvements [here](docs/sprint2improvements.md).
+
+#### AI usage documentation
+
+* AI usage during this sprint documented [here](docs/sprint2AIUsage.md).
 
 ### Sprint 3
 
