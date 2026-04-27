@@ -15,6 +15,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
 import { useTask } from '../hooks/useTask';
 import { userService } from '../api/userService';
+import SeeMembersModal from '../components/SeeMembersModal';
+import { projectService } from '../api/projectService';
 
 export default function Home() {
   const router = useRouter();
@@ -44,6 +46,8 @@ export default function Home() {
 
   const [ taskModalVisible, setTaskModalVisible ] = useState(false);
   const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
+	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false);
+
 
   // Search for current project in the user's projects
   const projectId = params.projectId;
@@ -88,6 +92,11 @@ export default function Home() {
 	setInviteModalVisible(false);
 	setInviteTarget('');
   };
+
+  // See members modal
+  const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
+  const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
+
 
   const handleGoBack = () => {
 	try {
@@ -170,14 +179,25 @@ export default function Home() {
 			</Pressable>
 		  ),
 		  headerRight: () => (
-			<Pressable onPress={handleInvitePress} hitSlop={10} style={{
-			  width: 40,
-			  height: 40,
-			  justifyContent: 'center',
-			  alignItems: 'center',
-			}}>
-			  <Ionicons name="person-add" size={24} color={palette.title} />
-			</Pressable>
+			<>
+				<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
+				width: 40,
+				height: 40,
+				justifyContent: 'center',
+				alignItems: 'center',
+				}}>
+					<Ionicons name="people" size={24} color={palette.title} />
+				</Pressable>
+
+				<Pressable onPress={handleInvitePress} hitSlop={10} style={{
+				width: 40,
+				height: 40,
+				justifyContent: 'center',
+				alignItems: 'center',
+				}}>
+					<Ionicons name="person-add" size={24} color={palette.title} />
+				</Pressable>
+			</>
 		  ),
 		  headerStyle: {
 			backgroundColor: palette.navBackground,
@@ -197,6 +217,12 @@ export default function Home() {
 		  onClose={handleCloseModal}
 		  onInvite={handleSendInvite}
 		  workspaceName={currentProjectName}
+		/>
+
+		<SeeMembersModal
+		  visible={seeMembersModalVisible}
+		  getProjectUsers={() => projectService.getProjectUsers(projectId)}
+		  onClose={handleCloseMembersModal}
 		/>
 		
 		<FlatList
