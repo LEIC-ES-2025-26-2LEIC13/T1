@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, Text, FlatList} from 'react-native';
+import { Alert, Pressable, StyleSheet, useColorScheme, Text, FlatList, View} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +15,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
 import { useTask } from '../hooks/useTask';
 import { userService } from '../api/userService';
+import OverflowMenu from '../components/OverflowMenu';
 
 export default function Home() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function Home() {
   const scheme = useColorScheme();
   const palette = Colors[scheme] ?? Colors.light;
 
-  const { projects } = useProject(); // user projects
+  const { projects, deleteProject } = useProject(); // user projects
   const { user } = useAuth();
 
   const { sendInvite } = useInvite();
@@ -150,6 +151,16 @@ export default function Home() {
 	  }
 	};
 
+	const handleProjectDelete = async() => {
+		try {
+			await deleteProject(projectId)
+			handleGoBack()
+		}
+		catch (error) {
+			console.log('Delete Failed', error)
+		}
+	} 
+
   return (
 	<>
 	  <Stack.Screen
@@ -170,14 +181,30 @@ export default function Home() {
 			</Pressable>
 		  ),
 		  headerRight: () => (
-			<Pressable onPress={handleInvitePress} hitSlop={10} style={{
-			  width: 40,
-			  height: 40,
-			  justifyContent: 'center',
-			  alignItems: 'center',
-			}}>
-			  <Ionicons name="person-add" size={24} color={palette.title} />
-			</Pressable>
+			<>
+			<OverflowMenu 
+				actions={[
+					{
+						id: 'invite-member',
+						title: 'Invite member',
+						icon: 'person-add',
+						onPress: () => handleInvitePress(),
+					},
+					{
+						id: 'delete-project',
+						title: 'Delete project',
+						icon: 'remove-circle',
+						confirm: {
+							title: 'Delete project',
+							message: 'Are you sure you want to delete this project?',
+						},
+						destructive: 'true', // If we place a string of text that is not null, 
+						// it will be marked as a destructive action
+						onPress: () => handleProjectDelete(),
+					}
+				]}
+			/>
+			</>
 		  ),
 		  headerStyle: {
 			backgroundColor: palette.navBackground,
