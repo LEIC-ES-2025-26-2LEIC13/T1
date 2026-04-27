@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, onSnapshot, query, updateDoc, writeBatch } from "firebase/firestore";
+import { getDocs, collection, deleteDoc, doc, onSnapshot, query, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
 function normalizeProjectData({ title, description }) {
@@ -93,5 +93,16 @@ export const projectService = {
 
     deleteProject: async (projectId) => {
         await deleteDoc(doc(db, 'projects', projectId))
+    },
+
+    getProjectUsers: async (projectId) => {
+        const projectUsersRef = collection(db, 'projects', projectId, 'projectUsers')
+        const projectUsersSnap = await getDocs(projectUsersRef)
+        
+        // Generate a new array of the fetched documents, with a new field id 
+        return projectUsersSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
     }
 };
