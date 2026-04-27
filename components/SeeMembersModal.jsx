@@ -47,7 +47,7 @@ export default function SeeMembersModal({
             }
         }
 
-        auxGetUsers()
+        auxGetUsers() // necessary because of warnings
         
     }, [visible, getProjectUsers, user.email]);
     

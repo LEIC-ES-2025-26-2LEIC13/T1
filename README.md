@@ -458,6 +458,7 @@ Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 #### Log and documentation
 
 Improvements for Sprint 2 are documented in [this](docs/sprint2improvements.md) file.
+AI Usage is documented in [this](docs/sprint2AIUsage.md) file.
 
 ### Sprint 3
 

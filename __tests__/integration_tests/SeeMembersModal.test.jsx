@@ -11,6 +11,16 @@ jest.mock('../../firebase/firebaseConfig', () => ({}));
 jest.mock('../../hooks/useAuth');
 
 describe('SeeMembersModal Integration Tests', () => {
+
+    //  To handle react state updates issue when running the tests
+    beforeAll(() => {
+        jest.useFakeTimers();
+    });
+
+    afterAll(() => {
+        jest.useRealTimers();
+    });
+
     // Fake current user
     const mockCurrentUser = { email: 'me@example.com' };
     
@@ -74,7 +84,7 @@ describe('SeeMembersModal Integration Tests', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('throws an error/handles it gracefully if current user is not in the project (integration)', async () => {
+    it('throws an error and handles it gracefully if current user is not in the project', async () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation(jest.fn()); // empty implementato
         mockGetProjectUsers.mockReturnValue([{ id: '1', email: 'someone@example.com' }]);
 
