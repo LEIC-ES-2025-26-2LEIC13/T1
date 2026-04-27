@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, Timestamp, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
 
@@ -56,30 +56,40 @@ export const inviteService = {
         const receiverRef = doc(db, 'users',  userId) // respective document of the user in the users collection
         const projectRef = doc(db, 'projects', projectId) // respective document of the project in the projects collection
 
-        // Actual documents (snapshots of them)
-        const projectSnap = await getDoc(projectRef)
+        // Executes atomically (all operations succeed or all operations fail)
+        await runTransaction(db, async (transaction) => {
+            // Actual document (snapshot of it) within the transaction
+            // Reads must happen before writes in transactions
+            const projectSnap = await transaction.get(projectRef)
 
-        if (!projectSnap.exists()) {
-            throw new Error('This project no longer exists. Project may have been deleted after the invite was sent.')
-        }
+            if (!projectSnap.exists()) {
+                throw new Error('This project no longer exists. Project may have been deleted after the invite was sent.')
+            }
 
-        // Get their data as an object
-        const { title, description } = projectSnap.data()
+            // Get their data as an object
+            const { title, description } = projectSnap.data()
 
-        await deleteDoc(doc(receiverRef, 'userInvites', id)) // delete the pending invite in the user's invites
+            // The following doc() function calls only generate a new random ID for a document that doesn't exist yet
+            const inviteRef = doc(receiverRef, 'userInvites', id)
+            const newUserProjectRef = doc(collection(receiverRef, 'userProjects'))
+            const newProjectUserRef = doc(collection(projectRef, 'projectUsers'))
 
-        // Creates a document for one more project inside the 'userProjects' subcollection inside receiver document
-        await addDoc(collection(receiverRef, 'userProjects'), {
-                projectId, // or projectSnap.id
-                title,
-                description
+            transaction.delete(inviteRef) // delete the pending invite in the user's invites
+
+            // Creates a document for one more project inside the 'userProjects' subcollection inside receiver document
+            // transaction.set() creates a document if it does not exist
+            transaction.set(newUserProjectRef, {
+                projectId: projectId, // or projectSnap.id
+                title: title,
+                description: description
             })
 
-        // Creates a document for one more user (email only) inside the 'projectUsers' subcollection inside project document
-        await addDoc(collection(projectRef, 'projectUsers'), {
+            // Creates a document for one more user (email only) inside the 'projectUsers' subcollection inside project document
+            transaction.set(newProjectUserRef, {
                 userId: userId,
                 email: userEmail
             })
+        })
     },
 
 

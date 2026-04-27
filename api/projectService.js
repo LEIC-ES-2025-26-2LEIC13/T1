@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, updateDoc } from "firebase/firestore";
+import { getDocs, collection, deleteDoc, doc, onSnapshot, query, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
 function normalizeProjectData({ title, description }) {
@@ -47,25 +47,35 @@ export const projectService = {
         const normalizedProjectData = normalizeProjectData(projectData)
         validateProjectTitle(normalizedProjectData)
 
-        const projectRef = await addDoc(collection(db, 'projects'), {
+        const batch = writeBatch(db); // creates a write batch
+
+        const projectRef = doc(collection(db, 'projects'));
+        // a write operation to perform at commit() 
+        batch.set(projectRef, {
             ...normalizedProjectData,
             createdBy: userId
         });
 
-        // Create a document in a subcolletion 'projectUsers' inside the respective project document
-        await addDoc(collection(projectRef, 'projectUsers'), {
+        // Create a document in a subcollection 'projectUsers' inside the respective project document
+        const projectUserRef = doc(collection(projectRef, 'projectUsers'));
+        // another write operation to perform at commit()
+        batch.set(projectUserRef, {
             userId: userId,
             email: userEmail
         });
 
         const userRef = doc(db, 'users', userId)
 
-        // Create a document in a subcolletion 'userProjects' inside the respective user document
-        await addDoc(collection(userRef, 'userProjects'), { 
+        // Create a document in a subcollection 'userProjects' inside the respective user document
+        const userProjectRef = doc(collection(userRef, 'userProjects'));
+        // another write operation to perform at commit()
+        batch.set(userProjectRef, { 
             projectId: projectRef.id,
             title: normalizedProjectData.title,
             description: normalizedProjectData.description
         });
+
+        await batch.commit(); // Ccommits all of the writes in this write batch as a single atomic unit
     },
 
     updateProject: async (projectId, updates) => {
