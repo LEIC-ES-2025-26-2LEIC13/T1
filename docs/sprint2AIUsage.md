@@ -6,7 +6,7 @@
 
   - [See Members Modal integration tests](../__tests__/integration_tests/SeeMembersModal.test.jsx)
 
-* Gemini 3.1 Pro Thinking was used to help write the following tests:
+* Gemini 3.1 Pro Thinking from Perplexity was used to help write the following tests:
 
   - [projectService, that handles project-related database API calls](../__tests__/unit_tests/api/projectService.test.jsx)
   - [batchDeleteHelper, that handles batch deletion of documents in the database](../__tests__/unit_tests/api/batchDeleteHelper.test.jsx)
