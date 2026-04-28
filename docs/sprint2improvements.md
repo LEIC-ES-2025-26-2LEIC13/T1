@@ -17,3 +17,6 @@ In this case, a solution was not implemented simply because it would complicate 
   - **Service Layer** (`api/`): provides high level functions to interact with the database.
   - **State Layer** (`contexts/`): manages the state of the app and provides caching across the whole app.
   - **Consumption Layer** (`hooks/`): provides custom hooks to consume the state and functions provided by the contexts.
+
+## Batch operations for project deletions
+As atomicity was desired for the application (collaborative), batch operations were implemented for project deletions. A single project deletion requires the deletion of multiple nested documents, all document references are collected, stored in an array `refsToDelete`, and then, using the `batchDelete` helper function, deleted in batches of 450 (to keep under the limit of 500 operations per batch commit imposed by firebase). This guarantees atomicity and also allows for the deletion of projects with a large number of nested documents without hitting the operation limit.
