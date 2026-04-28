@@ -5,7 +5,7 @@ import { batchDelete } from '../../../api/batchDeleteHelper'
 // Setup mocks
 const mockSet = jest.fn()
 const mockDelete = jest.fn()
-const mockCommit = jest.fn().mockResolvedValue(true) // Value returned from a successfull promise
+const mockCommit = jest.fn().mockResolvedValue(true) // Value returned from a successful promise
 
 // Mock Firebase dependencies
 jest.mock('firebase/firestore', () => ({

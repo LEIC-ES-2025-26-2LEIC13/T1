@@ -1,9 +1,4 @@
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-} from "firebase/auth"
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
 
 import { auth } from "../firebase/firebaseConfig.js"
 

@@ -1,5 +1,4 @@
 import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
-
 import { db } from '../firebase/firebaseConfig';
 import { batchDelete } from './batchDeleteHelper';
 
@@ -126,5 +125,16 @@ export const projectService = {
 
         // Execute the batch deletion of all the collected references
         await batchDelete(db, refsToDelete);
+    },
+
+    getProjectUsers: async (projectId) => {
+        const projectUsersRef = collection(db, 'projects', projectId, 'projectUsers')
+        const projectUsersSnap = await getDocs(projectUsersRef)
+        
+        // Generate a new array of the fetched documents, with a new field id 
+        return projectUsersSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
     }
 }
