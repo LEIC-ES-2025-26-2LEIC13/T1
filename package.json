@@ -8,11 +8,20 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "test": "jest",
+    "test-cov": "jest --coverage",
     "lint": "expo lint",
     "fix-conflicts": "rm -rf node_modules package-lock.json && npm install"
   },
   "jest": {
     "preset": "jest-expo",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "api/**/*.{js,jsx,ts,tsx}",
+      "app/**/*.{js,jsx,ts,tsx}",
+      "components/**/*.{js,jsx,ts,tsx}",
+      "contexts/**/*.{js,jsx,ts,tsx}",
+      "hooks/**/*.{js,jsx,ts,tsx}"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ]
