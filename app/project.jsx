@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import CreateTaskModal from '../components/CreateTaskModal';
+import TaskModal from '../components/TaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
@@ -30,8 +31,8 @@ export default function Home() {
   const { projects, deleteProject } = useProject(); // user projects
   const { user } = useAuth();
 
-	const { sendInvite } = useInvite();
-	const { tasks, createTask, setActiveProjectId } = useTask();
+  const { sendInvite } = useInvite();
+  const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
 
 	const [task, setTask] = useState({
 		name: '',
@@ -76,14 +77,12 @@ export default function Home() {
 		});
 	};
 
-	const handleCreateTask = async (taskData) => {
-		try{
-			await createTask(taskData);
-			closeTaskModal();
-		} catch (error) {
-			Alert.alert('Error', error.message);
-		}
-	};
+  const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
+
+  const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
+  const [ selectedTask, setSelectedTask ] = useState(null);
+
+  const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
 
 
   	// Invite modal
@@ -93,6 +92,66 @@ export default function Home() {
 		setInviteModalVisible(false);
 		setInviteTarget('');
 	};
+  }, [projectId, setActiveProjectId]);
+
+  // Task Creation Modal
+  const openTaskCreationModal = () => setTaskModalCreationVisible(true);
+
+  const closeTaskCreationModal = () => {
+	setTaskModalCreationVisible(false);
+	setTask({
+		name: '',
+		description: '',
+		label: '',
+	});
+  };
+
+  // Task Details Modal
+
+  const openTaskDetails = (taskItem) => {
+	setSelectedTask(taskItem);
+	setTaskDetailsVisible(true);
+  };
+
+  const closeTaskDetails = () => {
+	setTaskDetailsVisible(false);
+	setSelectedTask(null);
+  };
+
+  // Handlers
+
+  const handleCreateTask = async (taskData) => {
+    try{
+      await createTask(taskData);
+      closeTaskCreationModal();
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+	try {
+	  await deleteTask(taskId);
+	  closeTaskDetails();
+	} catch (error) {
+	  Alert.alert('Error', error.message);
+	}
+  };
+
+  // Invite modal
+  const handleInvitePress = () => setInviteModalVisible(true);
+
+  const handleCloseModal = () => {
+	setInviteModalVisible(false);
+	setInviteTarget('');
+  };
+
+  const handleGoBack = () => {
+	try {
+	  if (router.canGoBack()) {
+		router.back();
+		return;
+	  }
 
 	// See members modal
 	const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
@@ -236,57 +295,57 @@ export default function Home() {
 			headerTintColor: palette.title,
 			headerShadowVisible: false,
 		}}
+	  />
+
+	  <SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+		<InviteWorkspaceModal
+		  visible={inviteModalVisible}
+		  value={inviteTarget}
+		  onChangeText={setInviteTarget}
+		  onClose={handleCloseModal}
+		  onInvite={handleSendInvite}
+		  workspaceName={currentProjectName}
+		/>
+		
+		<FlatList
+		  data={tasks ?? []}
+		  style={styles.list}
+		  contentContainerStyle={styles.listContent}
+		  keyExtractor={(item, index) => `${item.name}-${index}`}
+		  renderItem={({ item }) => (
+			  <Task
+				  task={item}
+				  onPress={() => openTaskDetails(item)}
+			  />
+		  )}
 		/>
 
-		<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-			<InviteWorkspaceModal
-			visible={inviteModalVisible}
-			value={inviteTarget}
-			onChangeText={setInviteTarget}
-			onClose={handleCloseInviteModal}
-			onInvite={handleSendInvite}
-			workspaceName={currentProjectName}
-			/>
+		<ThemedButton
+		  onPress={openTaskCreationModal}
+		  style={styles.btn}
+		>
+		  <Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
+		  <Text style={styles.btnText}>Create Task</Text>
+		</ThemedButton>
 
-			<SeeMembersModal
-			visible={seeMembersModalVisible}
-			getProjectUsers={() => projectService.getProjectUsers(projectId)}
-			onClose={handleCloseMembersModal}
-			/>
-			
-			<FlatList
-			data={tasks ?? []}
-			style={styles.list}
-			contentContainerStyle={styles.listContent}
-			keyExtractor={(item, index) => `${item.name}-${index}`}
-			renderItem={({ item }) => (
-				<Task
-					name={item.name}
-					description={item.description}
-					label={item.label}
-				/>
-			)}
-			/>
+		<CreateTaskModal
+		  isVisible={taskModalCreationVisible}
+		  onClose={closeTaskCreationModal}
+		  onCreate={handleCreateTask}
+		  task={task}
+		  onChange={handleTaskChange}
+		  projectName={currentProjectName}
+		/>
 
-			<ThemedButton
-			onPress={openTaskModal}
-			style={styles.btn}
-			>
-			<Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
-			<Text style={styles.btnText}>Create Task</Text>
-			</ThemedButton>
-
-			<CreateTaskModal
-			isVisible={taskModalVisible}
-			onClose={closeTaskModal}
-			onCreate={handleCreateTask}
-			task={task}
-			onChange={handleTaskChange}
-			projectName={currentProjectName}
-			/>
-		</SafeAreaView>
-		</>
-	);
+		<TaskModal
+		  visible={taskDetailsVisible}
+		  onClose={closeTaskDetails}
+		  task={selectedTask}
+		  deleteTask={handleDeleteTask}
+		/>
+	  </SafeAreaView>
+	</>
+  );
 }
 
 const styles = StyleSheet.create({
