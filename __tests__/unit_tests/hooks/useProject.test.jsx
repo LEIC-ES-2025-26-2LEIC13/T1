@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-native';
-import useProject from '../../hooks/useProject';
-import { ProjectProvider } from '../../contexts/projectContext';
+import { useProject } from '../../../hooks/useProject';
+import { ProjectProvider } from '../../../contexts/projectContext';
 
 // Jest is mocking the database interactions and the db itself
 jest.mock('firebase/firestore', () => ({

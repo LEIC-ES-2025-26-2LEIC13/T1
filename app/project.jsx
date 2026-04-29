@@ -11,7 +11,7 @@ import TaskModal from '../components/TaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
-import useProject from '../hooks/useProject';
+import { useProject } from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
 import { useTask } from '../hooks/useTask';
@@ -28,7 +28,7 @@ export default function Home() {
 	const scheme = useColorScheme();
 	const palette = Colors[scheme] ?? Colors.light;
 
-  	const { projects, deleteProject } = useProject(); // user projects
+  	const { projects, deleteProject, kickMember } = useProject(); // user projects
   	const { user } = useAuth();
 
   	const { sendInvite } = useInvite();
@@ -197,7 +197,7 @@ export default function Home() {
 
 	const handleKickMember = async (projectId, userId, userEmail) => {
 			try { // maybe place this logic inside the context
-				await projectService.kickMember(projectId, userId)
+				await kickMember(projectId, userId)
 
 				let alertMessage
 				if (userId === user.uid) {
@@ -206,8 +206,8 @@ export default function Home() {
 
 					// To prevent unaccessible projects (leaks)
 					if (await projectService.projectHasNoMembers(projectId)) {
-						await projectService.deleteProject(projectId)
-					}
+            			await projectService.deleteProject(projectId)
+        			}	
 
 				} else {
 					alertMessage = `Successfully kicked ${userEmail}.`

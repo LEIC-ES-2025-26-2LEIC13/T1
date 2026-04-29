@@ -34,7 +34,7 @@ export default function SeeMembersModal({
 
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
-
+    
     async function updateMembers() {
         if (visible) {
             try {
@@ -49,8 +49,9 @@ export default function SeeMembersModal({
 
     useEffect(() => {
         updateMembers()
-    }, [updateMembers]);
+    }, [visible]);
 
+    // Another condition to update the members list (outside the useEffect hook)
     const kickAndUpdate = async (userId, userEmail) => {
         // Run the kick operation, and when done, refresh the state of the modal (the member list) immediately
         await onKickMember(userId, userEmail);

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ProjectContext } from "../contexts/projectContext";
 
-export default function useProject() {
+export function useProject() {
     const context = useContext(ProjectContext);
 
     if (!context) {
