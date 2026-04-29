@@ -29,7 +29,7 @@ export default function Home() {
   const { user } = useAuth();
 
   const { sendInvite } = useInvite();
-  const { tasks, createTask, setActiveProjectId } = useTask();
+  const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
 
   const [task, setTask] = useState({
 	name: '',
@@ -70,9 +70,9 @@ export default function Home() {
   const closeTaskCreationModal = () => {
 	setTaskModalCreationVisible(false);
 	setTask({
-	  name: '',
-	  description: '',
-	  label: '',
+		name: '',
+		description: '',
+		label: '',
 	});
   };
 
@@ -88,6 +88,8 @@ export default function Home() {
 	setSelectedTask(null);
   };
 
+  // Handlers
+
   const handleCreateTask = async (taskData) => {
     try{
       await createTask(taskData);
@@ -97,6 +99,14 @@ export default function Home() {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+	try {
+	  await deleteTask(taskId);
+	  closeTaskDetails();
+	} catch (error) {
+	  Alert.alert('Error', error.message);
+	}
+  };
 
   // Invite modal
   const handleInvitePress = () => setInviteModalVisible(true);
@@ -250,6 +260,7 @@ export default function Home() {
 		  visible={taskDetailsVisible}
 		  onClose={closeTaskDetails}
 		  task={selectedTask}
+		  deleteTask={handleDeleteTask}
 		/>
 	  </SafeAreaView>
 	</>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, useColorScheme } from 'react-native';
+import { Text, StyleSheet, View, useColorScheme, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppModal from './AppModal';
 import ThemedButton from './ThemedButton';
@@ -7,7 +7,7 @@ import ThemedText from './ThemedText';
 import ThemedView from './ThemedView';
 import { Colors } from '../constants/Colors';
 
-export default function TaskModal({ visible, onClose, task }) {
+export default function TaskModal({ visible, onClose, task, deleteTask }) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
     const isDark = colorScheme === 'dark';
@@ -53,6 +53,13 @@ export default function TaskModal({ visible, onClose, task }) {
                         <ThemedText style={styles.infoValue}>{task?.assignedTo || 'No one'}</ThemedText>
                     </ThemedView>
                 </ThemedView>
+
+                <ThemedButton   
+                    onPress={() => deleteTask(task.id)} 
+                    style={styles.btn}
+                >
+                    <Text style={styles.btnText}>Task Finished</Text>
+                </ThemedButton>
             </ThemedView>
             
         </AppModal>
@@ -101,6 +108,7 @@ const styles = StyleSheet.create({
     body: {
         paddingHorizontal: 20,
         paddingTop: 18,
+        paddingBottom: 20,
     },
     sectionCard: {
         borderRadius: 16,
@@ -144,4 +152,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '700',
     },
+        btn: {
+                width: '85%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 12,
+                alignSelf: 'center',
+                marginTop: 12,
+                marginBottom: 20,
+                borderRadius: 10,
+        },
+
+        btnText: {
+                color: 'white',
+                fontSize: 16,
+                fontWeight: 'bold',
+        }
 });

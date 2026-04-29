@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
+import { addDoc, deleteDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 
 function normalizeTaskData({ name, description, label }) {
@@ -41,6 +41,11 @@ export const taskService = {
             ...normalizedTaskData,
             createdAt: Timestamp.now(),
         });
+    },
+
+    deleteTask: async (projectId, taskId) => {
+        const taskDocRef = doc(db, 'projects', projectId, 'projectTasks', taskId);
+        await deleteDoc(taskDocRef);
     }
 }
 
