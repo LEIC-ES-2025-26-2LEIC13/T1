@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch, deleteDoc } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchDelete } from './batchDeleteHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Colletions";
@@ -59,10 +59,10 @@ export const projectService = {
         });
 
         // Create a document in a subcollection 'projectUsers' inside the respective project document
-        const projectUserRef = doc(collection(projectRef, SUBCOLLECTIONS.PROJECT_USERS));
+        const projectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, userId)
+    
         // another write operation to perform at commit()
         batch.set(projectUserRef, {
-            userId: userId,
             email: userEmail
         });
 
@@ -71,7 +71,6 @@ export const projectService = {
         const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectRef.id)
         // another write operation to perform at commit()
         batch.set(userProjectRef, { 
-            projectId: projectRef.id,
             title: normalizedProjectData.title,
             description: normalizedProjectData.description
         })
@@ -113,7 +112,7 @@ export const projectService = {
             // Queue the subcollection document itself for deletion
             refsToDelete.push(docSnap.ref)
             // Remove that project from all users that reference it
-            const userId = docSnap.data().userId;
+            const userId = docSnap.id;
             const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId)
             refsToDelete.push(userProjectRef)
         });
@@ -135,5 +134,23 @@ export const projectService = {
             id: doc.id,
             ...doc.data()
         }))
+    },
+
+    kickMember: async (projectId, userId) => {
+        const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId)
+        const projectUserRef = doc(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS, userId)
+
+        // Using batch to perform the deletions atomically
+        const batch = writeBatch(db)
+        batch.delete(userProjectRef)
+        batch.delete(projectUserRef)
+
+        await batch.commit()
+    },
+
+    projectHasNoMembers: async (projectId) => {
+        const projectUsersRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS)
+        const projectUsersSnap = await getDocs(projectUsersRef)
+        return projectUsersSnap.empty
     }
 }

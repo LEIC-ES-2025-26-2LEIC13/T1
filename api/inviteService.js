@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, getDoc, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { COLLECTIONS, SUBCOLLECTIONS } from '../constants/Colletions';
 
@@ -30,13 +30,10 @@ export const inviteService = {
 
         // Checking if the user is already in that project
         const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
-        const userAlreadyInProjectQuery = query(
-            collection(projectRef, SUBCOLLECTIONS.PROJECT_USERS),
-            where('userId', '==', receiverId)
-        )
+        const projectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, receiverId)
         
-        const inProjectSnapshot = await getDocs(userAlreadyInProjectQuery)
-        if (!inProjectSnapshot.empty) {
+        const projectUserSnap = await getDoc(projectUserRef)
+        if (projectUserSnap.exists()) {
             throw new Error('This user is already in this project')
         }
     
@@ -73,21 +70,19 @@ export const inviteService = {
             const inviteRef = doc(receiverRef, SUBCOLLECTIONS.USER_INVITES, id)
             // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
             const newUserProjectRef = doc(receiverRef, SUBCOLLECTIONS.USER_PROJECTS, projectId)
-            const newProjectUserRef = doc(collection(projectRef, SUBCOLLECTIONS.PROJECT_USERS))
+            const newProjectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, userId)
 
             transaction.delete(inviteRef) // delete the pending invite in the user's invites
 
             // Creates a document for one more project inside the 'userProjects' subcollection inside receiver document
             // transaction.set() creates a document if it does not exist
             transaction.set(newUserProjectRef, {
-                projectId: projectId, // or projectSnap.id
                 title: title,
                 description: description
             })
 
             // Creates a document for one more user (email only) inside the 'projectUsers' subcollection inside project document
             transaction.set(newProjectUserRef, {
-                userId: userId,
                 email: userEmail
             })
         })
