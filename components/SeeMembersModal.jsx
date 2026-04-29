@@ -4,6 +4,7 @@ import { Colors } from "../constants/Colors";
 import { Ionicons } from '@expo/vector-icons';
 import AppModal from "./AppModal";
 import { useAuth } from "../hooks/useAuth";
+import OverflowMenu from "./OverflowMenu";
 
 
 function putCurrUserFirst(userEmail, members) {
@@ -14,7 +15,7 @@ function putCurrUserFirst(userEmail, members) {
         else res.push(member)
     }
     if (!curUser) {
-        throw new Error('The current user does not belong to this project')
+        return res
     }
 
     res.unshift(curUser) // place the current user in the first position of the new array
@@ -25,6 +26,7 @@ export default function SeeMembersModal({
     visible,
     getProjectUsers,
     onClose,
+    onKickMember
 }) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
@@ -33,24 +35,29 @@ export default function SeeMembersModal({
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
 
-    useEffect(() => {
-
-        async function auxGetUsers() {
-            if (visible) {
-                try {
-                    const projectUsers = await getProjectUsers()
-                    const membersWithCurUserFirst = putCurrUserFirst(user.email, projectUsers)
-                    setMembers(membersWithCurUserFirst)
-                } catch (error) {
-                    console.error(error.message)
-                }
+    async function updateMembers() {
+        if (visible) {
+            try {
+                const projectUsers = await getProjectUsers()
+                const membersWithCurUserFirst = putCurrUserFirst(user.email, projectUsers)
+                setMembers(membersWithCurUserFirst)
+            } catch (error) {
+                console.error(error.message)
             }
         }
+    }
 
-        auxGetUsers() // necessary because of warnings
-        
-    }, [visible, getProjectUsers, user.email]);
-    
+    useEffect(() => {
+        updateMembers()
+    }, [updateMembers]);
+
+    const kickAndUpdate = async (userId, userEmail) => {
+        // Run the kick operation, and when done, refresh the state of the modal (the member list) immediately
+        await onKickMember(userId, userEmail);
+        if (userEmail !== user.email) {
+            await updateMembers();
+        }
+    }
 
     return (
         <AppModal visible={visible}>
@@ -81,13 +88,12 @@ export default function SeeMembersModal({
             <View style={[styles.divider, {
                 backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
             }]} />
-
             {/* Body */}
             <FlatList
                 contentContainerStyle={styles.body}
                 data={members}
                 keyExtractor={(item) => item.id?.toString() || item.email}
-                renderItem={({ item }) => (
+                renderItem={({ item }) => (                       
                     <View style={[styles.memberItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
                         <Ionicons 
                             name="person-circle-outline" 
@@ -95,10 +101,41 @@ export default function SeeMembersModal({
                             color={isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'}
                             style={{ marginRight: 10 }}
                         />
-                        <Text style={[styles.memberEmail, { color: theme.text }]}>
+                        <Text style={[styles.memberEmail, { color: theme.text, flex: 1 }]}>
                             {item.email === user.email ? `Me (${item.email})` : item.email}
                         </Text>
-                    </View>
+                        
+                        <OverflowMenu
+                            iconColor={isDark ? 'rgba(255,255,255,0.7)' : '#111'}
+                            menuOffset={40} // margin top of the menu popup to avoid hiding the ellipsis icon
+                            actions={[
+                                item.email === user.email ? 
+                                {
+                                    id: 'leave-project',
+                                    title: 'Leave project',
+                                    icon: 'exit',
+                                    confirm: {
+                                        title: 'Leave project',
+                                        message: `Are you sure you want to leave this project?`
+                                    },
+                                    destructive: true,
+                                    onPress: () => kickAndUpdate(item.id, item.email),
+                                } 
+                                : 
+                                {
+                                    id: 'kick-member',
+                                    title: 'Kick member',
+                                    icon: 'person-remove',
+                                    confirm: {
+                                        title: 'Kick member',
+                                        message: `Are you sure you want to kick ${item.email} from this project?`
+                                    },
+                                    destructive: true,
+                                    onPress: () => kickAndUpdate(item.id, item.email),
+                                }
+                            ]}
+                        />
+                    </View> 
                 )}
             />
         </AppModal>

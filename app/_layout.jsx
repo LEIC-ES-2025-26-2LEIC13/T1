@@ -21,16 +21,6 @@ function RootNavigator() {
 
   const { user, isLoading } = useAuth() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
 
-  if (isLoading) {
-	return (
-		<ThemedView style={styles.container}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <ThemedText style={styles.text}>
-                Loading...
-            </ThemedText>
-        </ThemedView>
-	)}
-
   return (
       <>
           <Stack 
@@ -51,6 +41,15 @@ function RootNavigator() {
               </Stack.Protected>
           </Stack>
           <AppToast />
+          
+          {isLoading && (
+              <ThemedView style={[styles.container, StyleSheet.absoluteFillObject, { zIndex: 9999 }]}>
+                  <ActivityIndicator size="large" color={Colors.primary} />
+                  <ThemedText style={styles.text}>
+                      Loading...
+                  </ThemedText>
+              </ThemedView>
+          )}
       </>
   )
 }

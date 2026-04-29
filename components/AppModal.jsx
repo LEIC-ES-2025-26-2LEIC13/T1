@@ -1,19 +1,22 @@
 import React from 'react';
 import {Modal, StyleSheet, Keyboard} from 'react-native';
 import ThemedView from './ThemedView';
+import { MenuProvider } from 'react-native-popup-menu';
 
 export default function AppModal({ visible, children }) {
     return (
         <Modal transparent animationType="fade" visible={visible}>
-            <ThemedView
-                style={styles.overlay}
-                onTouchStart={Keyboard.dismiss}
-            >
-                {/* MODAL CONTENT */}
-                <ThemedView style={styles.container}>
-                    {children}
+            <MenuProvider skipInstanceCheck>
+                <ThemedView
+                    style={styles.overlay}
+                    onTouchStart={Keyboard.dismiss}
+                >
+                    {/* MODAL CONTENT */}
+                    <ThemedView style={styles.container}>
+                        {children}
+                    </ThemedView>
                 </ThemedView>
-            </ThemedView>
+            </MenuProvider>
         </Modal>
     );
 }
