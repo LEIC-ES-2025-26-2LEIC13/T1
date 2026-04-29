@@ -1,5 +1,6 @@
-import { collection, deleteDoc, doc, onSnapshot, query, updateDoc, writeBatch } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
+import { batchDelete } from './batchDeleteHelper';
 
 function normalizeProjectData({ title, description }) {
     return {
@@ -49,8 +50,8 @@ export const projectService = {
 
         const batch = writeBatch(db); // creates a write batch
 
-        const projectRef = doc(collection(db, 'projects'));
-        // a write operation to perform at commit() 
+        const projectRef = doc(collection(db, 'projects')); // Generates a new random id for a document that doesnt exist yet
+
         batch.set(projectRef, {
             ...normalizedProjectData,
             createdBy: userId
@@ -67,15 +68,16 @@ export const projectService = {
         const userRef = doc(db, 'users', userId)
 
         // Create a document in a subcollection 'userProjects' inside the respective user document
-        const userProjectRef = doc(collection(userRef, 'userProjects'));
+        // The document ID is the same as the project ID to facilitate the project deletion later
+        const userProjectRef = doc(db, 'users', userId, 'userProjects', projectRef.id)
         // another write operation to perform at commit()
         batch.set(userProjectRef, { 
             projectId: projectRef.id,
             title: normalizedProjectData.title,
             description: normalizedProjectData.description
-        });
+        })
 
-        await batch.commit(); // Ccommits all of the writes in this write batch as a single atomic unit
+        await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
     },
 
     updateProject: async (projectId, updates) => {
@@ -92,6 +94,47 @@ export const projectService = {
     },
 
     deleteProject: async (projectId) => {
-        await deleteDoc(doc(db, 'projects', projectId))
+        // Array to hold the references of every document we need to delete
+        const refsToDelete = []
+        
+        // Find all tasks inside that project and adds them to the references to delete
+        const tasksRef = collection(db, 'projects', projectId, 'projectTasks')
+        const tasksSnapshot = await getDocs(tasksRef)
+
+        tasksSnapshot.forEach((docSnap) => {
+            refsToDelete.push(docSnap.ref)
+        });
+
+        // Find all projectUsers inside the project to be deleted
+        const projectUsersRef = collection(db, 'projects', projectId, 'projectUsers')
+        const projectUsersSnapshot = await getDocs(projectUsersRef)
+
+        // for each projectUsers doc
+        projectUsersSnapshot.forEach((docSnap) => {
+            // Queue the subcollection document itself for deletion
+            refsToDelete.push(docSnap.ref)
+            // Remove that project from all users that reference it
+            const userId = docSnap.data().userId;
+            const userProjectRef = doc(db, 'users', userId, 'userProjects', projectId)
+            refsToDelete.push(userProjectRef)
+        });
+
+        // Add the deletion of the project doc itself
+        const mainProjectRef = doc(db, 'projects', projectId)
+        refsToDelete.push(mainProjectRef);
+
+        // Execute the batch deletion of all the collected references
+        await batchDelete(db, refsToDelete);
+    },
+
+    getProjectUsers: async (projectId) => {
+        const projectUsersRef = collection(db, 'projects', projectId, 'projectUsers')
+        const projectUsersSnap = await getDocs(projectUsersRef)
+        
+        // Generate a new array of the fetched documents, with a new field id 
+        return projectUsersSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
     }
-};
+}

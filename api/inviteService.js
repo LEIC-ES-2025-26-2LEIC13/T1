@@ -71,7 +71,8 @@ export const inviteService = {
 
             // The following doc() function calls only generate a new random ID for a document that doesn't exist yet
             const inviteRef = doc(receiverRef, 'userInvites', id)
-            const newUserProjectRef = doc(collection(receiverRef, 'userProjects'))
+            // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
+            const newUserProjectRef = doc(receiverRef, 'userProjects', projectId)
             const newProjectUserRef = doc(collection(projectRef, 'projectUsers'))
 
             transaction.delete(inviteRef) // delete the pending invite in the user's invites

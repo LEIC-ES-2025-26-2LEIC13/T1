@@ -7,6 +7,7 @@ import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
 import { TaskProvider } from '../contexts/taskContext'
 import { useAuth } from '../hooks/useAuth'
+import { MenuProvider } from 'react-native-popup-menu';
 import AppToast from '../components/Toast';
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
@@ -56,16 +57,18 @@ function RootNavigator() {
 
 const RouteLayout = () => {  
   return (
-    <AuthProvider>
-      <ProjectProvider>
-        <InviteProvider>
-          <TaskProvider>
-            <StatusBar value="auto" />
-            <RootNavigator />
-          </TaskProvider>
-        </InviteProvider>
-      </ProjectProvider>
-    </AuthProvider>
+    <MenuProvider>
+      <AuthProvider>
+        <ProjectProvider>
+          <InviteProvider>
+            <TaskProvider>
+              <StatusBar value="auto" />
+              <RootNavigator />
+            </TaskProvider>
+          </InviteProvider>
+        </ProjectProvider>
+      </AuthProvider>
+    </MenuProvider>
   )
 }
 
