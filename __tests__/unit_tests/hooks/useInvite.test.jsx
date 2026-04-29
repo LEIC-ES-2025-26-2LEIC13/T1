@@ -1,6 +1,6 @@
 import {renderHook} from '@testing-library/react-native';
-import { InviteProvider } from '../../contexts/inviteContext';
-import { useInvite } from '../../hooks/useInvite';
+import { InviteProvider } from '../../../contexts/inviteContext';
+import { useInvite } from '../../../hooks/useInvite';
 import { query, where } from 'firebase/firestore';
 
 

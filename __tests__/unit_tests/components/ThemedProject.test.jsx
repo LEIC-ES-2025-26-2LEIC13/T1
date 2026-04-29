@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { useColorScheme } from 'react-native'
-import { Colors } from '../../constants/Colors'
-import ThemedCard from '../../components/ThemedCard'
+import { Colors } from '../../../constants/Colors'
+import ThemedCard from '../../../components/ThemedCard'
 import { useRouter } from 'expo-router'
-import ThemedProject from '../../components/ThemedProject'
+import ThemedProject from '../../../components/ThemedProject'
 
 // useRouter and its push mock
 const mockPush = jest.fn() // does nothing

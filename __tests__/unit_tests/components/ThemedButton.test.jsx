@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react-native"
-import ThemedButton from "../../components/ThemedButton"
-import { Colors } from "../../constants/Colors"
+import ThemedButton from "../../../components/ThemedButton"
+import { Colors } from "../../../constants/Colors"
 
 describe("ThemedButton", () => {
 

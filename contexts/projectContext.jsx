@@ -30,17 +30,21 @@ export const ProjectProvider = ({ children }) => {
 	}
 
 
-    async function updateProject(id, updates) {
-        await projectService.updateProject(id, updates)
+    async function updateProject(projectId, updates) {
+        await projectService.updateProject(projectId, updates)
     }
 
 
-    async function deleteProject(id){
-		await projectService.deleteProject(id)
+    async function deleteProject(projectId){
+		await projectService.deleteProject(projectId)
 	}
 
+    async function kickMember(projectId, memberId) {
+        await projectService.kickMember(projectId, memberId);
+    }
+
     return (
-        <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject }}>
+        <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject, kickMember }}>
             {children}
         </ProjectContext.Provider>
     );

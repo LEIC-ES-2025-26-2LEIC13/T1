@@ -44,3 +44,6 @@ yarn-error.*
 
 #builds
 /build
+
+# test coverage
+/coverage
