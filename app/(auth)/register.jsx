@@ -2,7 +2,6 @@ import { Keyboard, StyleSheet, Text, Alert, ScrollView, View, useColorScheme } f
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
-import { doc, setDoc } from 'firebase/firestore'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Colors } from '../../constants/Colors'
 
@@ -12,7 +11,6 @@ import ThemedText from '../../components/ThemedText'
 import Spacer from '../../components/Spacer'
 import ThemedButton from '../../components/ThemedButton'
 import ThemedTextInput from '../../components/ThemedTextInput'
-import { auth, db } from '../../firebase/firebaseConfig'
 
 const Register = () => {
     const [email, setEmail] = useState("")
