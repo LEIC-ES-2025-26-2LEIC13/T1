@@ -28,11 +28,11 @@ export default function Home() {
 	const scheme = useColorScheme();
 	const palette = Colors[scheme] ?? Colors.light;
 
-  const { projects, deleteProject } = useProject(); // user projects
-  const { user } = useAuth();
+  	const { projects, deleteProject } = useProject(); // user projects
+  	const { user } = useAuth();
 
-  const { sendInvite } = useInvite();
-  const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
+  	const { sendInvite } = useInvite();
+  	const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
 
 	const [task, setTask] = useState({
 		name: '',
@@ -46,10 +46,12 @@ export default function Home() {
 
 	const [ inviteTarget, setInviteTarget ] = useState('');
 
-	const [ taskModalVisible, setTaskModalVisible ] = useState(false);
+	const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
+	const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
+	const [ selectedTask, setSelectedTask ] = useState(null);
+	
 	const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false);
-
 
 	// Search for current project in the user's projects
 	const projectId = params.projectId;
@@ -65,26 +67,6 @@ export default function Home() {
 		};
 	}, [projectId, setActiveProjectId]);
 
-	// Task modal
-	const openTaskModal = () => setTaskModalVisible(true);
-
-	const closeTaskModal = () => {
-		setTaskModalVisible(false);
-		setTask({
-		name: '',
-		description: '',
-		label: '',
-		});
-	};
-
-  const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
-
-  const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
-  const [ selectedTask, setSelectedTask ] = useState(null);
-
-  const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
-
-
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true);
 
@@ -92,71 +74,54 @@ export default function Home() {
 		setInviteModalVisible(false);
 		setInviteTarget('');
 	};
-  }, [projectId, setActiveProjectId]);
 
-  // Task Creation Modal
-  const openTaskCreationModal = () => setTaskModalCreationVisible(true);
+	// Task Creation Modal
+	const openTaskCreationModal = () => setTaskModalCreationVisible(true);
 
-  const closeTaskCreationModal = () => {
-	setTaskModalCreationVisible(false);
-	setTask({
-		name: '',
-		description: '',
-		label: '',
-	});
-  };
+	const closeTaskCreationModal = () => {
+		setTaskModalCreationVisible(false);
+		setTask({
+			name: '',
+			description: '',
+			label: '',
+		});
+	};
 
-  // Task Details Modal
+	// Task Details Modal
 
-  const openTaskDetails = (taskItem) => {
-	setSelectedTask(taskItem);
-	setTaskDetailsVisible(true);
-  };
+	const openTaskDetails = (taskItem) => {
+		setSelectedTask(taskItem);
+		setTaskDetailsVisible(true);
+	};
 
-  const closeTaskDetails = () => {
-	setTaskDetailsVisible(false);
-	setSelectedTask(null);
-  };
+	const closeTaskDetails = () => {
+		setTaskDetailsVisible(false);
+		setSelectedTask(null);
+	};
 
-  // Handlers
+	// Handlers
 
-  const handleCreateTask = async (taskData) => {
-    try{
-      await createTask(taskData);
-      closeTaskCreationModal();
-    } catch (error) {
-      Alert.alert('Error', error.message);
-    }
-  };
+	const handleCreateTask = async (taskData) => {
+		try{
+		await createTask(taskData);
+		closeTaskCreationModal();
+		} catch (error) {
+		Alert.alert('Error', error.message);
+		}
+	};
 
-  const handleDeleteTask = async (taskId) => {
-	try {
-	  await deleteTask(taskId);
-	  closeTaskDetails();
-	} catch (error) {
-	  Alert.alert('Error', error.message);
-	}
-  };
-
-  // Invite modal
-  const handleInvitePress = () => setInviteModalVisible(true);
-
-  const handleCloseModal = () => {
-	setInviteModalVisible(false);
-	setInviteTarget('');
-  };
-
-  const handleGoBack = () => {
-	try {
-	  if (router.canGoBack()) {
-		router.back();
-		return;
-	  }
+	const handleDeleteTask = async (taskId) => {
+		try {
+		await deleteTask(taskId);
+		closeTaskDetails();
+		} catch (error) {
+		Alert.alert('Error', error.message);
+		}
+	};
 
 	// See members modal
 	const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
 	const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
-
 
 	const handleGoBack = () => {
 		try {
@@ -302,9 +267,15 @@ export default function Home() {
 		  visible={inviteModalVisible}
 		  value={inviteTarget}
 		  onChangeText={setInviteTarget}
-		  onClose={handleCloseModal}
+		  onClose={handleCloseInviteModal}
 		  onInvite={handleSendInvite}
 		  workspaceName={currentProjectName}
+		/>
+
+		<SeeMembersModal
+			visible={seeMembersModalVisible}
+			getProjectUsers={() => projectService.getProjectUsers(projectId)}
+			onClose={handleCloseMembersModal}
 		/>
 		
 		<FlatList
