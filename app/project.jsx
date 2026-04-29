@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import CreateTaskModal from '../components/CreateTaskModal';
+import TaskModal from '../components/TaskModal';
 import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
 import Task from "../components/ThemedTask";
@@ -30,8 +31,8 @@ export default function Home() {
   	const { projects, deleteProject } = useProject(); // user projects
   	const { user } = useAuth();
 
-	const { sendInvite } = useInvite();
-	const { tasks, createTask, setActiveProjectId } = useTask();
+  	const { sendInvite } = useInvite();
+  	const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
 
 	const [task, setTask] = useState({
 		name: '',
@@ -45,10 +46,12 @@ export default function Home() {
 
 	const [ inviteTarget, setInviteTarget ] = useState('');
 
-	const [ taskModalVisible, setTaskModalVisible ] = useState(false);
+	const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
+	const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
+	const [ selectedTask, setSelectedTask ] = useState(null);
+	
 	const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false);
-
 
 	// Search for current project in the user's projects
 	const projectId = params.projectId;
@@ -64,28 +67,6 @@ export default function Home() {
 		};
 	}, [projectId, setActiveProjectId]);
 
-	// Task modal
-	const openTaskModal = () => setTaskModalVisible(true);
-
-	const closeTaskModal = () => {
-		setTaskModalVisible(false);
-		setTask({
-		name: '',
-		description: '',
-		label: '',
-		});
-	};
-
-	const handleCreateTask = async (taskData) => {
-		try{
-			await createTask(taskData);
-			closeTaskModal();
-		} catch (error) {
-			Alert.alert('Error', error.message);
-		}
-	};
-
-
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true);
 
@@ -94,10 +75,53 @@ export default function Home() {
 		setInviteTarget('');
 	};
 
+	// Task Creation Modal
+	const openTaskCreationModal = () => setTaskModalCreationVisible(true);
+
+	const closeTaskCreationModal = () => {
+		setTaskModalCreationVisible(false);
+		setTask({
+			name: '',
+			description: '',
+			label: '',
+		});
+	};
+
+	// Task Details Modal
+
+	const openTaskDetails = (taskItem) => {
+		setSelectedTask(taskItem);
+		setTaskDetailsVisible(true);
+	};
+
+	const closeTaskDetails = () => {
+		setTaskDetailsVisible(false);
+		setSelectedTask(null);
+	};
+
+	// Handlers
+
+	const handleCreateTask = async (taskData) => {
+		try{
+		await createTask(taskData);
+		closeTaskCreationModal();
+		} catch (error) {
+		Alert.alert('Error', error.message);
+		}
+	};
+
+	const handleDeleteTask = async (taskId) => {
+		try {
+		await deleteTask(taskId);
+		closeTaskDetails();
+		} catch (error) {
+		Alert.alert('Error', error.message);
+		}
+	};
+
 	// See members modal
 	const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
 	const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
-
 
 	const handleGoBack = () => {
 		try {
@@ -265,12 +289,12 @@ export default function Home() {
 
 			<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
 				<InviteWorkspaceModal
-				visible={inviteModalVisible}
-				value={inviteTarget}
-				onChangeText={setInviteTarget}
-				onClose={handleCloseInviteModal}
-				onInvite={handleSendInvite}
-				workspaceName={currentProjectName}
+					visible={inviteModalVisible}
+					value={inviteTarget}
+					onChangeText={setInviteTarget}
+					onClose={handleCloseInviteModal}
+					onInvite={handleSendInvite}
+					workspaceName={currentProjectName}
 				/>
 
 				<SeeMembersModal
@@ -281,34 +305,37 @@ export default function Home() {
 				/>
 				
 				<FlatList
-				data={tasks ?? []}
-				style={styles.list}
-				contentContainerStyle={styles.listContent}
-				keyExtractor={(item, index) => `${item.name}-${index}`}
-				renderItem={({ item }) => (
-					<Task
-						name={item.name}
-						description={item.description}
-						label={item.label}
-					/>
-				)}
+					data={tasks ?? []}
+					style={styles.list}
+					contentContainerStyle={styles.listContent}
+					keyExtractor={(item, index) => `${item.name}-${index}`}
+					renderItem={({ item }) => (
+						<Task
+							task={item}
+							onPress={() => openTaskDetails(item)}
+						/>
+					)}
 				/>
 
-				<ThemedButton
-				onPress={openTaskModal}
-				style={styles.btn}
-				>
-				<Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
-				<Text style={styles.btnText}>Create Task</Text>
+				<ThemedButton onPress={openTaskCreationModal} style={styles.btn}>
+					<Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
+					<Text style={styles.btnText}>Create Task</Text>
 				</ThemedButton>
 
 				<CreateTaskModal
-				isVisible={taskModalVisible}
-				onClose={closeTaskModal}
+				isVisible={taskModalCreationVisible}
+				onClose={closeTaskCreationModal}
 				onCreate={handleCreateTask}
 				task={task}
 				onChange={handleTaskChange}
 				projectName={currentProjectName}
+				/>
+
+				<TaskModal
+				visible={taskDetailsVisible}
+				onClose={closeTaskDetails}
+				task={selectedTask}
+				deleteTask={handleDeleteTask}
 				/>
 			</SafeAreaView>
 		</>

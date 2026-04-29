@@ -25,8 +25,12 @@ export const TaskProvider = ({ children }) => {
         await taskService.createTask(activeProjectId, taskData);
     }
 
+    async function deleteTask(taskId) {
+        await taskService.deleteTask(activeProjectId, taskId);
+    }
+
     return (
-        <TaskContext.Provider value={{ tasks, createTask, activeProjectId, setActiveProjectId }}>
+        <TaskContext.Provider value={{ tasks, createTask, deleteTask, activeProjectId, setActiveProjectId }}>
             {children}
         </TaskContext.Provider>
     )

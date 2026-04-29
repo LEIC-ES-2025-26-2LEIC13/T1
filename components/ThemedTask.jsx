@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorScheme, StyleSheet, View } from "react-native";
+import { useColorScheme, StyleSheet, View, Pressable, Platform, TouchableNativeFeedback } from "react-native";
 import ThemedText from "./ThemedText";
 import ThemedView from "./ThemedView";
 import { Colors } from "../constants/Colors";
@@ -12,17 +12,17 @@ const LABEL_COLORS = {
     "default": "#ac6f25" 
 };
 
-export default function ThemedTask({ name, description, label }) {
+export default function ThemedTask({ task, onPress}) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
     const isDark = colorScheme === 'dark';
 
-    const labelBgColor = LABEL_COLORS[label] || LABEL_COLORS.default;
+    const labelBgColor = LABEL_COLORS[task.label] || LABEL_COLORS.default;
 
-    return (
+    const card = (
         <ThemedView
             style={[
-                styles.container,
+                styles.card,
                 {
                     backgroundColor: theme.navBackground,
                     borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
@@ -30,39 +30,37 @@ export default function ThemedTask({ name, description, label }) {
             ]}
         >
             <View style={styles.topRow}>
-                <ThemedText title3={true} style={styles.title} numberOfLines={2}>
-                    {name}
+                <ThemedText title={true} style={styles.title} numberOfLines={2}>
+                    {task.name}
                 </ThemedText>
 
-                {!!label && (
+                {!!task.label && (
                     <View style={[styles.label, { backgroundColor: labelBgColor }]}>
                         <ThemedText style={styles.labelText}>
-                            {label}
+                            {task.label}
                         </ThemedText>
                     </View>
                 )}
             </View>
-
-            {!!description && (
-                <ThemedText 
-                    style={[styles.description, { color: theme.text }]} 
-                    numberOfLines={3}
-                >
-                    {description}
-                </ThemedText>
-            )}
         </ThemedView>
+    );
+
+    return (
+        <Pressable
+            onPress={onPress}
+            style={styles.touch}
+        >
+            {card}
+        </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    card: {
         padding: 16,
-        marginVertical: 6,
-        marginHorizontal: 16,
         borderRadius: 12,
         borderWidth: 1,
-        
+
         shadowColor: "#000",
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -81,11 +79,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         flex: 1,
     },
-    description: {
-        fontSize: 14,
-        opacity: 0.6,
-        lineHeight: 20,
-    },
     label: {
         paddingVertical: 2,
         paddingHorizontal: 8,
@@ -96,5 +89,19 @@ const styles = StyleSheet.create({
         fontSize: 11,
         color: "white",
         fontWeight: "bold",
+    },
+    touch: {
+        marginVertical: 6,
+        marginHorizontal: 16,
+    },
+    cardOuter: {
+        borderRadius: 12,
+        borderWidth: 1,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
     },
 });
