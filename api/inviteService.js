@@ -1,11 +1,11 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-
+import { COLLECTIONS, SUBCOLLECTIONS } from '../constants/Colletions';
 
 export const inviteService = {
     subscribeToUserInvites: (userId, onUpdate) => {
-        const userRef = doc(db, 'users', userId);
-        const invitesQuery = query(collection(userRef, 'userInvites'));
+        const userRef = doc(db, COLLECTIONS.USERS, userId);
+        const invitesQuery = query(collection(userRef, SUBCOLLECTIONS.USER_INVITES));
     
         return onSnapshot(invitesQuery, (snapshot) => {
             const fetchedInvites = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -15,11 +15,11 @@ export const inviteService = {
 
 
     sendInvite: async ({ senderId, senderEmail, receiverId, projectId, projectName }) => {
-        const receiverRef = doc(db, 'users', receiverId)
+        const receiverRef = doc(db, COLLECTIONS.USERS, receiverId)
 
         // Checking if an invite was already sent to that user
         const existingInviteQuery = query(
-            collection(receiverRef, 'userInvites'),
+            collection(receiverRef, SUBCOLLECTIONS.USER_INVITES),
             where('projectId', '==', projectId)
         )
 
@@ -29,9 +29,9 @@ export const inviteService = {
         }
 
         // Checking if the user is already in that project
-        const projectRef = doc(db, 'projects', projectId)
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
         const userAlreadyInProjectQuery = query(
-            collection(projectRef, 'projectUsers'),
+            collection(projectRef, SUBCOLLECTIONS.PROJECT_USERS),
             where('userId', '==', receiverId)
         )
         
@@ -41,7 +41,7 @@ export const inviteService = {
         }
     
         // Add a document to the userInvites subcollection
-        await addDoc(collection(receiverRef, 'userInvites'), {
+        await addDoc(collection(receiverRef, SUBCOLLECTIONS.USER_INVITES), {
             senderId: senderId,
             senderEmail: senderEmail,
             projectId: projectId,
@@ -53,8 +53,8 @@ export const inviteService = {
 
     acceptInvite: async (userId, userEmail, { id, projectId }) => {
         // Just references / paths to documents, not actual documents
-        const receiverRef = doc(db, 'users',  userId) // respective document of the user in the users collection
-        const projectRef = doc(db, 'projects', projectId) // respective document of the project in the projects collection
+        const receiverRef = doc(db, COLLECTIONS.USERS,  userId) // respective document of the user in the users collection
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId) // respective document of the project in the projects collection
 
         // Executes atomically (all operations succeed or all operations fail)
         await runTransaction(db, async (transaction) => {
@@ -70,10 +70,10 @@ export const inviteService = {
             const { title, description } = projectSnap.data()
 
             // The following doc() function calls only generate a new random ID for a document that doesn't exist yet
-            const inviteRef = doc(receiverRef, 'userInvites', id)
+            const inviteRef = doc(receiverRef, SUBCOLLECTIONS.USER_INVITES, id)
             // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
-            const newUserProjectRef = doc(receiverRef, 'userProjects', projectId)
-            const newProjectUserRef = doc(collection(projectRef, 'projectUsers'))
+            const newUserProjectRef = doc(receiverRef, SUBCOLLECTIONS.USER_PROJECTS, projectId)
+            const newProjectUserRef = doc(collection(projectRef, SUBCOLLECTIONS.PROJECT_USERS))
 
             transaction.delete(inviteRef) // delete the pending invite in the user's invites
 
@@ -96,6 +96,6 @@ export const inviteService = {
 
     ignoreInvite: async (userId, inviteId)  => {
         // alternating collection/document path sequence
-        await deleteDoc(doc(db, 'users', userId, 'userInvites', inviteId));
+        await deleteDoc(doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_INVITES, inviteId));
     }
 }

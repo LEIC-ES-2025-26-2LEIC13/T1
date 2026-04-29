@@ -1,7 +1,5 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
-
 import { auth } from "../firebase/firebaseConfig.js"
-
 
 export const authService = {
     subscribeAuthState: (onUpdate) => {

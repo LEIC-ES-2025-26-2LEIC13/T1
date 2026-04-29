@@ -1,5 +1,6 @@
 import { addDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
+import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Colletions";
 
 function normalizeTaskData({ name, description, label }) {
     return {
@@ -11,8 +12,8 @@ function normalizeTaskData({ name, description, label }) {
 
 export const taskService = {
     subscribeToProjectTasks: (projectId, onUpdate) => {
-        const projectRef = doc(db, 'projects', projectId);
-        const projectTasksRef = collection(projectRef, 'projectTasks');
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId);
+        const projectTasksRef = collection(projectRef, SUBCOLLECTIONS.PROJECT_TASKS);
 
         return onSnapshot(projectTasksRef, (snapshot) => {
             const taskList = snapshot.docs.map((doc) => ({
@@ -32,10 +33,10 @@ export const taskService = {
         const normalizedTaskData = normalizeTaskData(taskData);
         
         // Reference to the project document
-        const projectRef = doc(db, 'projects', projectId);
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId);
         
         // Reference to the projectTasks subcollection that will be created
-        const taskRef = collection(projectRef, 'projectTasks');
+        const taskRef = collection(projectRef, SUBCOLLECTIONS.PROJECT_TASKS);
 
         await addDoc(taskRef, {
             ...normalizedTaskData,
@@ -43,4 +44,3 @@ export const taskService = {
         });
     }
 }
-
