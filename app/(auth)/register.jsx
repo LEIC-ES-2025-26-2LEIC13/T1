@@ -18,12 +18,11 @@ const Register = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [loading, setLoading] = useState(false)
 
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
-    const { register } = useAuth()
+    const { isLoading, register } = useAuth()
     const router = useRouter()
 
     const handleSubmit = async () => {
@@ -42,31 +41,7 @@ const Register = () => {
             return
         }
 
-        setLoading(true)
-        try {
-            await register(email, password)
-            if (auth.currentUser) {
-                const normalizedEmail = email.trim().toLowerCase()
-                await setDoc(doc(db, 'users', auth.currentUser.uid), {
-                    email: normalizedEmail,
-                })
-            }
-            Alert.alert("Success", "Account created successfully!")
-        } catch (error) {
-            let errorMessage = error.message
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage = "This email is already registered. Please use a different email or login instead."
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = "The email address is invalid. Please check and try again."
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage = "The password is too weak. Please use at least 6 characters."
-            } else if (error.code === 'auth/operation-not-allowed') {
-                errorMessage = "Account creation is currently disabled. Please try again later."
-            }
-            Alert.alert("Registration Error", errorMessage)
-        } finally {
-            setLoading(false)
-        }
+        await register(email, password)
     }
 
     return (
@@ -116,7 +91,7 @@ const Register = () => {
                     placeholder="Email"
                     onChangeText={setEmail}
                     value={email}
-                    editable={!loading}
+                    editable={!isLoading}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     leftIcon="mail-outline"
@@ -128,7 +103,7 @@ const Register = () => {
                     placeholder="Password"
                     onChangeText={setPassword}
                     value={password}
-                    editable={!loading}
+                    editable={!isLoading}
                     leftIcon="lock-closed-outline"
                     secureTextEntry
                 />
@@ -139,7 +114,7 @@ const Register = () => {
                     placeholder="Confirm Password"
                     onChangeText={setConfirmPassword}
                     value={confirmPassword}
-                    editable={!loading}
+                    editable={!isLoading}
                     leftIcon="lock-closed-outline"
                     secureTextEntry
                 />
@@ -149,12 +124,10 @@ const Register = () => {
                 <ThemedButton
                     testID="register-submit-button"
                     onPress={handleSubmit}
-                    disabled={loading}
+                    disabled={isLoading}
                     style={{ width: '80%', alignItems: 'center' }}
                 >
-                    <Text style={{ color: "#ffffff" }}>
-                        {loading ? "Creating account..." : "Register"}
-                    </Text>
+                    <Text style={{ color: "#ffffff" }}>Register</Text>
                 </ThemedButton>
 
                 <Spacer />
@@ -163,7 +136,7 @@ const Register = () => {
                 <Spacer height={10} />
                 <ThemedButton
                     onPress={() => router.push('/(auth)/login')}
-                    disabled={loading}
+                    disabled={isLoading}
                     style={{ paddingVertical: 8 }}
                 >
                     <Text style={{ color: "#ffffff" }}>Login here</Text>

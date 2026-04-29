@@ -27,37 +27,7 @@ const Login = () => {
             return
         }
 
-        try {
-            await login(email, password)
-        } catch (error) {
-            let errorMessage
-
-            switch (error.code) {
-                case 'auth/invalid-email':
-                    errorMessage = "The email address is invalid."
-                    break
-                case 'auth/user-disabled':
-                    errorMessage = "This account has been disabled."
-                    break
-                case 'auth/user-not-found':
-                    errorMessage = "No account found with this email. Please register first."
-                    break
-                case 'auth/wrong-password':
-                case 'auth/invalid-credential':
-                    errorMessage = "Incorrect email or password. Please try again."
-                    break
-                case 'auth/too-many-requests':
-                    errorMessage = "Too many failed login attempts. Please try again later."
-                    break
-                case 'auth/network-request-failed':
-                    errorMessage = "Network error. Please check your internet connection."
-                    break
-                default:
-                    errorMessage = error.message
-            }
-
-            Alert.alert("Login Error", errorMessage)
-        }
+        await login(email, password)
     }
 
     return (
