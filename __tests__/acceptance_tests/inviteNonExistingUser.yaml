@@ -1,0 +1,26 @@
+appId: com.anonymous.LEICo
+tags:
+    - invite
+env:
+    SENDER_EMAIL: "johndoe@gmail.com"
+    SENDER_PASSWORD: "123456"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: "Testing Invite Non Existing User"
+        PROJECT_DESCRIPTION: "Description" # not relevant for this test
+- tapOn: "\uf2d4" # ellipsis vertical icon
+- tapOn: "Invite member, \uf4a6" # invite member icon
+- tapOn:
+    id: "invite-email-input"
+- inputText: "nonexistinguser@nowhere.com"
+- tapOn: "\uf48e, Send Invite" # send invite icon
+- assertVisible: "User not found"
+- assertVisible: "No registered user matches that email."
+
