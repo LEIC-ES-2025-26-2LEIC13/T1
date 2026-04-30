@@ -154,7 +154,7 @@ export default function Home() {
 		}
 
 		if (receiverUser.id === user.uid) {
-			Alert.alert('Invalid invite', 'You cannot invite yourself.');
+			Alert.alert('Invalid invite', 'You cannot invite yourself.')
 			return;
 		}
 
@@ -163,15 +163,21 @@ export default function Home() {
 			return;
 		}
 
-		await sendInvite({
-			senderId: user.uid,
-			senderEmail: user.email,
-			receiverId: receiverUser.id,
-			projectId: currentProject.id,
-			projectName: currentProject.title,
-		});
+		try {
+			await sendInvite({
+				senderId: user.uid,
+				senderEmail: user.email,
+				receiverId: receiverUser.id,
+				projectId: currentProject.id,
+				projectName: currentProject.title,
+			});
+		} catch (error) {
+			Alert.alert('Invite failed', error.message);
+			return;
+		} finally {
+			handleCloseInviteModal();
+		}
 
-		handleCloseInviteModal();
 		Toast.show({
 			type: 'success',
 			text1: 'Invite sent',
