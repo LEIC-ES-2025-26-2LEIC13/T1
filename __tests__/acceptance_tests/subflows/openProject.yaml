@@ -1,0 +1,15 @@
+appId: com.anonymous.LEICo
+tags:
+  - project
+---
+- runFlow: 
+    file: createProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        
+- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
+- assertVisible: "${PROJECT_TITLE}"
+- assertVisible: "\uf127" # Go back icon

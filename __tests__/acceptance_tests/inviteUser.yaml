@@ -1,12 +1,41 @@
-appId: com.example.app
+appId: com.anonymous.LEICo
+tags:
+    - invite
+env:
+    SENDER_EMAIL: "johndoe@gmail.com"
+    SENDER_PASSWORD: "123456"
+    RECEIVER_EMAIL: "pedro19@gmail.com"
+    RECEIVER_PASSWORD: "123456"
+    PROJECT_TITLE: "Testing Invite User"
 ---
 - launchApp:
     clearState: true
 
-- runFlow: openProject.yaml
-- tapOn: "\uf4a6"
-- tapOn: "Enter user email"
-- inputText: "pedro19@gmail.com"
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: "Description" # not relevant for this test
+- tapOn: "\uf2d4" # ellipsis vertical icon
+- tapOn: "Invite member, \uf4a6" # invite member icon
+- tapOn:
+    id: "invite-email-input"
+- inputText: ${RECEIVER_EMAIL}
+- tapOn: "\uf48e, Send Invite" # send invite icon
 - hideKeyboard
-
-- runFlow: ""
+- tapOn: "\uf451" # hamburguer menu
+- tapOn: "\uf3d1, Logout" # logout
+- runFlow:
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${RECEIVER_EMAIL}
+        PASSWORD: ${RECEIVER_PASSWORD}
+- assertVisible: "\uf475" # notification bell icon
+- tapOn: "\uf451" # hamburguer icon
+- assertVisible: "\uf437" # invite with notification icon
+- tapOn: "\uf437, Invites" # enter invites
+- assertVisible: "1 pending invite" # condition to ensure test correctness
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${SENDER_EMAIL}

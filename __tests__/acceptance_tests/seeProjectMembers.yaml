@@ -1,3 +1,20 @@
 appId: com.anonymous.LEICo
+tags:
+  - project
+env:
+    USER_EMAIL: "johndoe@gmail.com"
+    USER_PASSWORD: "123456"
 ---
-- runFlow: openProject.yaml
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${USER_EMAIL}
+        PASSWORD: ${USER_PASSWORD}
+        PROJECT_TITLE: "Testing See Project Members" # not relevant for this test
+        PROJECT_DESCRIPTION: "Description" # not relevant for this test
+
+- tapOn: "\uf49f" # See Members icon
+- assertVisible: "Project Members"
+- assertVisible: "Me (${USER_EMAIL})"
