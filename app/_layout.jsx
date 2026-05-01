@@ -11,6 +11,8 @@ import { MenuProvider } from 'react-native-popup-menu';
 import AppToast from '../components/Toast';
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
+import Column from './column'
+import { ColumnProvider } from '../contexts/columnContext'
 
 
 // This component was defined explicity, because useAuth hook can only be used inside descendents of UserProvider, not inside itself
@@ -59,12 +61,12 @@ const RouteLayout = () => {
     <MenuProvider>
       <AuthProvider>
         <ProjectProvider>
-          <InviteProvider>
-            <TaskProvider>
-              <StatusBar value="auto" />
-              <RootNavigator />
-            </TaskProvider>
-          </InviteProvider>
+          <ColumnProvider>
+              <InviteProvider>
+                <StatusBar value="auto" />
+                <RootNavigator />
+            </InviteProvider>
+          </ColumnProvider>
         </ProjectProvider>
       </AuthProvider>
     </MenuProvider>
