@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, View, useColorScheme, } from 'react-native';
+import { Text, StyleSheet, useColorScheme, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AppModal from './AppModal';
 import ThemedButton from './ThemedButton';

@@ -11,7 +11,7 @@ const ThemedInvite = ({ projectName, sender, onAccept, onIgnore }) => {
         <View style={[styles.card, { backgroundColor: theme.navBackground }] }>
             <View style={styles.content}>
                 <ThemedText style={styles.label}>Project</ThemedText>
-                <ThemedText title={true} style={styles.value}>{projectName}</ThemedText>
+                <ThemedText testID="project-title" style={styles.value}>{projectName}</ThemedText>
 
                 <ThemedText style={styles.label}>Invited by</ThemedText>
                 <ThemedText style={styles.value}>{sender}</ThemedText>

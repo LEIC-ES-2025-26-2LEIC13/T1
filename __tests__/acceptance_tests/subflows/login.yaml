@@ -1,0 +1,17 @@
+# login.yaml
+appId: com.anonymous.LEICo
+tags:
+    - authentication
+---
+- tapOn:
+    id: login-button
+- tapOn:
+    id: login-email-input
+- inputText: ${EMAIL}
+- tapOn:
+    id: login-password-input
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn:
+    id: "login-submit-button"
+- assertVisible: "My Projects"

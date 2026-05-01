@@ -1,0 +1,47 @@
+appId: com.anonymous.LEICo
+tags:
+    - project
+    - kick
+env:
+    SENDER_EMAIL: "johndoe@gmail.com"
+    SENDER_PASSWORD: "123456"
+    PROJECT_TITLE: "Testing-Kick-Project-Member"
+    PROJECT_DESCRIPTION: "Description"
+    RECEIVER_EMAIL: "guilherme12@gmail.com"
+    RECEIVER_PASSWORD: "123456"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/acceptInvite.yaml
+    env:
+        SENDER_EMAIL: ${SENDER_EMAIL}
+        SENDER_PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        RECEIVER_EMAIL: ${RECEIVER_EMAIL}
+        RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn: "\uf3d1, Logout" # logout
+
+- runFlow:
+    file: subflows/seeProjectMembers.yaml
+    env:
+        EMAIL: ${SENDER_EMAIL} # login back to the user that created the project
+        PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+
+# Currently the See Members modal is open
+- tapOn:
+    id: "overflow-menu-${RECEIVER_EMAIL}"
+- tapOn: "Kick member, \uf4ad" # kick member option
+- assertVisible: "Kick member"
+- assertVisible: "Are you sure you want to kick ${RECEIVER_EMAIL} from this project?"
+- tapOn: "OK"
+- tapOn: "Success"
+- assertVisible: "Successfully kicked ${RECEIVER_EMAIL}."
+- tapOn: "OK"
+- assertNotVisible: ${RECEIVER_EMAIL}

@@ -20,3 +20,22 @@ In this case, a solution was not implemented simply because it would complicate 
 
 ## Batch operations for project deletions
 As atomicity was desired for the application (collaborative), batch operations were implemented for project deletions. A single project deletion requires the deletion of multiple nested documents, all document references are collected, stored in an array `refsToDelete`, and then, using the `batchDelete` helper function, deleted in batches of 450 (to keep under the limit of 500 operations per batch commit imposed by firebase). This guarantees atomicity and also allows for the deletion of projects with a large number of nested documents without hitting the operation limit.
+
+## Acceptance tests
+
+* There is a new subdirectory `subflows/` inside the [acceptance tests directory](../__tests__/acceptance_tests/) that includes reusable test flows that can be used to compose other tests.
+* These subflows are used in the main tests as follows:
+
+```yaml
+- runFlow:
+    file: subflows/login.yaml # for example, login subflow
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+```
+
+* ... where:
+  * `file` is the path to the subflow.
+  * `env` allows passing environment variables to the subflow. In this case, `SENDER_EMAIL` and `SENDER_PASSWORD` are environment variables defined within the main test itself.
+
+* Inside the subflow, the environment variables are used with the same `${VAR_NAME}` syntax.

@@ -1,13 +1,20 @@
 appId: com.anonymous.LEICo
+tags:
+    - authentication
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
 ---
 - launchApp:
     clearState: true
 - tapOn:
+    id: login-button
+- tapOn:
     id: login-email-input
-- inputText: "johndoe@gmail.com"
+- inputText: ${EMAIL}
 - tapOn:
     id: login-password-input
-- inputText: "123456"
+- inputText: ${PASSWORD}
 - hideKeyboard          
 - tapOn:
     id: "login-submit-button"

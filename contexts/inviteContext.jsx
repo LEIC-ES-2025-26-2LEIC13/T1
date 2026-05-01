@@ -27,17 +27,17 @@ export function InviteProvider({ children }) {
 
 
 	async function sendInvite(inviteData) {
-		inviteService.sendInvite(inviteData)
+		await inviteService.sendInvite(inviteData)
   	}
 
 	// id <=> inviteId
 	async function acceptInvite(inviteData) {
-		inviteService.acceptInvite(user.uid, user.email, inviteData)
+		await inviteService.acceptInvite(user.uid, user.email, inviteData)
   	}
 
 
   	async function ignoreInvite({ id }) {
-		inviteService.ignoreInvite(user.uid, id)
+		await inviteService.ignoreInvite(user.uid, id)
  	}
 
 	const value = useMemo(() => ({

@@ -1,15 +1,30 @@
 appId: com.anonymous.LEICo
+tags:
+    - authentication
+env:
+    EMAIL: "new-account@gmail.com"
+    PASSWORD: "123456"
 ---
 - launchApp:
     clearState: true
-- tapOn: "Register here"
-- tapOn: "Email"
-- inputText: "test@gmail.com"
-- tapOn: "Password"
-- inputText: 123456
-- tapOn: "Confirm Password"
-- inputText: "123456"
+- tapOn:
+    id: register-button
+- tapOn:
+    id: "register-email-input"
+# In order for this test to work, there can be no account with the same email in the database
+- inputText: ${EMAIL}
+- tapOn:
+    id: "register-password-input"
+- inputText: ${PASSWORD}
+- tapOn:
+    id: "register-confirm-password-input"
+- inputText: ${PASSWORD}
 - hideKeyboard
-- tapOn: "Register"
+- tapOn:
+    id: "register-submit-button"
+- assertVisible:
+    id: "alert_title"
+- assertVisible:
+    id: "message"
 - tapOn: "OK"
 - assertVisible: "My Projects"

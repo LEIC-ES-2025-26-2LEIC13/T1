@@ -45,6 +45,7 @@ export default function DrawerLayout() {
                     headerShown: false,
                     drawerIcon: ({ focused, color }) => (
                         <Ionicons
+                            testID="home-drawer-screen"
                             name={focused ? "home" : "home-outline"}
                             size={24}
                             color={color}
@@ -59,6 +60,7 @@ export default function DrawerLayout() {
                     title: "My Tasks",
                     drawerIcon: ({ focused, color }) => (
                         <Ionicons
+                            testID="tasks-drawer-screen"
                             name={focused ? "checkmark-circle" : "checkmark-circle-outline"}
                             size={24}
                             color={color}
@@ -73,6 +75,7 @@ export default function DrawerLayout() {
                     title: "Calendar",
                     drawerIcon: ({ focused, color }) => (
                         <Ionicons
+                            testID="calendar-drawer-screen"
                             name={focused ? "calendar" : "calendar-outline"}
                             size={24}
                             color={color}
@@ -87,6 +90,7 @@ export default function DrawerLayout() {
                     title: "Invites",
                     drawerIcon: ({ focused, color }) => (
                         <Ionicons
+                            testID={hasNewInvites ? "invites-with-notification" : "invites-drawer-screen"}
                             name={focused ? "mail" : (hasNewInvites ? "mail-unread-outline" : "mail-outline")}
                             size={24}
                             color={color}
@@ -101,6 +105,7 @@ export default function DrawerLayout() {
                     title: "Settings",
                     drawerIcon: ({ focused, color }) => (
                         <Ionicons
+                            testID="settings-drawer-screen"
                             name={focused ? "settings" : "settings-outline"}
                             size={24}
                             color={color}

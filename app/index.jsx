@@ -37,6 +37,7 @@ const Intro = () => {
 
                 <View style={styles.actions}>
                     <ThemedButton
+                        testID="login-button"
                         style={styles.primaryButton}
                         onPress={() => router.push("/(auth)/login")}
                     >
@@ -44,6 +45,7 @@ const Intro = () => {
                     </ThemedButton>
 
                     <ThemedButton
+                            testID="register-button"
                             style={[styles.primaryButton, { backgroundColor: theme.card }]}
                             onPress={() => router.push("/(auth)/register")}
                         >

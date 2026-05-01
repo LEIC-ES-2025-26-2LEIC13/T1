@@ -78,6 +78,7 @@ export default function SeeMembersModal({
                     testID="see-members-close"
                 >
                     <Ionicons
+                        testID="see-members-close-icon"
                         name="close"
                         size={20}
                         color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'}
@@ -107,6 +108,7 @@ export default function SeeMembersModal({
                         </Text>
                         
                         <OverflowMenu
+                            testID={`overflow-menu-${item.email}`}
                             iconColor={isDark ? 'rgba(255,255,255,0.7)' : '#111'}
                             menuOffset={40} // margin top of the menu popup to avoid hiding the ellipsis icon
                             actions={[
