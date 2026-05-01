@@ -15,7 +15,6 @@ export default function CreateTaskModal({
     onCreate,
     task,
     onChange,
-    projectName,
 }) {
     const isPreset = LABELS.includes(task.label);
 
@@ -23,7 +22,7 @@ export default function CreateTaskModal({
         <AppModal visible={isVisible}>
 
             <ThemedText title={true} style={styles.title}>
-                Create Task - {projectName}
+                Create Task
             </ThemedText>
 
             <ThemedText title={true}>Task Name</ThemedText>
