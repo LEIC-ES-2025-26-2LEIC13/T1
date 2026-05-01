@@ -14,7 +14,6 @@ export const ProjectProvider = ({ children }) => {
             setProjects([]);
             return
         }
-
         setIsLoadingProjects(true);
         const unsub = projectService.subscribeToUserProjects(user.uid, (projectsToDisplay) => {
             setProjects(projectsToDisplay);
