@@ -1,6 +1,6 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, getDoc, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-import { COLLECTIONS, SUBCOLLECTIONS } from '../constants/Colletions';
+import { COLLECTIONS, SUBCOLLECTIONS } from '../constants/Collections';
 
 export const inviteService = {
     subscribeToUserInvites: (userId, onUpdate) => {
