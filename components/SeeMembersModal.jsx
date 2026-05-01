@@ -107,6 +107,7 @@ export default function SeeMembersModal({
                         </Text>
                         
                         <OverflowMenu
+                            testID={`overflow-menu-${item.email}`}
                             iconColor={isDark ? 'rgba(255,255,255,0.7)' : '#111'}
                             menuOffset={40} // margin top of the menu popup to avoid hiding the ellipsis icon
                             actions={[

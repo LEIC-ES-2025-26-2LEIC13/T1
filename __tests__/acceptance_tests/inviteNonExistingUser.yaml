@@ -4,6 +4,8 @@ tags:
 env:
     SENDER_EMAIL: "johndoe@gmail.com"
     SENDER_PASSWORD: "123456"
+    PROJECT_TITLE: "Testing-Invite-Non-Existing-User"
+    PROJECT_DESCRIPTION: "Description" # not relevant for this test
 ---
 - launchApp:
     clearState: true
@@ -13,8 +15,8 @@ env:
     env:
         EMAIL: ${SENDER_EMAIL}
         PASSWORD: ${SENDER_PASSWORD}
-        PROJECT_TITLE: "Testing Invite Non Existing User"
-        PROJECT_DESCRIPTION: "Description" # not relevant for this test
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
 - tapOn: "\uf2d4" # ellipsis vertical icon
 - tapOn: "Invite member, \uf4a6" # invite member icon
 - tapOn:

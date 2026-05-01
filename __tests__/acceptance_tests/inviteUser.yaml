@@ -6,7 +6,8 @@ env:
     SENDER_PASSWORD: "123456"
     RECEIVER_EMAIL: "pedro19@gmail.com"
     RECEIVER_PASSWORD: "123456"
-    PROJECT_TITLE: "Testing Invite User"
+    PROJECT_TITLE: "Testing-Invite-User"
+    PROJECT_DESCRIPTION: "Description" # not relevant for this test
 ---
 - launchApp:
     clearState: true
@@ -17,7 +18,7 @@ env:
         EMAIL: ${SENDER_EMAIL}
         PASSWORD: ${SENDER_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
-        PROJECT_DESCRIPTION: "Description" # not relevant for this test
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
 - tapOn: "\uf2d4" # ellipsis vertical icon
 - tapOn: "Invite member, \uf4a6" # invite member icon
 - tapOn:
@@ -36,6 +37,6 @@ env:
 - tapOn: "\uf451" # hamburguer icon
 - assertVisible: "\uf437" # invite with notification icon
 - tapOn: "\uf437, Invites" # enter invites
-- assertVisible: "1 pending invite" # condition to ensure test correctness
+- assertVisible: "1 pending invite" # simple condition to ensure test correctness
 - assertVisible: ${PROJECT_TITLE}
 - assertVisible: ${SENDER_EMAIL}

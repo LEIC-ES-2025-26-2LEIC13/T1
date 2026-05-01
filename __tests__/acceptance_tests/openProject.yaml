@@ -4,7 +4,7 @@ tags:
 env:
     EMAIL: johndoe@gmail.com
     PASSWORD: "123456"
-    PROJECT_TITLE: "Testing Open Project"
+    PROJECT_TITLE: "Testing-Open-Project"
     PROJECT_DESCRIPTION: "Description"
 ---
 - runFlow: 

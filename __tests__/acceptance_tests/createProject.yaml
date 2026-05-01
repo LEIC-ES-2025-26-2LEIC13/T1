@@ -2,7 +2,9 @@ appId: com.anonymous.LEICo
 tags:
     - project
 env:
-    PROJECT_TITLE: "Test Create Project"
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Create-Project"
     PROJECT_DESCRIPTION: "Description"
 ---
 - launchApp:
@@ -10,8 +12,8 @@ env:
 - runFlow: 
     file: subflows/login.yaml
     env:
-        EMAIL: "johndoe@gmail.com"
-        PASSWORD: "123456"
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
 - tapOn: "+, Create Project"
 - tapOn: "Enter project title"
 - inputText: ${PROJECT_TITLE}
