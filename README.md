@@ -363,12 +363,12 @@ Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 To integrate our app with a database, in this case, we had to redesign the database model, from a more SQL centric approach to a NoSQL approach (Firestore is inherently NoSQL so the first idea didn't make any sense).
 The final model is the follwing:
 ````
+/
 ├─ users                (collection)
 │  └─ {userId}          (user document)
 │     ├─ email
-│     ├─ projects       (subcolletion)
+│     ├─ userProjects       (subcolletion)
 │     │  └─ {projectId} (subcolletion document)
-│     │     ├─ projectId
 │     │     ├─ title
 │     │     └─ description
 │     └─ userInvites        (subcollection)
@@ -384,10 +384,20 @@ The final model is the follwing:
       ├─ title
       ├─ description
       ├─ createdBy
-      └─ projectUsers        (subcollection)
-         └─ {userId}         (subcollection document)
-            ├─ userId
-            └─ email
+      ├─ projectUsers        (subcollection)
+      │  └─ {userId}         (subcollection document)
+      │     └─ email
+      ├─ columnCount
+      │
+      └─ projectColumns
+          └─ {columnId}   (subcollection document)
+              ├─ name
+              ├─ order
+              └─ columnTasks
+                  └─ {taskId}   (subcollection document)
+                      ├─ name
+                      ├─ description
+                      └─ label
 ````
 
 #### Defect Log, Tracking and Verification
