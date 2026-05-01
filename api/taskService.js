@@ -1,6 +1,7 @@
 import { addDoc, deleteDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Colletions";
+import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
+import { columnService } from "./columnService";
 
 function normalizeTaskData({ name, description, label }) {
     return {
@@ -11,32 +12,29 @@ function normalizeTaskData({ name, description, label }) {
 }
 
 export const taskService = {
-    subscribeToProjectTasks: (projectId, onUpdate) => {
-        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId);
-        const projectTasksRef = collection(projectRef, SUBCOLLECTIONS.PROJECT_TASKS);
-
-        return onSnapshot(projectTasksRef, (snapshot) => {
-            const taskList = snapshot.docs.map((doc) => ({
+    subscribeToColumnTasks: (projectId, columnId, onUpdate) => {
+        const columnTasksRef = collection(db, COLLECTIONS.PROJECTS, projectId, 
+            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS)
+        
+        return onSnapshot(columnTasksRef, (snapshot) => {
+            const tasksToDisplay = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data()
             }));
 
-            onUpdate(taskList);
+            onUpdate(tasksToDisplay);
         });
     },
 
-    createTask: async (projectId, taskData) => {
+    createTask: async (projectId, columnId, taskData) => {
         if (!projectId) {
             throw new Error('Project ID is required to create a task');
         }
 
         const normalizedTaskData = normalizeTaskData(taskData);
-        
-        // Reference to the project document
-        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId);
-        
-        // Reference to the projectTasks subcollection that will be created
-        const taskRef = collection(projectRef, SUBCOLLECTIONS.PROJECT_TASKS);
+
+        const taskRef = collection(db, COLLECTIONS.PROJECTS, projectId, 
+            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS);
 
         await addDoc(taskRef, {
             ...normalizedTaskData,
@@ -44,8 +42,9 @@ export const taskService = {
         });
     },
 
-    deleteTask: async (projectId, taskId) => {
-        const taskDocRef = doc(db, 'projects', projectId, 'projectTasks', taskId);
+    deleteTask: async (projectId, columnId, taskId) => {
+        const taskDocRef = doc(db, COLLECTIONS.PROJECTS, projectId, 
+            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS, taskId);
         await deleteDoc(taskDocRef);
     }
 }
