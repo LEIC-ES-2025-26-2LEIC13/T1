@@ -34,19 +34,6 @@ export const columnService = {
         });
     },
 
-    getColumnCount: async (projectId) => {
-        if (!projectId) {
-            throw new Error('Project ID is required to get column count')
-        }
-        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
-        const projectColumns = collection(projectRef, SUBCOLLECTIONS.PROJECT_COLUMNS) // Will contain all existing columns (id's of the project)
-
-        // Get count from server allows to count the number of elements without fetching (avoids unecessary reads)
-        const snapshot = await getCountFromServer(projectColumns)
-        
-        return snapshot.data().count
-    },
-
     createColumn: async (projectId, columnData) => {
         if (!projectId) {
             throw new Error('Project ID is required to create a column')

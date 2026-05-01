@@ -1,5 +1,5 @@
 import { useColorScheme, FlatList, View, Pressable, StyleSheet, Text } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Colors } from "../constants/Colors";
 import { Ionicons } from '@expo/vector-icons';
 import AppModal from "./AppModal";
@@ -35,7 +35,7 @@ export default function SeeMembersModal({
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
 
-    async function updateMembers() {
+    const updateMembers = useCallback(async () => {
         if (visible) {
             try {
                 const projectUsers = await getProjectUsers()
@@ -45,7 +45,7 @@ export default function SeeMembersModal({
                 console.error(error.message)
             }
         }
-    }
+    }, [visible, getProjectUsers, user.email]);
 
     useEffect(() => {
         updateMembers()

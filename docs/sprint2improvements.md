@@ -20,3 +20,53 @@ In this case, a solution was not implemented simply because it would complicate 
 
 ## Batch operations for project deletions
 As atomicity was desired for the application (collaborative), batch operations were implemented for project deletions. A single project deletion requires the deletion of multiple nested documents, all document references are collected, stored in an array `refsToDelete`, and then, using the `batchDelete` helper function, deleted in batches of 450 (to keep under the limit of 500 operations per batch commit imposed by firebase). This guarantees atomicity and also allows for the deletion of projects with a large number of nested documents without hitting the operation limit.
+
+## Updated database structure
+Since the database now includes projectColumns as a subcollection that contains columns of a project and those columns now have a subcollection of tasks, the database structure has been updated to reflect this change:
+
+````
+/
+├─ users                (collection)
+│  └─ {userId}          (user document)
+│     ├─ email
+│     ├─ userProjects       (subcolletion)
+│     │  └─ {projectId} (subcolletion document)
+│     │     ├─ title
+│     │     └─ description
+│     └─ userInvites        (subcollection)
+│        └─ {inviteId}  (subcolletion document)
+│           ├─ createdAt
+│           ├─ projectId
+│           ├─ projectName
+│           ├─ senderId
+│           └─ senderEmail
+│
+└─ projects             (collection)
+   └─ {projectId}       (project document)
+      ├─ title
+      ├─ description
+      ├─ createdBy
+      ├─ projectUsers        (subcollection)
+      │  └─ {userId}         (subcollection document)
+      │     └─ email
+      ├─ columnCount
+      │
+      └─ projectColumns
+          └─ {columnId}   (subcollection document)
+              ├─ name
+              ├─ order
+              └─ columnTasks
+                  └─ {taskId}   (subcollection document)
+                      ├─ name
+                      ├─ description
+                      └─ label
+````
+## New api services
+For that same reason, a new api service was created: `columnsService`, that is responsible for all the interactions with the database for creating, updating and deleting column related data. Also, `tasksService.js` was updated to reflect the database overhaul. Contexts and services were created for that same reason.
+
+## New UI elements
+Inside `project.jsx` a PagerView was introduced to allow column swiping, facilitating the navigation inside each project (much appreciated for mobile users). Also new modals and components were created to allow users to create, edit and delete columns. This refactor made the code much more modular and organized inside `project.jsx` file as the code had to many responsibilities before. Still a refactor is needed to further separate the concerns of the file, but for now, the code is much more organized and easier to understand.
+
+# Implement database path helper
+## NOT YET IMPLEMENTED (but will be done in this sprint) 
+To avoid hardcoding database paths throughout the codebase, a helper function was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorScheme, StyleSheet, View, Pressable, Platform, TouchableNativeFeedback } from "react-native";
+import { useColorScheme, StyleSheet, View, Pressable} from "react-native";
 import ThemedText from "./ThemedText";
 import ThemedView from "./ThemedView";
 import { Colors } from "../constants/Colors";

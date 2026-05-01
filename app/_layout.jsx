@@ -5,13 +5,11 @@ import { Colors } from '../constants/Colors'
 import { AuthProvider } from '../contexts/authContext'
 import { ProjectProvider } from '../contexts/projectContext'
 import { InviteProvider } from '../contexts/inviteContext'
-import { TaskProvider } from '../contexts/taskContext'
 import { useAuth } from '../hooks/useAuth'
 import { MenuProvider } from 'react-native-popup-menu';
 import AppToast from '../components/Toast';
 import ThemedView from '../components/ThemedView'
 import ThemedText from '../components/ThemedText'
-import Column from './column'
 import { ColumnProvider } from '../contexts/columnContext'
 
 

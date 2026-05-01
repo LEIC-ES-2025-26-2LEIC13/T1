@@ -1,14 +1,12 @@
-import { act, use, useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, Text, FlatList, View } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
-import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
-import Task from "../components/ThemedTask";
 import useProject from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
@@ -32,7 +30,7 @@ export default function ProjectScreen() {
 
   	const { projects, deleteProject } = useProject() // user projects
 
-	const { columns, setActiveProjectId, isLoadingColumns, createColumn, setColumns} = useColumn()
+	const { columns, setActiveProjectId, createColumn} = useColumn()
 	const [ createColumnModalVisible, setCreateColumnModalVisible ] = useState(false)
 
   	const { user } = useAuth()
@@ -62,18 +60,25 @@ export default function ProjectScreen() {
 	}, [projectId, setActiveProjectId])
 	
 
-	const handleGoBack = () => {
+	const handleGoBack = useCallback(() => {
 		try {
-		if (router.canGoBack()) {
+			if (router.canGoBack()) {
 			router.back()
 			return
-		}
-
-		router.replace('/')
+			}
+			router.replace('/')
 		} catch {
-		router.replace('/')
+			router.replace('/')
 		}
-  	};
+	}, [router]); // Add router as a dependency
+
+	// Then update the useEffect dependency array:
+	useEffect(() => {
+		if (!currentProject) {
+			Alert.alert('Access Lost', 'You have been kicked from this project.');
+			handleGoBack();
+		}
+	}, [currentProject, handleGoBack]); // Add handleGoBack here
 
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true)
