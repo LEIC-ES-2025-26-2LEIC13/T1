@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import Task from "../components/ThemedTask";
-import useColumn  from '../hooks/useColumn'
+import {useColumn}  from '../hooks/useColumn'
 import { taskService } from '../api/taskService';
 import ThemedText from "../components/ThemedText";
 import ThemedButton from "../components/ThemedButton";

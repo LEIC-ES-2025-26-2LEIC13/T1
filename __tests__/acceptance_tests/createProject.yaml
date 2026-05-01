@@ -1,15 +1,24 @@
 appId: com.anonymous.LEICo
 tags:
-  - task
+    - project
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Create-Project"
+    PROJECT_DESCRIPTION: "Description"
 ---
-
-# Login and Launch
-- runFlow: login.yaml
+- launchApp:
+    clearState: true
+- runFlow: 
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
 - tapOn: "+, Create Project"
 - tapOn: "Enter project title"
-- inputText: "Simple Test"
+- inputText: ${PROJECT_TITLE}
 - tapOn: "Enter project description (optional)"
-- inputText: "Simple Description"
+- inputText: ${PROJECT_DESCRIPTION}
 - tapOn: "\uf103, Create"
-- assertVisible: "Simple Test"
-- assertVisible: "Simple Description"
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${PROJECT_DESCRIPTION}

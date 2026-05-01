@@ -1,0 +1,39 @@
+appId: com.anonymous.LEICo
+tags:
+    - invite
+---
+- runFlow:
+    file: openProject.yaml
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+- tapOn:
+    id: "project-overflow-menu"
+- tapOn: "Invite member, \uf4a6" # invite member icon
+- tapOn:
+    id: "invite-email-input"
+- inputText: ${RECEIVER_EMAIL}
+- hideKeyboard
+- tapOn: "\uf48e, Send Invite" # send invite icon
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn: "\uf3d1, Logout" # logout
+- runFlow:
+    file: login.yaml
+    env:
+        EMAIL: ${RECEIVER_EMAIL}
+        PASSWORD: ${RECEIVER_PASSWORD}
+- assertVisible:
+    id: "notification-bell"
+- tapOn:
+    id: "drawer-hamburger-button"
+- assertVisible:
+    id: "invites-with-notification"
+- tapOn: "\uf437, Invites" # enter invites
+- assertVisible: "1 pending invite" # simple condition to ensure test correctness
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${SENDER_EMAIL}

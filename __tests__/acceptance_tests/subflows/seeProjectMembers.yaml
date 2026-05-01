@@ -1,0 +1,16 @@
+appId: com.anonymous.LEICo
+tags:
+  - project
+---
+- runFlow:
+    file: openProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+
+- tapOn:
+    id: "see-members-icon"
+- assertVisible: "Project Members"
+- assertVisible: "Me (${EMAIL})"

@@ -1,0 +1,25 @@
+appId: com.anonymous.LEICo
+tags:
+    - invite
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/inviteUser.yaml
+    env:
+        SENDER_EMAIL: "johndoe@gmail.com"
+        SENDER_PASSWORD: "123456"
+        RECEIVER_EMAIL: "pedro19@gmail.com"
+        RECEIVER_PASSWORD: "123456"
+        PROJECT_TITLE: "Testing-Invite-User"
+        PROJECT_DESCRIPTION: "Description"
+        
+- copyTextFrom:
+    id: project-title # copy project title
+- tapOn: "Accept"
+- assertVisible: "No pending invites"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn: "\uf383, Home" # go to My Projects tab
+- assertVisible: ${maestro.copiedText} # check if the project is in the user's projects

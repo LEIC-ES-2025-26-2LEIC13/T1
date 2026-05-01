@@ -13,13 +13,14 @@ const DrawerThemedButton = ({ showNotification }) =>{
     return (
         <>
             <Pressable
+                testID="drawer-hamburger-button"
                 onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
                 style={{ marginLeft: 10}}
             >
                 <Ionicons name="menu" size={28} color={theme.iconColor} />
             </Pressable>
 
-            {showNotification ? <Ionicons name="notifications" size={15} color={Colors.warning} /> : <></>}
+            {showNotification ? <Ionicons testID="notification-bell" name="notifications" size={15} color={Colors.warning} /> : <></>}
         </>
 
     );

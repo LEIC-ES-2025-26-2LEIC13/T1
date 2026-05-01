@@ -55,22 +55,27 @@ export const inviteService = {
 
         // Executes atomically (all operations succeed or all operations fail)
         await runTransaction(db, async (transaction) => {
+
+            // Refers to the pending invite
+            const inviteRef = doc(receiverRef, SUBCOLLECTIONS.USER_INVITES, id)
+
             // Actual document (snapshot of it) within the transaction
             // Reads must happen before writes in transactions
             const projectSnap = await transaction.get(projectRef)
 
             if (!projectSnap.exists()) {
+                transaction.delete(inviteRef) // delete the pending invite upon error
                 throw new Error('This project no longer exists. Project may have been deleted after the invite was sent.')
             }
 
             // Get their data as an object
             const { title, description } = projectSnap.data()
 
-            // The following doc() function calls only generate a new random ID for a document that doesn't exist yet
-            const inviteRef = doc(receiverRef, SUBCOLLECTIONS.USER_INVITES, id)
             // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
             const newUserProjectRef = doc(receiverRef, SUBCOLLECTIONS.USER_PROJECTS, projectId)
             const newProjectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, userId)
+            
+            // Writes after reads:
 
             transaction.delete(inviteRef) // delete the pending invite in the user's invites
 

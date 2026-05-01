@@ -70,3 +70,21 @@ Inside `project.jsx` a PagerView was introduced to allow column swiping, facilit
 # Implement database path helper
 ## NOT YET IMPLEMENTED (but will be done in this sprint) 
 To avoid hardcoding database paths throughout the codebase, a helper function was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes.
+
+## Acceptance tests
+* There is a new subdirectory `subflows/` inside the [acceptance tests directory](../__tests__/acceptance_tests/) that includes reusable test flows that can be used to compose other tests.
+* These subflows are used in the main tests as follows:
+
+```yaml
+- runFlow:
+    file: subflows/login.yaml # for example, login subflow
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+```
+
+* ... where:
+  * `file` is the path to the subflow.
+  * `env` allows passing environment variables to the subflow. In this case, `SENDER_EMAIL` and `SENDER_PASSWORD` are environment variables defined within the main test itself.
+
+* Inside the subflow, the environment variables are used with the same `${VAR_NAME}` syntax.

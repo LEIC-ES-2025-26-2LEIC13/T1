@@ -7,10 +7,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
 import ThemedText from "../components/ThemedText";
-import useProject from '../hooks/useProject';
+import { useProject } from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
-import  useColumn  from '../hooks/useColumn'
+import { useColumn }  from '../hooks/useColumn'
 import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
 import OverflowMenu from '../components/OverflowMenu';
@@ -28,12 +28,12 @@ export default function ProjectScreen() {
 	const scheme = useColorScheme()
 	const palette = Colors[scheme] ?? Colors.light
 
-  	const { projects, deleteProject } = useProject() // user projects
+  	const { projects, deleteProject, kickMember } = useProject(); // user 
+	const [deleting, setDeleting] = useState(false) 
+  	const { user } = useAuth();
 
 	const { columns, setActiveProjectId, createColumn} = useColumn()
 	const [ createColumnModalVisible, setCreateColumnModalVisible ] = useState(false)
-
-  	const { user } = useAuth()
 
   	const { sendInvite } = useInvite()
 	const [ inviteTarget, setInviteTarget ] = useState('')
@@ -74,11 +74,11 @@ export default function ProjectScreen() {
 
 	// Then update the useEffect dependency array:
 	useEffect(() => {
-		if (!currentProject) {
-			Alert.alert('Access Lost', 'You have been kicked from this project.');
+		if (!currentProject && !deleting) {
+			Alert.alert('Access Lost', 'This project is not accessible anymore. You may have been removed or the project may have been deleted.');
 			handleGoBack();
 		}
-	}, [currentProject, handleGoBack]); // Add handleGoBack here
+	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
 
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true)
@@ -120,23 +120,29 @@ export default function ProjectScreen() {
 				return
 			}
 
+		try {
 			await sendInvite({
 				senderId: user.uid,
 				senderEmail: user.email,
 				receiverId: receiverUser.id,
 				projectId: currentProject.id,
 				projectName: currentProject.title,
-			})
+			});
+		} catch (error) {
+			Alert.alert('Invite failed', error.message);
+			return; // still executes the finally block
+		} finally {
+			handleCloseInviteModal();
+		}
 
-			handleCloseInviteModal()
-			Toast.show({
-				type: 'success',
-				text1: 'Invite sent',
-				text2: `Invitation sent to ${trimmedTarget}.`,
-				position: 'top',
-				visibilityTime: 1500,
-				topOffset: 100,
-			})
+		Toast.show({
+			type: 'success',
+			text1: 'Invite sent',
+			text2: `Invitation sent to ${trimmedTarget}.`,
+			position: 'top',
+			visibilityTime: 1500,
+			topOffset: 100,
+		});
 		} catch (error) {
 			Alert.alert('Invalid invite', error.message)
 		}
@@ -144,6 +150,7 @@ export default function ProjectScreen() {
 
 	const handleProjectDelete = async () => {
 		try {
+			setDeleting(true)
 			await deleteProject(projectId)
 			handleGoBack()
 		}
@@ -167,7 +174,6 @@ export default function ProjectScreen() {
 		setColumnData((prev) => ({ ...prev, [field]: value }))
 	}
 
-	// Column related handlers
 	const handleCreateColumn = async (columnData) => {
 		try {
 			await createColumn(columnData)
@@ -177,9 +183,10 @@ export default function ProjectScreen() {
 		}
 	}
 
+	// Column related handlers
 	const handleKickMember = async (projectId, userId, userEmail) => {
-		try { // maybe place this logic inside the context
-			await projectService.kickMember(projectId, userId)
+		try {
+			await kickMember(projectId, userId)
 
 			let alertMessage
 			if (userId === user.uid) {
@@ -200,7 +207,7 @@ export default function ProjectScreen() {
 		catch (error) {
 			console.log('Kick fail', error.message)
 		}
-	}
+    }
 
 	const EmptyColumnsState = () => (
 		<View style={styles.emptyContainer}>
@@ -243,7 +250,7 @@ export default function ProjectScreen() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					}}>
-						<Ionicons name="arrow-back" size={24} color={palette.title} />
+						<Ionicons testID="project-arrow-back" name="arrow-back" size={24} color={palette.title} />
 					</Pressable>
 				),
 
@@ -263,10 +270,11 @@ export default function ProjectScreen() {
 							justifyContent: 'center',
 							alignItems: 'center',
 						}}>
-							<Ionicons name="people" size={24} color={palette.title} />
+							<Ionicons testID="see-members-icon" name="people" size={24} color={palette.title} />
 						</Pressable>
 
-						<OverflowMenu 
+						<OverflowMenu
+							testID="project-overflow-menu"
 							actions={[
 								{
 									id: 'invite-member',

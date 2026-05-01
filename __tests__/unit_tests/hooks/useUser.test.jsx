@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 import { UserProvider } from "../../contexts/userContext"
-import { useAuth } from "../../hooks/useAuth"
+import { useAuth } from "../../../hooks/useAuth"
 
 describe("useAuth", () => {
 

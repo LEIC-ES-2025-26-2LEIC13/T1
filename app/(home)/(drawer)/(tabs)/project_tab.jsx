@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Alert, View, StyleSheet, useColorScheme, FlatList, ActivityIndicator } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
+import { useProject } from '../../../../hooks/useProject';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import CreateProjectModal from '../../../../components/CreateProjectModal';
-import useProject from '../../../../hooks/useProject';
 
 const Projects = () => {
     const colorScheme = useColorScheme();

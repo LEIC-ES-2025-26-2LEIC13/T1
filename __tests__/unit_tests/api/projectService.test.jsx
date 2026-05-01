@@ -108,7 +108,7 @@ describe('Test Project Service', () => {
     })
 })
 
-describe('Update Project Branching', () => {
+describe('Update Project', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
@@ -203,4 +203,54 @@ it('Delete all project related data from the database', async () => {
     const refsToDelete = batchDelete.mock.calls[0][1]
     // Total refs should be: 2 tasks + 2 projectUsers docs + 2 userProject references(remove the project from the users that were part of it) + 1 main project doc = 7
     expect(refsToDelete.length).toBe(7)
+})
+
+describe('Kick Member and Project Members Tests', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('should remove a member from a project using batch delete', async () => {
+        const projectId = 'proj-123'
+        const userId = 'user-456'
+
+        await projectService.kickMember(projectId, userId)
+        
+        expect(doc).toHaveBeenCalledWith(expect.anything(), 'projects', projectId, 'projectUsers', userId)
+        expect(doc).toHaveBeenCalledWith(expect.anything(), 'users', userId, 'userProjects', projectId)
+
+        expect(writeBatch).toHaveBeenCalledTimes(1)
+        expect(mockDelete).toHaveBeenCalledTimes(2)
+        expect(mockDelete).toHaveBeenCalledWith(expect.objectContaining({ id: userId })) // projectUsers doc
+        expect(mockDelete).toHaveBeenCalledWith(expect.objectContaining({ id: projectId })) // userProjects doc
+        expect(mockCommit).toHaveBeenCalledTimes(1)
+    })
+
+    it('should return true if project has no members', async () => {
+        const projectId = 'proj-empty'
+        
+        // Mock getDocs to return an empty snapshot
+        getDocs.mockResolvedValueOnce({ empty: true })
+
+        const result = await projectService.projectHasNoMembers(projectId)
+
+        // Verify the exact path being queried for project users
+        expect(collection).toHaveBeenCalledWith(expect.anything(), 'projects', projectId, 'projectUsers')
+        expect(getDocs).toHaveBeenCalledTimes(1)
+        expect(result).toBe(true)
+    })
+
+    it('should return false if project has members', async () => {
+        const projectId = 'proj-populated'
+        
+        // Mock getDocs to return a non-empty snapshot
+        getDocs.mockResolvedValueOnce({ empty: false })
+
+        const result = await projectService.projectHasNoMembers(projectId)
+
+        // Verify the exact path being queried for project users
+        expect(collection).toHaveBeenCalledWith(expect.anything(), 'projects', projectId, 'projectUsers')
+        expect(getDocs).toHaveBeenCalledTimes(1)
+        expect(result).toBe(false)
+    })
 })

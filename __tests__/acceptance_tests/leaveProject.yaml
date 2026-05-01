@@ -1,0 +1,33 @@
+appId: com.anonymous.LEICo
+tags:
+    - kick
+    - leave
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Testing-Leave-Project"
+    PROJECT_DESCRIPTION: "Description"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/seeProjectMembers.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+
+# See Members modal is currently open
+- tapOn:
+    id: "overflow-menu-${EMAIL}"
+- tapOn: "Leave project, \uf2dd"
+- assertVisible: "Leave project"
+- assertVisible: "Are you sure you want to leave this project?"
+- tapOn: "OK"
+- assertVisible: "Success"
+- assertVisible: "Successfully left the project."
+- tapOn: "OK"
+- assertVisible: "My Projects" # Check if the user is redirected to the My Projects tab
+- assertNotVisible: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"

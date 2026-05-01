@@ -1,0 +1,17 @@
+appId: com.anonymous.LEICo
+tags:
+  - task
+---
+- runFlow:
+    file: login.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+- tapOn: "+, Create Project"
+- tapOn: "Enter project title"
+- inputText: ${PROJECT_TITLE}
+- tapOn: "Enter project description (optional)"
+- inputText: ${PROJECT_DESCRIPTION}
+- tapOn: "\uf103, Create"
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${PROJECT_DESCRIPTION}

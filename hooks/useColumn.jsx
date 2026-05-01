@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ColumnContext } from "../contexts/columnContext";
 
-export default function useColumn() {
+export function useColumn() {
     const context = useContext(ColumnContext);
 
     if (!context) {

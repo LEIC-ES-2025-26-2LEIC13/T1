@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch, deleteDoc } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchDelete } from './batchDeleteHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";

@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, waitFor, act } from '@testing-library/react-native';
-import useProject from '../../../hooks/useProject';
+import { useProject } from '../../../hooks/useProject';
 import { ProjectProvider } from '../../../contexts/projectContext';
 import { addDoc, onSnapshot, updateDoc, doc} from 'firebase/firestore';
 

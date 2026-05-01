@@ -1,0 +1,37 @@
+appId: com.anonymous.LEICo
+tags:
+    - project
+    - kick
+---
+- runFlow:
+    file: acceptInvite.yaml
+    env:
+        SENDER_EMAIL: ${SENDER_EMAIL}
+        SENDER_PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        RECEIVER_EMAIL: ${RECEIVER_EMAIL}
+        RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn: "\uf3d1, Logout" # logout
+
+- runFlow: # login back to the user that created the project
+    file: login.yaml
+    env:
+        EMAIL: ${SENDER_EMAIL}
+        PASSWORD: ${SENDER_PASSWORD}
+
+- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
+- tapOn:
+    id: "see-members-icon"
+- tapOn:
+    id: "overflow-menu-${RECEIVER_EMAIL}"
+- tapOn: "Kick member, \uf4ad" # kick member option
+- assertVisible: "Kick member"
+- assertVisible: "Are you sure you want to kick ${RECEIVER_EMAIL} from this project?"
+- tapOn: "OK"
+- tapOn: "Success"
+- assertVisible: "Successfully kicked ${RECEIVER_EMAIL}."
+- tapOn: "OK"
+- assertNotVisible: ${RECEIVER_EMAIL}

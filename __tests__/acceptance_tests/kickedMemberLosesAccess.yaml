@@ -1,0 +1,39 @@
+appId: com.anonymous.LEICo
+tags:
+    - kick
+env:
+    SENDER_EMAIL: "johndoe@gmail.com"
+    SENDER_PASSWORD: "123456"
+    PROJECT_TITLE: "Testing-Kicked-Member-Loses-Access"
+    PROJECT_DESCRIPTION: "Description"
+    RECEIVER_EMAIL: "guilherme12@gmail.com"
+    RECEIVER_PASSWORD: "123456"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/kickProjectMember.yaml
+    env:
+        SENDER_EMAIL: ${SENDER_EMAIL} # refers to the user that will initially invite another user
+        SENDER_PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        RECEIVER_EMAIL: ${RECEIVER_EMAIL} # the invited user
+        RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
+
+- tapOn:
+    id: "see-members-close-icon"
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn: "\uf3d1, Logout" # Logout
+
+- runFlow: # login back in the invite receiver account
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${RECEIVER_EMAIL}
+        PASSWORD: ${RECEIVER_PASSWORD}
+
+- assertNotVisible: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192" # kicked member does not see the project

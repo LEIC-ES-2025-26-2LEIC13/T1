@@ -8,7 +8,7 @@ import {
   MenuTrigger,
 } from 'react-native-popup-menu';
 
-export default function OverflowMenu({ actions = [], iconColor = '#111', menuOffset = 0 }) {
+export default function OverflowMenu({ actions = [], iconColor = '#111', menuOffset = 0, testID }) {
   // If inside the actions passed there is a confirmation step, for example, upon deletion of a project, the 
   // user is reprompted to be sure of his operation
   const handleSelect = (action) => {
@@ -30,7 +30,7 @@ export default function OverflowMenu({ actions = [], iconColor = '#111', menuOff
 
   return (
     <Menu>
-      <MenuTrigger customStyles={{ TriggerTouchableComponent: Pressable }}>
+      <MenuTrigger testID={testID} customStyles={{ TriggerTouchableComponent: Pressable }}>
         <View
           style={{
             width: 40,
