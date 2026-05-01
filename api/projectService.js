@@ -1,7 +1,8 @@
 import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchDelete } from './batchDeleteHelper';
-import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Colletions";
+import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
+import { columnService } from "./columnService";
 
 function normalizeProjectData({ title, description }) {
     return {
@@ -55,7 +56,8 @@ export const projectService = {
 
         batch.set(projectRef, {
             ...normalizedProjectData,
-            createdBy: userId
+            createdBy: userId,
+            columnCount: 0, // Initial column count is 0 (used to track the order number of the next column)
         });
 
         // Create a document in a subcollection 'projectUsers' inside the respective project document
@@ -94,14 +96,9 @@ export const projectService = {
     deleteProject: async (projectId) => {
         // Array to hold the references of every document we need to delete
         const refsToDelete = []
-        
-        // Find all tasks inside that project and adds them to the references to delete
-        const tasksRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_TASKS)
-        const tasksSnapshot = await getDocs(tasksRef)
 
-        tasksSnapshot.forEach((docSnap) => {
-            refsToDelete.push(docSnap.ref)
-        });
+        // Add all data from columns and tasks within the project (need to destructure the data as allColumnsRefsToDelete returns an array, to ensure proper deletion)
+        refsToDelete.push(...await columnService.allColumnsRefsToDelete(projectId))
 
         // Find all projectUsers inside the project to be deleted
         const projectUsersRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS)

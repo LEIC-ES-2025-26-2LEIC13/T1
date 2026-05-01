@@ -1,167 +1,124 @@
-import { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, Text, FlatList } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
 import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
-import CreateTaskModal from '../components/CreateTaskModal';
-import TaskModal from '../components/TaskModal';
-import ThemedButton from "../components/ThemedButton";
 import ThemedText from "../components/ThemedText";
-import Task from "../components/ThemedTask";
 import { useProject } from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
 import { useInvite } from '../hooks/useInvite';
-import { useTask } from '../hooks/useTask';
+import { useColumn }  from '../hooks/useColumn'
 import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
 import OverflowMenu from '../components/OverflowMenu';
 import SeeMembersModal from '../components/SeeMembersModal';
+import PagerView from 'react-native-pager-view';
+import Column from './column';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import CreateColumnModal from '../components/CreateColumnModal';
 
-export default function Home() {
-  	const router = useRouter();
-	const params = useLocalSearchParams(); // Routing parameters of the current screen
+export default function ProjectScreen() {
+  	const router = useRouter()
+	const params = useLocalSearchParams() // Routing parameters of the current screen
 	// For example: /project?projectId=abc -> params.projectId will be abc
 
-	const scheme = useColorScheme();
-	const palette = Colors[scheme] ?? Colors.light;
+	const scheme = useColorScheme()
+	const palette = Colors[scheme] ?? Colors.light
 
-  	const { projects, deleteProject, kickMember } = useProject(); // user projects
+  	const { projects, deleteProject, kickMember } = useProject(); // user 
+	const [deleting, setDeleting] = useState(false) 
   	const { user } = useAuth();
 
-  	const { sendInvite } = useInvite();
-  	const { tasks, createTask, deleteTask, setActiveProjectId } = useTask();
+	const { columns, setActiveProjectId, createColumn} = useColumn()
+	const [ createColumnModalVisible, setCreateColumnModalVisible ] = useState(false)
 
-	const [task, setTask] = useState({
-		name: '',
-		description: '',
-		label: '',
-  	});
-
-	const handleTaskChange = (field, value) => {
-		setTask((prev) => ({ ...prev, [field]: value }));
-	};
-
-	const [ inviteTarget, setInviteTarget ] = useState('');
-
-	const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false);
-	const [ taskDetailsVisible, setTaskDetailsVisible ] = useState(false);
-	const [ selectedTask, setSelectedTask ] = useState(null);
+  	const { sendInvite } = useInvite()
+	const [ inviteTarget, setInviteTarget ] = useState('')
 	
-	const [ inviteModalVisible, setInviteModalVisible ] = useState(false);
-	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false);
+	const [ inviteModalVisible, setInviteModalVisible ] = useState(false)
+	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false)
 
 	// Search for current project in the user's projects
-	const projectId = params.projectId;
-	const currentProject = projects.find((project) => project.id === projectId);
-	const currentProjectName = currentProject?.title ?? 'Project';
+	const projectId = params.projectId
+	const currentProject = projects.find((project) => project.id === projectId)
+	const currentProjectName = currentProject?.title ?? 'Project'
+
+	const colorScheme = useColorScheme();
+    const theme = Colors[colorScheme] ?? Colors.light;
+    const isDark = colorScheme === 'dark';
 	
 	// sets projectId for Task context
 	useEffect(() => {
-		setActiveProjectId(projectId ?? '');
+		setActiveProjectId(projectId ?? '')
 
 		return () => {
-		setActiveProjectId('');
-		};
-	}, [projectId, setActiveProjectId]);
+			setActiveProjectId('')
+		}
+	}, [projectId, setActiveProjectId])
+	
+
+	const handleGoBack = useCallback(() => {
+		try {
+			if (router.canGoBack()) {
+			router.back()
+			return
+			}
+			router.replace('/')
+		} catch {
+			router.replace('/')
+		}
+	}, [router]); // Add router as a dependency
+
+	// Then update the useEffect dependency array:
+	useEffect(() => {
+		if (!currentProject && !deleting) {
+			Alert.alert('Access Lost', 'This project is not accessible anymore. You may have been removed or the project may have been deleted.');
+			handleGoBack();
+		}
+	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
 
   	// Invite modal
-  	const handleInvitePress = () => setInviteModalVisible(true);
+  	const handleInvitePress = () => setInviteModalVisible(true)
 
   	const handleCloseInviteModal = () => {
-		setInviteModalVisible(false);
-		setInviteTarget('');
-	};
-
-	// Task Creation Modal
-	const openTaskCreationModal = () => setTaskModalCreationVisible(true);
-
-	const closeTaskCreationModal = () => {
-		setTaskModalCreationVisible(false);
-		setTask({
-			name: '',
-			description: '',
-			label: '',
-		});
-	};
-
-	// Task Details Modal
-
-	const openTaskDetails = (taskItem) => {
-		setSelectedTask(taskItem);
-		setTaskDetailsVisible(true);
-	};
-
-	const closeTaskDetails = () => {
-		setTaskDetailsVisible(false);
-		setSelectedTask(null);
-	};
-
-	// Handlers
-
-	const handleCreateTask = async (taskData) => {
-		try{
-		await createTask(taskData);
-		closeTaskCreationModal();
-		} catch (error) {
-		Alert.alert('Error', error.message);
-		}
-	};
-
-	const handleDeleteTask = async (taskId) => {
-		try {
-		await deleteTask(taskId);
-		closeTaskDetails();
-		} catch (error) {
-		Alert.alert('Error', error.message);
-		}
+		setInviteModalVisible(false)
+		setInviteTarget('')
 	};
 
 	// See members modal
-	const handleSeeMembersPress = () => setSeeMembersModalVisible(true);
-	const handleCloseMembersModal = () => setSeeMembersModalVisible(false);
+	const handleSeeMembersPress = () => setSeeMembersModalVisible(true)
+	const handleCloseMembersModal = () => setSeeMembersModalVisible(false)
 
-	const handleGoBack = () => {
-		try {
-		if (router.canGoBack()) {
-			router.back();
-			return;
-		}
-
-		router.replace('/');
-		} catch {
-		router.replace('/');
-		}
-  	};
 
 
 	const handleSendInvite = async () => {
-		const trimmedTarget = inviteTarget.trim().toLowerCase();
+		const trimmedTarget = inviteTarget.trim().toLowerCase()
 
 		if (!trimmedTarget) {
-		Alert.alert('Missing user', 'Please enter a valid email.');
-		return;
+			Alert.alert('Missing user', 'Please enter a valid email.')
+			return
 		}
 
 		try {
-		const receiverUser = await userService.getUserByEmail(trimmedTarget);
+			const receiverUser = await userService.getUserByEmail(trimmedTarget)
 
-		if (!receiverUser) {
-			Alert.alert('User not found', 'No registered user matches that email.');
-			return;
-		}
+			if (!receiverUser) {
+				Alert.alert('User not found', 'No registered user matches that email.')
+				return
+			}
 
-		if (receiverUser.id === user.uid) {
-			Alert.alert('Invalid invite', 'You cannot invite yourself.')
-			return;
-		}
+			if (receiverUser.id === user.uid) {
+				Alert.alert('Invalid invite', 'You cannot invite yourself.')
+				return
+			}
 
-		if (!currentProject?.id) {
-			Alert.alert('Project unavailable', 'Unable to find this project.');
-			return;
-		}
+			if (!currentProject?.id) {
+				Alert.alert('Project unavailable', 'Unable to find this project.')
+				return
+			}
 
 		try {
 			await sendInvite({
@@ -173,7 +130,7 @@ export default function Home() {
 			});
 		} catch (error) {
 			Alert.alert('Invite failed', error.message);
-			return;
+			return; // still executes the finally block
 		} finally {
 			handleCloseInviteModal();
 		}
@@ -187,12 +144,13 @@ export default function Home() {
 			topOffset: 100,
 		});
 		} catch (error) {
-			Alert.alert('Invalid invite', error.message);
+			Alert.alert('Invalid invite', error.message)
 		}
-	};
+	}
 
 	const handleProjectDelete = async () => {
 		try {
+			setDeleting(true)
 			await deleteProject(projectId)
 			handleGoBack()
 		}
@@ -201,30 +159,78 @@ export default function Home() {
 		}
 	}
 
+	// Column related modals
+	const openCreateColumnModal = () => setCreateColumnModalVisible(true)
+	const closeCreateColumnModal = () => {
+		setCreateColumnModalVisible(false)
+		setColumnData({ name: '' })
+	}
+
+	const [columnData, setColumnData] = useState({
+		name: ''
+	})
+
+	const handleColumnChange = (field, value) => {
+		setColumnData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleCreateColumn = async (columnData) => {
+		try {
+			await createColumn(columnData)
+			closeCreateColumnModal()
+		} catch (error) {
+			Alert.alert('Column creation failed', error.message)
+		}
+	}
+
+	// Column related handlers
 	const handleKickMember = async (projectId, userId, userEmail) => {
-			try { // maybe place this logic inside the context
-				await kickMember(projectId, userId)
+		try {
+			await kickMember(projectId, userId)
 
-				let alertMessage
-				if (userId === user.uid) {
-					alertMessage = "Successfully left the project."
-					handleGoBack() // navigate away when leaving project
+			let alertMessage
+			if (userId === user.uid) {
+				alertMessage = "Successfully left the project."
+				handleGoBack() // navigate away when leaving project
 
-					// To prevent unaccessible projects (leaks)
-					if (await projectService.projectHasNoMembers(projectId)) {
-            			await projectService.deleteProject(projectId)
-        			}	
-
-				} else {
-					alertMessage = `Successfully kicked ${userEmail}.`
+				// To prevent unaccessible projects (leaks)
+				if (await projectService.projectHasNoMembers(projectId)) {
+					await projectService.deleteProject(projectId)
 				}
 
-				Alert.alert('Success', alertMessage)
+			} else {
+				alertMessage = `Successfully kicked ${userEmail}.`
 			}
-			catch (error) {
-				console.log('Kick fail', error.message)
-			}
-	}
+
+			Alert.alert('Success', alertMessage)
+		}
+		catch (error) {
+			console.log('Kick fail', error.message)
+		}
+    }
+
+	const EmptyColumnsState = () => (
+		<View style={styles.emptyContainer}>
+			<MaterialCommunityIcons
+			name="view-column-outline"
+			size={64}
+			color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
+			/>
+
+			<ThemedText style={[styles.emptyTitle, { color: theme.text }]}>
+			No columns yet
+			</ThemedText>
+
+			<ThemedText
+			style={[
+				styles.emptySubtitle,
+				{ color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }
+			]}
+			> Create your first column to start organizing tasks in this project
+			</ThemedText>
+		</View>
+	)
+
 
   	return (
 		<>
@@ -250,11 +256,19 @@ export default function Home() {
 
 				headerRight: () => (
 					<>
+						<Pressable onPress={openCreateColumnModal} hitSlop={10} style={{
+							width: 40,
+							height: 40,
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}>
+							<MaterialCommunityIcons name="table-column-plus-after" size={24} color="black" />
+						</Pressable>
 						<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
-						width: 40,
-						height: 40,
-						justifyContent: 'center',
-						alignItems: 'center',
+							width: 40,
+							height: 40,
+							justifyContent: 'center',
+							alignItems: 'center',
 						}}>
 							<Ionicons testID="see-members-icon" name="people" size={24} color={palette.title} />
 						</Pressable>
@@ -274,7 +288,7 @@ export default function Home() {
 									icon: 'remove-circle',
 									confirm: {
 										title: 'Delete project',
-										message: 'Are you sure you want to delete this project?',
+										message: 'Are you sure you want to delete this project? All related data will be lost.',
 									},
 									destructive: true, // If we place a string of text that is not null, 
 									// it will be marked as a destructive action
@@ -294,7 +308,40 @@ export default function Home() {
 			}}
 			/>
 
+
+
 			<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
+				{columns.length === 0 ? <EmptyColumnsState /> : null}
+				{ // Had to add a special case for 1 column because the pager crashed with only 1 page
+				columns.length === 1 ? 
+					<View key={columns[0].id} style={{ flex: 1, padding: 16 }} collapsable={false}>
+						<Column
+							projectId={projectId}
+							columnData={columns[0]} // Pass the entire column data instead of just the name
+						/>
+					</View> 
+					
+					: 
+
+					<PagerView style={{ flex: 1 }} initialPage={0}>
+						{columns.map((item) => (
+						<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
+							<Column
+								projectId={projectId}
+								columnData={item} // Pass the entire column data instead of just the name
+							/>
+						</View>
+						))}
+					</PagerView>}
+
+				<CreateColumnModal
+					visible={createColumnModalVisible}
+					onClose={closeCreateColumnModal}
+					onCreate={handleCreateColumn}
+					onChange={handleColumnChange}
+					columnData={columnData}
+				/>
+
 				<InviteWorkspaceModal
 					visible={inviteModalVisible}
 					value={inviteTarget}
@@ -310,43 +357,9 @@ export default function Home() {
 				onClose={handleCloseMembersModal}
 				onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
 				/>
-				
-				<FlatList
-					data={tasks ?? []}
-					style={styles.list}
-					contentContainerStyle={styles.listContent}
-					keyExtractor={(item, index) => `${item.name}-${index}`}
-					renderItem={({ item }) => (
-						<Task
-							task={item}
-							onPress={() => openTaskDetails(item)}
-						/>
-					)}
-				/>
-
-				<ThemedButton onPress={openTaskCreationModal} style={styles.btn}>
-					<Text style={[styles.btnText ,{ marginRight: 20 }]}>+</Text>
-					<Text style={styles.btnText}>Create Task</Text>
-				</ThemedButton>
-
-				<CreateTaskModal
-				isVisible={taskModalCreationVisible}
-				onClose={closeTaskCreationModal}
-				onCreate={handleCreateTask}
-				task={task}
-				onChange={handleTaskChange}
-				projectName={currentProjectName}
-				/>
-
-				<TaskModal
-				visible={taskDetailsVisible}
-				onClose={closeTaskDetails}
-				task={selectedTask}
-				deleteTask={handleDeleteTask}
-				/>
 			</SafeAreaView>
 		</>
-	);
+	)
 }
 
 const styles = StyleSheet.create({
@@ -374,5 +387,42 @@ const styles = StyleSheet.create({
 	color: 'white',
 	fontSize: 16,
 	fontWeight: 'bold',
-  }
+  },
+  emptyContainer: {
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  paddingHorizontal: 24,
+},
+
+	emptyTitle: {
+	fontSize: 20,
+	fontWeight: '600',
+	marginTop: 10,
+	},
+
+	emptySubtitle: {
+	fontSize: 14,
+	textAlign: 'center',
+	maxWidth: 260,
+	lineHeight: 20,
+	marginTop: 6,
+	},
+
+	emptyAction: {
+	marginTop: 18,
+	flexDirection: 'row',
+	alignItems: 'center',
+	justifyContent: 'center',
+	paddingHorizontal: 16,
+	paddingVertical: 12,
+	borderRadius: 999,
+	gap: 8,
+	},
+
+	emptyActionText: {
+	color: '#fff',
+	fontSize: 14,
+	fontWeight: '600',
+	},
 });

@@ -7,7 +7,7 @@ import ThemedText from './ThemedText';
 import ThemedView from './ThemedView';
 import { Colors } from '../constants/Colors';
 
-export default function TaskModal({ visible, onClose, task, deleteTask }) {
+export default function TaskModal({ visible, onClose, task, deleteTask}) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
     const isDark = colorScheme === 'dark';

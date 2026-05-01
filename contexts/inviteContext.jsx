@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useEffect, useMemo, useState, useCallback } from 'react';
 import { inviteService } from '../api/inviteService';
 import { useAuth } from '../hooks/useAuth';
 
@@ -26,28 +26,28 @@ export function InviteProvider({ children }) {
 	}, [user?.uid]); // cannot add invites.length as a dependency, otherwise the callback will be triggered twice
 
 
-	async function sendInvite(inviteData) {
-		await inviteService.sendInvite(inviteData)
-  	}
-
 	// id <=> inviteId
-	async function acceptInvite(inviteData) {
-		await inviteService.acceptInvite(user.uid, user.email, inviteData)
-  	}
+	const sendInvite = useCallback((inviteData) => {
+        inviteService.sendInvite(inviteData)
+    }, []);
 
+    const acceptInvite = useCallback((inviteData) => {
+        inviteService.acceptInvite(user.uid, user.email, inviteData)
+    }, [user?.uid, user?.email]);
 
-  	async function ignoreInvite({ id }) {
-		await inviteService.ignoreInvite(user.uid, id)
- 	}
+    const ignoreInvite = useCallback(({ id }) => {
+        inviteService.ignoreInvite(user.uid, id)
+    }, [user?.uid]);
 
-	const value = useMemo(() => ({
-		invites,
-		hasNewInvites,
-		setHasNewInvites,
-		sendInvite,
-		acceptInvite,
-		ignoreInvite
-	}), [invites, hasNewInvites]);
+    const value = useMemo(() => ({
+        invites,
+        hasNewInvites,
+        setHasNewInvites,
+        sendInvite,
+        acceptInvite,
+        ignoreInvite
+    }), [invites, hasNewInvites, sendInvite, acceptInvite, ignoreInvite]);
+    
 
 	return (
 		<InviteContext.Provider value={value}>

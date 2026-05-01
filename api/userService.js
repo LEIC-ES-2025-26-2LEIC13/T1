@@ -1,6 +1,6 @@
 import { collection, getDocs, limit, query, where } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
-import { COLLECTIONS } from '../constants/Colletions';
+import { COLLECTIONS } from '../constants/Collections';
 
 export const userService = {
   getUserByEmail: async (email) => {

@@ -10,5 +10,7 @@ export const SUBCOLLECTIONS = {
     USER_PROJECTS: 'userProjects',
     USER_TASKS: 'userTasks',
     PROJECT_USERS: 'projectUsers',
-    PROJECT_TASKS: 'projectTasks',  
+    //PROJECT_TASKS: 'projectTasks',
+    PROJECT_COLUMNS: 'projectColumns',
+    COLUMN_TASKS: 'columnTasks',  
 };
