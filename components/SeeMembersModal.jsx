@@ -78,6 +78,7 @@ export default function SeeMembersModal({
                     testID="see-members-close"
                 >
                     <Ionicons
+                        testID="see-members-close-icon"
                         name="close"
                         size={20}
                         color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'}

@@ -7,8 +7,10 @@ env:
     PROJECT_TITLE: "Testing-Open-Project"
     PROJECT_DESCRIPTION: "Description"
 ---
+- launchApp:
+    clearState: true
 - runFlow: 
-    file: createProject.yaml
+    file: subflows/createProject.yaml
     env:
         EMAIL: ${EMAIL}
         PASSWORD: ${PASSWORD}
@@ -17,4 +19,5 @@ env:
         
 - tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
 - assertVisible: "${PROJECT_TITLE}"
-- assertVisible: "\uf127" # Go back icon
+- assertVisible:
+    id: "project-arrow-back"

@@ -244,7 +244,7 @@ export default function Home() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					}}>
-						<Ionicons name="arrow-back" size={24} color={palette.title} />
+						<Ionicons testID="project-arrow-back" name="arrow-back" size={24} color={palette.title} />
 					</Pressable>
 				),
 
@@ -256,10 +256,11 @@ export default function Home() {
 						justifyContent: 'center',
 						alignItems: 'center',
 						}}>
-							<Ionicons name="people" size={24} color={palette.title} />
+							<Ionicons testID="see-members-icon" name="people" size={24} color={palette.title} />
 						</Pressable>
 
-						<OverflowMenu 
+						<OverflowMenu
+							testID="project-overflow-menu"
 							actions={[
 								{
 									id: 'invite-member',

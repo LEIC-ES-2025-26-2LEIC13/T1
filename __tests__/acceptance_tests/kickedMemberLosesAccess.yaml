@@ -22,9 +22,12 @@ env:
         RECEIVER_EMAIL: ${RECEIVER_EMAIL} # the invited user
         RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
 
-- tapOn: "\uf24a" # Press the 'X' to close the Project Members modal
-- tapOn: "\uf127" # Go back to the My Projects tab
-- tapOn: "\uf451" # Hamburguer menu icon
+- tapOn:
+    id: "see-members-close-icon"
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
 - tapOn: "\uf3d1, Logout" # Logout
 
 - runFlow: # login back in the invite receiver account

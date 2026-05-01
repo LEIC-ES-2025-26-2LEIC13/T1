@@ -10,6 +10,7 @@ tags:
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
 
-- tapOn: "\uf49f" # See Members icon
+- tapOn:
+    id: "see-members-icon"
 - assertVisible: "Project Members"
 - assertVisible: "Me (${EMAIL})"

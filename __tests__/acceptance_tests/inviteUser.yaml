@@ -19,23 +19,30 @@ env:
         PASSWORD: ${SENDER_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
-- tapOn: "\uf2d4" # ellipsis vertical icon
+- tapOn:
+    id: "project-overflow-menu"
 - tapOn: "Invite member, \uf4a6" # invite member icon
 - tapOn:
     id: "invite-email-input"
 - inputText: ${RECEIVER_EMAIL}
-- tapOn: "\uf48e, Send Invite" # send invite icon
 - hideKeyboard
-- tapOn: "\uf451" # hamburguer menu
+- tapOn: "\uf48e, Send Invite" # send invite icon
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
 - tapOn: "\uf3d1, Logout" # logout
 - runFlow:
     file: subflows/login.yaml
     env:
         EMAIL: ${RECEIVER_EMAIL}
         PASSWORD: ${RECEIVER_PASSWORD}
-- assertVisible: "\uf475" # notification bell icon
-- tapOn: "\uf451" # hamburguer icon
-- assertVisible: "\uf437" # invite with notification icon
+- assertVisible:
+    id: "notification-bell"
+- tapOn:
+    id: "drawer-hamburger-button"
+- assertVisible:
+    id: "invites-with-notification"
 - tapOn: "\uf437, Invites" # enter invites
 - assertVisible: "1 pending invite" # simple condition to ensure test correctness
 - assertVisible: ${PROJECT_TITLE}

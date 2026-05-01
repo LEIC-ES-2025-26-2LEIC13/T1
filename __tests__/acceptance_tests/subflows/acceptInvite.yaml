@@ -15,6 +15,7 @@ tags:
     id: project-title # copy project title
 - tapOn: "Accept"
 - assertVisible: "No pending invites"
-- tapOn: "\uf451" # hamburguer menu
+- tapOn:
+    id: "drawer-hamburger-button"
 - tapOn: "\uf383, Home" # go to My Projects tab
 - assertVisible: ${maestro.copiedText} # check if the project is in the user's projects

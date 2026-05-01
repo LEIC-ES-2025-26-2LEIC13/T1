@@ -12,7 +12,8 @@ tags:
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
         RECEIVER_EMAIL: ${RECEIVER_EMAIL}
         RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
-- tapOn: "\uf451" # hamburguer menu
+- tapOn:
+    id: "drawer-hamburger-button"
 - tapOn: "\uf3d1, Logout" # logout
 
 - runFlow: # login back to the user that created the project
@@ -22,7 +23,8 @@ tags:
         PASSWORD: ${SENDER_PASSWORD}
 
 - tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
-- tapOn: "\uf49f" # See Members icon
+- tapOn:
+    id: "see-members-icon"
 - tapOn:
     id: "overflow-menu-${RECEIVER_EMAIL}"
 - tapOn: "Kick member, \uf4ad" # kick member option

@@ -22,17 +22,19 @@ env:
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
         RECEIVER_EMAIL: ${RECEIVER_EMAIL}
         RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
-- tapOn: "\uf451" # hamburguer menu
+- tapOn:
+    id: "drawer-hamburger-button"
 - tapOn: "\uf3d1, Logout" # logout
 
-- runFlow: # login back to the user that created the project
-    file: subflows/login.yaml
+- runFlow:
+    file: subflows/seeProjectMembers.yaml
     env:
-        EMAIL: ${SENDER_EMAIL}
+        EMAIL: ${SENDER_EMAIL} # login back to the user that created the project
         PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
 
-- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
-- tapOn: "\uf49f" # See Members icon
+# Currently the See Members modal is open
 - tapOn:
     id: "overflow-menu-${RECEIVER_EMAIL}"
 - tapOn: "Kick member, \uf4ad" # kick member option

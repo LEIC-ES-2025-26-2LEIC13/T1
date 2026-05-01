@@ -17,7 +17,8 @@ env:
         PASSWORD: ${SENDER_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
-- tapOn: "\uf2d4" # ellipsis vertical icon
+- tapOn:
+    id: "project-overflow-menu"
 - tapOn: "Invite member, \uf4a6" # invite member icon
 - tapOn:
     id: "invite-email-input"

@@ -12,4 +12,5 @@ tags:
         
 - tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
 - assertVisible: "${PROJECT_TITLE}"
-- assertVisible: "\uf127" # Go back icon
+- assertVisible:
+    id: "project-arrow-back"
