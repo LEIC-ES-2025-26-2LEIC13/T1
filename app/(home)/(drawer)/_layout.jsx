@@ -28,8 +28,8 @@ export default function DrawerLayout() {
                         marginLeft: 10,
                     },
 
-                    drawerActiveTintColor: theme.iconColorFocused,
-                    drawerInactiveTintColor: theme.iconColor,
+                    drawerActiveTintColor: theme.iconColorFocused, // color for the icon and label of the currently active drawer item
+                    drawerInactiveTintColor: theme.iconColor, // color for the icon and label of all inactive drawer items
 
                     drawerStyle: {
                         backgroundColor: theme.navBackground,

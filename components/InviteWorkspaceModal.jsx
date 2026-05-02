@@ -90,7 +90,7 @@ export default function InviteWorkspaceModal({
                     testID="invite-email-input"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    leftIcon="mail-outline"
+                    leftIcon="email-outline"
                 />
             </View>
 

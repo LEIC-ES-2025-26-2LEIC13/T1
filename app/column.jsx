@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
 import Task from "../components/ThemedTask";
-import {useColumn}  from '../hooks/useColumn'
+import { useColumn } from '../hooks/useColumn'
 import { taskService } from '../api/taskService';
 import ThemedText from "../components/ThemedText";
 import ThemedButton from "../components/ThemedButton";
 import OverflowMenu from '../components/OverflowMenu';
 import TaskModal from '../components/TaskModal';
-import { View, FlatList, ActivityIndicator, StyleSheet, Alert} from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 
-export default function Column({projectId, columnData}) {
+export default function Column({ projectId, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
         id: columnData.id,
@@ -18,11 +18,11 @@ export default function Column({projectId, columnData}) {
     })
     const [tasks, setTasks] = useState([])
     const [isLoadingTasks, setIsLoadingTasks] = useState(false)
-    const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false)
+    const [taskModalCreationVisible, setTaskModalCreationVisible] = useState(false)
     const [taskDetailsVisible, setTaskDetailsVisible] = useState(false)
     const [editColumnModalVisible, setEditColumnModalVisible] = useState(false)
     const [selectedTask, setSelectedTask] = useState(null)
-    const [task, setTask] = useState({
+    const [task, setTask] = useState({ // this state holds each task field while the user fills out a form when creating a task, e.g.
         name: '',
         description: '',
         label: '',
@@ -60,24 +60,25 @@ export default function Column({projectId, columnData}) {
 
     const closeEditColumnModal = () => setEditColumnModalVisible(false)
 
+    // used for updating task state fields inside CreateTaskModal (as the user fills the create task form)
     const handleTaskChange = (field, value) => {
-		setTask((prev) => ({ ...prev, [field]: value }));
-	};
+        setTask((prev) => ({ ...prev, [field]: value }));
+    };
 
     // Task Creation Modal
-	const openTaskCreationModal = () => setTaskModalCreationVisible(true)
+    const openTaskCreationModal = () => setTaskModalCreationVisible(true)
 
-	const closeTaskCreationModal = () => {
-		setTaskModalCreationVisible(false)
-		setTask({
-			name: '',
-			description: '',
-			label: '',
-		})
-	}
+    const closeTaskCreationModal = () => {
+        setTaskModalCreationVisible(false)
+        setTask({
+            name: '',
+            description: '',
+            label: '',
+        })
+    }
 
     // Task Details Modal
-    
+
     const openTaskDetails = (taskItem) => {
         setSelectedTask(taskItem)
         setTaskDetailsVisible(true)
@@ -122,16 +123,16 @@ export default function Column({projectId, columnData}) {
                             icon: 'create',
                             onPress: () => openEditColumnModal()
                         },
-                        { 
-                            id: 'delete', 
-                            title: 'Delete column', 
+                        {
+                            id: 'delete',
+                            title: 'Delete column',
                             icon: 'remove-circle',
                             confirm: {
                                 title: 'Delete column',
                                 message: 'Are you sure you want to delete this column? All related data will be lost.',
                             },
-                            destructive: true, 
-                            onPress: () => deleteColumn(column.id) 
+                            destructive: true,
+                            onPress: () => deleteColumn(column.id)
                         }
                     ]}
                 />
@@ -161,7 +162,7 @@ export default function Column({projectId, columnData}) {
             {/* Create Task Button */}
             <ThemedButton onPress={openTaskCreationModal} style={styles.btn}>
                 <ThemedText style={styles.btnText}>+ Add Task</ThemedText>
-			</ThemedButton>
+            </ThemedButton>
 
             <EditColumnModal
                 visible={editColumnModalVisible}
@@ -172,12 +173,12 @@ export default function Column({projectId, columnData}) {
 
             {/* Modals — scoped to this column */}
             <CreateTaskModal
-				isVisible={taskModalCreationVisible}
-				onClose={closeTaskCreationModal}
-				onCreate={handleCreateTask}
-				task={task}
-				onChange={handleTaskChange}
-			/>
+                isVisible={taskModalCreationVisible}
+                onClose={closeTaskCreationModal}
+                onCreate={handleCreateTask}
+                task={task}
+                onChange={handleTaskChange}
+            />
             <TaskModal
                 visible={taskDetailsVisible}
                 task={selectedTask}
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
-    }, 
+    },
     btnText: {
         color: 'white',
         fontWeight: 'bold',

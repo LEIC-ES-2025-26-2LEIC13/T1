@@ -270,7 +270,7 @@ export default function ProjectScreen() {
 							justifyContent: 'center',
 							alignItems: 'center',
 						}}>
-							<Ionicons testID="see-members-icon" name="people" size={24} color={palette.title} />
+							<Ionicons testID="see-members-icon" name="people" size={24} color={Colors.dark.iconColor} />
 						</Pressable>
 
 						<OverflowMenu

@@ -1,6 +1,6 @@
-import { TextInput, useColorScheme, View } from 'react-native'
+import { StyleSheet, TextInput, useColorScheme, View } from 'react-native'
 import { Colors } from '../constants/Colors'
-import Ionicons from '@expo/vector-icons/Ionicons'
+import ThemedIcon from './ThemedIcon'
 
 const ThemedTextInput = ({
   style,
@@ -14,13 +14,11 @@ const ThemedTextInput = ({
   const theme = Colors[colorScheme] ?? Colors.light
 
   return (
-    <View style={[{ position: 'relative' }, containerStyle]}>
+    <View style={styles.container}>
       {leftIcon ? (
-        <Ionicons
-          name={leftIcon}
-          size={20}
-          color={theme.text}
-          style={{ position: 'absolute', left: 16, top: 18, zIndex: 1 }}
+        <ThemedIcon
+            name={leftIcon}
+            style={{ position: 'absolute', left: 16, top: 21, zIndex: 1 }}
         />
       ) : null}
 
@@ -30,24 +28,20 @@ const ThemedTextInput = ({
           {
             backgroundColor: theme.background,
             color: theme.text,
-            padding: 20,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colorScheme === 'dark' ? '#374151' : '#d1d5db',
+            borderColor: theme.borders,
             paddingLeft: leftIcon ? 46 : 20,
             paddingRight: rightIcon ? 46 : 20
           },
+          styles.input,
           style
         ]}
         {...props}
       />
 
       {rightIcon ? (
-        <Ionicons
-          name={rightIcon}
-          size={20}
-          color={theme.text}
-          style={{ position: 'absolute', right: 16, top: 18, zIndex: 1 }}
+        <ThemedIcon
+            name={rightIcon}
+            style={{ position: 'absolute', right: 16, top: 21, zIndex: 1 }}
         />
       ) : null}
     </View>
@@ -55,3 +49,19 @@ const ThemedTextInput = ({
 }
 
 export default ThemedTextInput
+
+
+const styles = StyleSheet.create({
+    container: {
+        position: 'relative',
+        width: '100%', // not always...
+        marginBottom: 15
+    },
+
+    input: {
+        padding: 20,
+        borderRadius: 10,
+        borderWidth: 1
+    }
+})
+    

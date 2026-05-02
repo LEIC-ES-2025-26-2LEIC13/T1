@@ -9,6 +9,9 @@ export const Colors = {
         navBackground: "#111827",
         iconColor: "#9ca3af",
         iconColorFocused: "#3b82f6",
+        onPrimary: "#f9fafb", // color of text/icon onprimary colored background
+        borders: "rgba(255, 255, 255, 0.10)"
+        
     },
     light: {
         text: "#4b5563",
@@ -17,5 +20,7 @@ export const Colors = {
         navBackground: "#ffffff",
         iconColor: "#7a7a7a",
         iconColorFocused: "#1d4ed8",
+        onPrimary: "#f9fafb", // color of text/icon on primary colored background
+        borders: "rgba(0, 0, 0, 0.1)"
     }
 }
