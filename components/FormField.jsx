@@ -3,7 +3,20 @@ import React from 'react'
 import ThemedTextInput from './ThemedTextInput'
 import { Colors } from '../constants/Colors'
 
-const FormField = ({ labelName, placeholder, value, onChangeText }) => {
+const FormField = ({ 
+    labelName,
+    placeholder,
+    value,
+    onChangeText,
+    leftIcon,
+    rightIcon,
+    testID,
+    keyboardType,
+    autoCapitalize,
+    readOnly,
+    multiline
+}) => {
+
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -13,9 +26,17 @@ const FormField = ({ labelName, placeholder, value, onChangeText }) => {
                 {labelName}
             </Text>
             <ThemedTextInput
+                style={multiline && styles.textArea}
+                testID={testID}
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
+                leftIcon={leftIcon}
+                rightIcon={rightIcon}
+                keyboardType={keyboardType}
+                autoCapitalize={autoCapitalize}
+                readOnly={readOnly}
+                multiline={multiline}
             />
         </>
     )
@@ -31,7 +52,7 @@ const styles = StyleSheet.create({
         marginBottom: 7,
     },
     textArea: {
-        height: 90,
         textAlignVertical: 'top',
+        height: 80
     }
 })

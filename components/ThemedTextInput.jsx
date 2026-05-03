@@ -3,49 +3,47 @@ import { Colors } from '../constants/Colors'
 import ThemedIcon from './ThemedIcon'
 
 const ThemedTextInput = ({
-  style,
-  containerStyle,
-  testID,
-  leftIcon,
-  rightIcon,
-  ...props
+    style,
+    containerStyle,
+    testID,
+    placeholder,
+    leftIcon,
+    rightIcon,
+    readOnly,
+    multiline,
+    ...props
 }) => {
-  const colorScheme = useColorScheme()
-  const theme = Colors[colorScheme] ?? Colors.light
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
 
-  return (
-    <View style={styles.container}>
-      {leftIcon ? (
-        <ThemedIcon
-            name={leftIcon}
-            style={{ position: 'absolute', left: 16, top: 21, zIndex: 1 }}
+    return (
+        <View style={[
+            { borderColor: theme.borders },
+            styles.container,
+            containerStyle
+            ]}>
+        {leftIcon && <ThemedIcon name={leftIcon} style={styles.leftIcon} />}
+        
+        <TextInput
+            testID={testID}
+            placeholder={placeholder}
+            readOnly={readOnly}
+            multiline={multiline}
+            scrollEnabled={false}
+            style={[
+            {
+                backgroundColor: theme.background,
+                color: theme.text
+            },
+            styles.input,
+            style
+            ]}
+            {...props}
         />
-      ) : null}
 
-      <TextInput
-        testID={testID}
-        style={[
-          {
-            backgroundColor: theme.background,
-            color: theme.text,
-            borderColor: theme.borders,
-            paddingLeft: leftIcon ? 46 : 20,
-            paddingRight: rightIcon ? 46 : 20
-          },
-          styles.input,
-          style
-        ]}
-        {...props}
-      />
-
-      {rightIcon ? (
-        <ThemedIcon
-            name={rightIcon}
-            style={{ position: 'absolute', right: 16, top: 21, zIndex: 1 }}
-        />
-      ) : null}
-    </View>
-  )
+        {rightIcon && <ThemedIcon name={rightIcon} style={styles.rightIcon} />}
+        </View>
+    )
 }
 
 export default ThemedTextInput
@@ -53,15 +51,22 @@ export default ThemedTextInput
 
 const styles = StyleSheet.create({
     container: {
-        position: 'relative',
-        width: '100%', // not always...
-        marginBottom: 15
-    },
-
-    input: {
-        padding: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
         borderRadius: 10,
-        borderWidth: 1
+        borderWidth: 1,
+        overflow: 'hidden'
+    },
+    leftIcon: {
+        paddingLeft: 16
+    },
+    rightIcon: {
+        // not needed for now
+    },
+    input: {
+        flex: 1,
+        padding: 16
     }
 })
     

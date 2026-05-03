@@ -1,184 +1,78 @@
-import { Text, StyleSheet, View, Pressable } from 'react-native';
 import AppModal from './AppModal';
-import ThemedText from "./ThemedText";
-import Spacer from "./Spacer";
-import ThemedButton from "./ThemedButton";
-import ThemedView from "./ThemedView";
-import ThemedTextInput from "./ThemedTextInput";
+import ModalHeader from './modal/ModalHeader';
+import Pill from './modal/Pill';
+import ModalBody from './modal/ModalBody';
+import FormField from './FormField';
+import PillsContainer from './modal/PillsContainer';
+import Labels from './modal/Labels';
+import ModalActions from './modal/ModalActions';
+import { LABELS } from '../constants/Labels';
 
-// Example of labels for the task
-const LABELS = ["Work", "Urgent", "Idea"];
 
 export default function CreateTaskModal({
-    isVisible,
+    visible,
+    projectName,
+    columnName,
     onClose,
     onCreate,
     task,
     onChange,
 }) {
-    const isPreset = LABELS.includes(task.label);
+    // Flag that indicates if the selected label is one of the presets from the array LABELS. Used to clear the custom label input.
+    const isPreset = LABELS.some(label => label.name === task.label);
 
     return (
-        <AppModal visible={isVisible}>
+        <AppModal visible={visible}>
 
-            <ThemedText title={true} style={styles.title}>
-                Create Task
-            </ThemedText>
-
-            <ThemedText title={true}>Task Name</ThemedText>
-            <Spacer height={10}/>
-
-            <ThemedTextInput
-                style={{width: '100%', marginBottom: 15}}
-                placeholder="Enter task name"
-
-                value={task.name}
-                onChangeText={(value) => onChange('name', value)}
+            <ModalHeader
+                heading="Create Task"
+                iconName="note-plus"
+                onClose={onClose}
             />
 
-            <ThemedText title={true}>Description</ThemedText>
-            <Spacer height={10}/>
+            <ModalBody>
 
-            <ThemedTextInput
-                style={{width: '100%', marginBottom: 15, height: 100, textAlignVertical: 'top'}}
-                placeholder="Enter task description"
-                multiline={true}
+                <PillsContainer>
+                    <Pill projectName={projectName}/>
+                    <Pill columnName={columnName}/>
+                </PillsContainer>
 
-                value={task.description}
-                onChangeText={(value) => onChange('description', value)}
+                <FormField
+                    labelName="TASK NAME"
+                    placeholder="Enter task name"
+                    value={task.name}
+                    onChangeText={(value) => onChange('name', value)}
+                />
+
+                <FormField
+                    labelName="DESCRIPTION"
+                    placeholder="Enter task description (optional)"
+                    value={task.description}
+                    onChangeText={(value) => onChange('description', value)}
+                    multiline
+                />
+                
+                <FormField
+                    labelName="LABELS"
+                    placeholder="Enter or select label"
+                    value={isPreset ? "" : task.label}
+                    onChangeText={(text) => onChange('label', text)}
+                />
+
+                <Labels
+                    labels={LABELS}
+                    currentLabel={task.label}
+                    onChange={onChange}
+                />
+
+            </ModalBody>
+
+            <ModalActions
+                onCancel={onClose}
+                primaryActionName="Create"
+                primaryActionIconName="plus"
+                onPrimaryActionPress={() => onCreate(task)}
             />
-
-            {/* Label input */}
-            <View style={styles.labelContainer}>
-                {LABELS.map((label) => {
-                    const selected = task.label === label
-
-                    return (
-                        <Pressable
-                            key={label}
-                            onPress={() => onChange('label', label)}
-                            style={[
-                                styles.labelChip,
-                                selected && styles.labelChipSelected
-                            ]}
-                        >
-                            <Text
-                                style={[
-                                    styles.labelText,
-                                    selected && styles.labelTextSelected
-                                ]}
-                            >
-                                {label}
-                            </Text>
-                        </Pressable>
-                    );
-                })}
-            </View>
-
-            {/* Custom Label Input, will change in the future*/}
-            <ThemedTextInput
-                style={[
-                    styles.customInput,
-                    !isPreset && task.label !== "" && styles.customInputActive
-                ]}
-                placeholder="Or type custom label..."
-                value={isPreset ? "" : task.label}
-                onChangeText={(text) => onChange('label', text)}
-            />
-
-            <ThemedView style={styles.actions}>
-                <ThemedButton style={[styles.button,styles.cancel]} onPress={onClose}>
-                    <Text style={styles.buttonTextCancel}>Cancel</Text>
-                </ThemedButton>
-
-                <ThemedButton style={[styles.button]} 
-                    onPress={() => onCreate(task)}
-                >
-                    <Text style={styles.buttonTextCreate}>Create Task</Text>
-                </ThemedButton>
-            </ThemedView>
-
         </AppModal>
     );
 }
-
-const styles = StyleSheet.create({
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 12,
-    },
-
-    actions: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        marginTop: 20,
-    },
-
-    button: {
-        flex: 1,
-        paddingVertical: 14,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        minWidth: 100,
-        alignItems: 'center',
-        marginHorizontal: 5,
-    },
-
-    cancel: {
-        backgroundColor: 'white',
-        borderWidth: 0.5,
-        borderColor: 'grey',
-    },
-
-    buttonTextCancel: {
-        color: 'black',
-        fontWeight: 'bold',
-    },
-
-    buttonTextCreate: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    labelContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 8,
-        marginBottom: 15,
-    },
-
-    labelChip: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: "#ccc",
-        backgroundColor: "transparent",
-    },
-
-    labelChipSelected: {
-        backgroundColor: "#4F46E5",
-        borderColor: "#4F46E5",
-    },
-
-    labelText: {
-        fontSize: 13,
-        color: "#333",
-    },
-
-    labelTextSelected: {
-        color: "white",
-        fontWeight: "600",
-    },
-
-    customInput: {
-        width: '100%',
-        marginBottom: 5,
-        borderWidth: 1,
-        borderColor: '#ccc',
-    },
-
-    customInputActive: {
-        borderColor: '#4F46E5',
-    },
-});

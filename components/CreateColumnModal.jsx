@@ -1,10 +1,8 @@
-import { Text, StyleSheet, View, useColorScheme } from 'react-native';
 import AppModal from './AppModal';
-import ThemedButton from './ThemedButton';
-import ThemedTextInput from './ThemedTextInput';
-import { Colors } from '../constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import ModalHeader from './modal/ModalHeader';
+import ModalBody from './modal/ModalBody';
+import FormField from './FormField';
+import ModalActions from './modal/ModalActions';
 
 export default function CreateColumnModal({
     visible,
@@ -13,165 +11,34 @@ export default function CreateColumnModal({
     onChange,
     columnData,
 }) {
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
 
     return (
         <AppModal visible={visible}>
-            {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerLeft}>
-                    <View style={[styles.iconWrap, { backgroundColor: isDark ? 'rgba(70,148,251,0.15)' : 'rgba(70,148,251,0.1)' }]}>
-                        <MaterialCommunityIcons name="table-column" size={24} color="#4694fb" />
-                    </View>
-                    <Text style={[styles.title, { color: theme.text }]}>New Column</Text>
-                </View>
-                <ThemedButton style={styles.closeBtn} onPress={onClose}>
-                    <Ionicons name="close" size={20} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
-                </ThemedButton>
-            </View>
 
-            {/* Divider */}
-            <View style={[styles.divider, {
-                backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
-            }]} />
+            <ModalHeader
+                heading="New Column"
+                iconName="table-column"
+                onClose={onClose}
+            />
 
-            {/* Fields */}
-            <View style={styles.body}>
-                <Text style={[styles.label, { color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.5)' }]}>
-                    COLUMN TITLE
-                </Text>
-                <ThemedTextInput
-                    containerStyle={styles.input}
-                    placeholder="Enter column title"
+            <ModalBody>
+
+                <FormField
+                    labelName="COLUMN NAME"
+                    placeholder="Enter column name"
                     value={columnData.name}
                     onChangeText={(value) => onChange('name', value)}
                 />
-            </View>
 
-            {/* Actions */}
-            <View style={styles.actions}>
-                <ThemedButton
-                    style={[styles.button, styles.cancelBtn, {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)',
-                    }]}
-                    onPress={onClose}
-                >
-                    <Text style={[styles.cancelText, { color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }]}>
-                        Cancel
-                    </Text>
-                </ThemedButton>
+            </ModalBody>
 
-                <ThemedButton
-                    style={[styles.button, styles.createBtn]}
-                    onPress={() => onCreate(columnData)}
-                >
-                    <Ionicons name="add" size={16} color="#fff" style={{ marginRight: 6 }} />
-                    <Text style={styles.createText}>Create</Text>
-                </ThemedButton>
-            </View>
+
+            <ModalActions
+                onCancel={onClose}
+                primaryActionName="Create"
+                primaryActionIconName="plus"
+                onPrimaryActionPress={() => onCreate(columnData)}
+            />
         </AppModal>
     );
 }
-
-const styles = StyleSheet.create({
-    // Header
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 14,
-    },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    iconWrap: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        fontWeight: '700',
-        letterSpacing: 0.2,
-    },
-    closeBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        padding: 0,
-    },
-
-    // Divider
-    divider: {
-        height: 1,
-        marginHorizontal: 0,
-    },
-
-    // Body
-    body: {
-        paddingHorizontal: 20,
-        paddingTop: 18,
-    },
-    label: {
-        fontSize: 11,
-        fontWeight: '600',
-        letterSpacing: 0.8,
-        marginBottom: 7,
-    },
-    input: {
-        width: '100%',
-        marginBottom: 18,
-    },
-    textArea: {
-        height: 90,
-        textAlignVertical: 'top',
-    },
-
-    // Actions
-    actions: {
-        flexDirection: 'row',
-        gap: 10,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        paddingTop: 4,
-    },
-    button: {
-        flex: 1,
-        flexDirection: 'row',
-        paddingVertical: 13,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    cancelBtn: {
-        // background set inline for theme support
-    },
-    createBtn: {
-        backgroundColor: '#4694fb',
-        shadowColor: '#4694fb',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
-        elevation: 4,
-    },
-    cancelText: {
-        fontWeight: '600',
-        fontSize: 15,
-    },
-    createText: {
-        color: '#ffffff',
-        fontWeight: '600',
-        fontSize: 15,
-    },
-});

@@ -10,9 +10,9 @@ export const Colors = {
         iconColor: "#9ca3af",
         iconColorFocused: "#3b82f6",
         onPrimary: "#f9fafb", // color of text/icon onprimary colored background
-        borders: "rgba(255, 255, 255, 0.10)"
-        
+        borders: "rgba(255, 255, 255, 0.1)"
     },
+    
     light: {
         text: "#4b5563",
         title: "#111111",

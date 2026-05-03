@@ -88,3 +88,7 @@ To avoid hardcoding database paths throughout the codebase, a helper function wa
   * `env` allows passing environment variables to the subflow. In this case, `SENDER_EMAIL` and `SENDER_PASSWORD` are environment variables defined within the main test itself.
 
 * Inside the subflow, the environment variables are used with the same `${VAR_NAME}` syntax.
+
+## Icons
+
+* Icons used in the project are now from the `@expo/vector-icons/MaterialCommunityIcons` library. Icon collection [here](https://icons.expo.fyi/Index) with the filter set to "MaterialCommunityIcons".

@@ -5,7 +5,7 @@ import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
-import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
+import InviteProjectModal from '../components/InviteProjectModal';
 import ThemedText from "../components/ThemedText";
 import { useProject } from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
@@ -120,19 +120,17 @@ export default function ProjectScreen() {
 				return
 			}
 
-		try {
 			await sendInvite({
 				senderId: user.uid,
 				senderEmail: user.email,
 				receiverId: receiverUser.id,
 				projectId: currentProject.id,
-				projectName: currentProject.title,
-			});
+				projectName: currentProjectName,
+			})
+			
 		} catch (error) {
-			Alert.alert('Invite failed', error.message);
-			return; // still executes the finally block
-		} finally {
-			handleCloseInviteModal();
+			Alert.alert('Invite failed', error.message)
+			return
 		}
 
 		Toast.show({
@@ -142,10 +140,7 @@ export default function ProjectScreen() {
 			position: 'top',
 			visibilityTime: 1500,
 			topOffset: 100,
-		});
-		} catch (error) {
-			Alert.alert('Invalid invite', error.message)
-		}
+		})
 	}
 
 	const handleProjectDelete = async () => {
@@ -279,13 +274,13 @@ export default function ProjectScreen() {
 								{
 									id: 'invite-member',
 									title: 'Invite member',
-									icon: 'person-add',
+									icon: 'account-plus',
 									onPress: () => handleInvitePress(),
 								},
 								{
 									id: 'delete-project',
 									title: 'Delete project',
-									icon: 'remove-circle',
+									icon: 'delete',
 									confirm: {
 										title: 'Delete project',
 										message: 'Are you sure you want to delete this project? All related data will be lost.',
@@ -317,6 +312,7 @@ export default function ProjectScreen() {
 					<View key={columns[0].id} style={{ flex: 1, padding: 16 }} collapsable={false}>
 						<Column
 							projectId={projectId}
+							projectName={currentProjectName}
 							columnData={columns[0]} // Pass the entire column data instead of just the name
 						/>
 					</View> 
@@ -328,6 +324,7 @@ export default function ProjectScreen() {
 						<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
 							<Column
 								projectId={projectId}
+								projectName={currentProjectName}
 								columnData={item} // Pass the entire column data instead of just the name
 							/>
 						</View>
@@ -342,20 +339,20 @@ export default function ProjectScreen() {
 					columnData={columnData}
 				/>
 
-				<InviteWorkspaceModal
+				<InviteProjectModal
 					visible={inviteModalVisible}
 					value={inviteTarget}
 					onChangeText={setInviteTarget}
 					onClose={handleCloseInviteModal}
 					onInvite={handleSendInvite}
-					workspaceName={currentProjectName}
+					projectName={currentProjectName}
 				/>
 
 				<SeeMembersModal
-				visible={seeMembersModalVisible}
-				getProjectUsers={() => projectService.getProjectUsers(projectId)}
-				onClose={handleCloseMembersModal}
-				onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
+					visible={seeMembersModalVisible}
+					getProjectUsers={() => projectService.getProjectUsers(projectId)}
+					onClose={handleCloseMembersModal}
+					onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
 				/>
 			</SafeAreaView>
 		</>

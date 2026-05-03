@@ -22,6 +22,7 @@ export default function CreateProjectModal({
             />
 
             <ModalBody>
+
                 <FormField
                     labelName="PROJECT TITLE"
                     placeholder="Enter project title"
@@ -35,6 +36,7 @@ export default function CreateProjectModal({
                     value={project.description}
                     onChangeText={(value) => onChange('description', value)}
                 />
+                
             </ModalBody>
 
 
@@ -42,7 +44,7 @@ export default function CreateProjectModal({
                 onCancel={onClose}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
-                onPrimaryAction={() => onCreate(project)}
+                onPrimaryActionPress={() => onCreate(project)}
             />
 
         </AppModal>

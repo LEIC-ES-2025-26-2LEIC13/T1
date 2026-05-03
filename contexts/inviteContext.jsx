@@ -27,16 +27,16 @@ export function InviteProvider({ children }) {
 
 
 	// id <=> inviteId
-	const sendInvite = useCallback((inviteData) => {
-        inviteService.sendInvite(inviteData)
+	const sendInvite = useCallback(async (inviteData) => {
+        await inviteService.sendInvite(inviteData)
     }, []);
 
-    const acceptInvite = useCallback((inviteData) => {
-        inviteService.acceptInvite(user.uid, user.email, inviteData)
+    const acceptInvite = useCallback(async (inviteData) => {
+        await inviteService.acceptInvite(user.uid, user.email, inviteData)
     }, [user?.uid, user?.email]);
 
-    const ignoreInvite = useCallback(({ id }) => {
-        inviteService.ignoreInvite(user.uid, id)
+    const ignoreInvite = useCallback(async ({ id }) => {
+        await inviteService.ignoreInvite(user.uid, id)
     }, [user?.uid]);
 
     const value = useMemo(() => ({

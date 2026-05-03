@@ -10,7 +10,7 @@ import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-nati
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 
-export default function Column({ projectId, columnData }) {
+export default function Column({ projectId, projectName, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
         id: columnData.id,
@@ -120,13 +120,13 @@ export default function Column({ projectId, columnData }) {
                         {
                             id: 'edit',
                             title: 'Edit column name',
-                            icon: 'create',
+                            icon: 'pencil',
                             onPress: () => openEditColumnModal()
                         },
                         {
                             id: 'delete',
                             title: 'Delete column',
-                            icon: 'remove-circle',
+                            icon: 'delete',
                             confirm: {
                                 title: 'Delete column',
                                 message: 'Are you sure you want to delete this column? All related data will be lost.',
@@ -173,15 +173,19 @@ export default function Column({ projectId, columnData }) {
 
             {/* Modals — scoped to this column */}
             <CreateTaskModal
-                isVisible={taskModalCreationVisible}
+                visible={taskModalCreationVisible}
+                task={task}
+                projectName={projectName}
+                columnName={column.name}
                 onClose={closeTaskCreationModal}
                 onCreate={handleCreateTask}
-                task={task}
                 onChange={handleTaskChange}
             />
             <TaskModal
                 visible={taskDetailsVisible}
                 task={selectedTask}
+                projectName={projectName}
+                columnName={column.name}
                 onClose={closeTaskDetails}
                 deleteTask={handleDeleteTask}
             />
