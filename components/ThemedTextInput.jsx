@@ -9,6 +9,7 @@ const ThemedTextInput = ({
     placeholder,
     leftIcon,
     rightIcon,
+    onRightIconPress,
     readOnly,
     multiline,
     ...props
@@ -18,7 +19,7 @@ const ThemedTextInput = ({
 
     return (
         <View style={[
-            { borderColor: theme.borders },
+            { borderColor: theme.borders, backgroundColor: theme.background },
             styles.container,
             containerStyle
             ]}>
@@ -41,7 +42,7 @@ const ThemedTextInput = ({
             {...props}
         />
 
-        {rightIcon && <ThemedIcon name={rightIcon} style={styles.rightIcon} />}
+        {rightIcon && <ThemedIcon name={rightIcon} onPress={onRightIconPress} style={styles.rightIcon} />}
         </View>
     )
 }
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
         paddingLeft: 16
     },
     rightIcon: {
-        // not needed for now
+        paddingRight: 16
     },
     input: {
         flex: 1,

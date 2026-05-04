@@ -1,30 +1,29 @@
-import { StyleSheet, Text, useColorScheme } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React from 'react'
 import ThemedTextInput from './ThemedTextInput'
-import { Colors } from '../constants/Colors'
+import ThemedText from './ThemedText'
 
 const FormField = ({ 
+    testID,
     labelName,
     placeholder,
     value,
     onChangeText,
     leftIcon,
     rightIcon,
-    testID,
     keyboardType,
     autoCapitalize,
     readOnly,
-    multiline
+    multiline,
+    secureTextEntry
 }) => {
-
-    const colorScheme = useColorScheme()
-    const theme = Colors[colorScheme] ?? Colors.light
 
     return (
         <>
-            <Text style={[styles.label, { color: theme.text }]}>
+            <ThemedText style={[styles.label]}>
                 {labelName}
-            </Text>
+            </ThemedText>
+            
             <ThemedTextInput
                 style={multiline && styles.textArea}
                 testID={testID}
@@ -37,6 +36,7 @@ const FormField = ({
                 autoCapitalize={autoCapitalize}
                 readOnly={readOnly}
                 multiline={multiline}
+                secureTextEntry={secureTextEntry}
             />
         </>
     )

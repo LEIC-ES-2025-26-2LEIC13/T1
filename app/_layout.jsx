@@ -1,4 +1,4 @@
-import { useColorScheme, StyleSheet, ActivityIndicator } from 'react-native'
+import { useColorScheme } from 'react-native'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
@@ -8,9 +8,8 @@ import { InviteProvider } from '../contexts/inviteContext'
 import { useAuth } from '../hooks/useAuth'
 import { MenuProvider } from 'react-native-popup-menu';
 import AppToast from '../components/Toast';
-import ThemedView from '../components/ThemedView'
-import ThemedText from '../components/ThemedText'
 import { ColumnProvider } from '../contexts/columnContext'
+import LoadingScreen from '../components/LoadingScreen'
 
 
 // This component was defined explicity, because useAuth hook can only be used inside descendents of UserProvider, not inside itself
@@ -42,14 +41,7 @@ function RootNavigator() {
           </Stack>
           <AppToast />
           
-          {isLoading && (
-              <ThemedView style={[styles.container, StyleSheet.absoluteFillObject, { zIndex: 9999 }]}>
-                  <ActivityIndicator size="large" color={Colors.primary} />
-                  <ThemedText style={styles.text}>
-                      Loading...
-                  </ThemedText>
-              </ThemedView>
-          )}
+          {isLoading && (<LoadingScreen/>)}
       </>
   )
 }
@@ -72,16 +64,3 @@ const RouteLayout = () => {
 }
 
 export default RouteLayout
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    text: {
-        marginTop: 15,
-        fontSize: 16,
-        color: "#555",
-    },
-})
