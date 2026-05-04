@@ -138,6 +138,8 @@ export default function ProjectScreen() {
 			visibilityTime: 1500,
 			topOffset: 100,
 		})
+
+		handleCloseInviteModal()
 	}
 
 	const handleProjectDelete = async () => {

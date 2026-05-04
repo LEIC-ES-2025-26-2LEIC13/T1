@@ -1,4 +1,4 @@
-import { FlatList, View, StyleSheet } from "react-native";
+import { FlatList, View, StyleSheet, useColorScheme } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import AppModal from "./AppModal";
 import { useAuth } from "../hooks/useAuth";
@@ -6,7 +6,8 @@ import OverflowMenu from "./OverflowMenu";
 import ModalHeader from "./modal/ModalHeader";
 import ThemedIcon from "./ThemedIcon";
 import ThemedText from "./ThemedText";
-import Divider from "./Divider";
+import Spacer from "./Spacer";
+import { Colors } from "../constants/Colors";
 
 
 function putCurrUserFirst(userEmail, members) {
@@ -25,6 +26,8 @@ function putCurrUserFirst(userEmail, members) {
 }
 
 export default function SeeMembersModal({visible, getProjectUsers, onClose, onKickMember}) {
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
 
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
@@ -60,53 +63,53 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
             <FlatList
                 data={members}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (                       
-                    <View style={[styles.memberItem]}>
+                renderItem={({ item }) => (
+                    <>                     
+                        <View style={[styles.memberItem, { borderColor: theme.borders }]}>
 
-                        <ThemedIcon
-                            name="account-circle"
-                            style={{ marginRight: 10 }}
-                        />
-                        
-                        <ThemedText bold style={{ flex: 1 }} numberOfLines={1}>
-                            {item.email === user.email ? `Me (${item.email})` : item.email}
-                        </ThemedText>
-                        
-                        <OverflowMenu
-                            testID={`overflow-menu-${item.email}`}
+                            <ThemedIcon
+                                name="account-circle"
+                                style={{ marginRight: 10 }}
+                            />
+                            
+                            <ThemedText bold style={{ flex: 1 }} numberOfLines={1}>
+                                {item.email === user.email ? `Me (${item.email})` : item.email}
+                            </ThemedText>
+                            
+                            <OverflowMenu
+                                testID={`overflow-menu-${item.email}`}
 
-                            actions={[
-                                {
-                                    id: 'leave-project',
-                                    title: 'Leave project',
-                                    icon: 'exit-to-app',
-                                    confirm: {
+                                actions={[
+                                    {
+                                        id: 'leave-project',
                                         title: 'Leave project',
-                                        message: `Are you sure you want to leave this project?`
-                                    },
-                                    destructive: true,
-                                    hidden: !item.email === user.email, // only shows this option for the current user
-                                    onPress: () => kickAndUpdate(item.id, item.email),
-                                }, 
-                                {
-                                    id: 'kick-member',
-                                    title: 'Kick member',
-                                    icon: 'account-remove',
-                                    confirm: {
+                                        icon: 'exit-to-app',
+                                        confirm: {
+                                            title: 'Leave project',
+                                            message: `Are you sure you want to leave this project?`
+                                        },
+                                        destructive: true,
+                                        hidden: item.email !== user.email, // only shows this option for the current user
+                                        onPress: () => kickAndUpdate(item.id, item.email),
+                                    }, 
+                                    {
+                                        id: 'kick-member',
                                         title: 'Kick member',
-                                        message: `Are you sure you want to kick ${item.email} from this project?`
-                                    },
-                                    destructive: true,
-                                    hidden: item.email === user.email,
-                                    onPress: () => kickAndUpdate(item.id, item.email),
-                                }
-                            ]}
-                        />
-                    </View> 
+                                        icon: 'account-remove',
+                                        confirm: {
+                                            title: 'Kick member',
+                                            message: `Are you sure you want to kick ${item.email} from this project?`
+                                        },
+                                        destructive: true,
+                                        hidden: item.email === user.email,
+                                        onPress: () => kickAndUpdate(item.id, item.email),
+                                    }
+                                ]}
+                            />
+                        </View>
+                    </>
                 )}
             />
-
-            <Divider/>
         </>    
         )
     }
@@ -121,6 +124,7 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
                 onClose={onClose}
             />
 
+            <Spacer height={10} />
             <MemberList members={members}/>
             
         </AppModal>
@@ -132,7 +136,10 @@ const styles = StyleSheet.create({
     memberItem: {
         flexDirection: 'row',
         alignItems: 'center',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginVertical: 5,
         paddingHorizontal: 18,
-        paddingVertical: 20
+        paddingVertical: 15,
     }
 });
