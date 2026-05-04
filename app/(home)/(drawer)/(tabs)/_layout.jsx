@@ -2,8 +2,8 @@ import {Tabs} from "expo-router"
 import {useColorScheme} from "react-native"
 import { Colors } from "../../../../constants/Colors"
 import { Ionicons } from "@expo/vector-icons"
-import DrawerThemedButton from "../../../../components/DrawerThemedButton";
 import { useInvite } from "../../../../hooks/useInvite";
+import { commonHeaderOptions } from "../../../../constants/navigationStyles";
 
 export default function DashboardLayout() {
     const colorScheme = useColorScheme()
@@ -14,18 +14,7 @@ export default function DashboardLayout() {
     return (
         <Tabs
             screenOptions={{
-                headerStyle: { backgroundColor: theme.navBackground },
-                headerTintColor: theme.title,
-                headerTitleAlign: "left",
-
-                // Change the header tittle of the screen
-                headerTitleStyle: {
-                    color: theme.title,
-                    fontWeight: "700",
-                    fontSize: 30,
-                    lineHeight: 34,
-                    marginLeft: 10,
-                },
+                ...commonHeaderOptions(theme, hasNewInvites),
 
                 tabBarStyle: {
                     backgroundColor: theme.navBackground,
@@ -35,8 +24,6 @@ export default function DashboardLayout() {
 
                 tabBarActiveTintColor: theme.iconColorFocused,
                 tabBarInactiveTintColor: theme.iconColor,
-
-                headerLeft: () => <DrawerThemedButton showNotification={hasNewInvites}/>
             }}
         >
             <Tabs.Screen

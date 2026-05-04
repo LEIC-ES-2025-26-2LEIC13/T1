@@ -1,8 +1,9 @@
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import {useAuth} from "../hooks/useAuth";
-import {View} from "react-native";
 import {Colors} from "../constants/Colors";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import ThemedIcon from './ThemedIcon';
+import Divider from './Divider';
+import Spacer from './Spacer';
 
 const CustomDrawerContent = (props) =>{
     const { logout } = useAuth();
@@ -16,28 +17,19 @@ const CustomDrawerContent = (props) =>{
             <DrawerItemList {...props} />
 
             {/* Bottom section */}
-            <View style={styles.bottomContainer}>
-                <DrawerItem
-                    label="Logout"
-                    onPress={logout}
-                    labelStyle={{ color: Colors.warning }}
-                    // Drawer passes the size automatically to the icon function
-                    icon = {({ size }) => (
-                        <Ionicons name="log-out-outline" size={size} color={Colors.warning}/>
-                    )}
-                />
-            </View>
+            <Spacer height={10} />
+            <Divider/>
+            <Spacer height={10} />
+
+            <DrawerItem
+                label="Logout"
+                onPress={logout}
+                labelStyle={{ color: Colors.warning }}
+                icon = {() => <ThemedIcon name="logout" color={Colors.warning}/>}
+            />
+        
         </DrawerContentScrollView>
     );
-}
-
-const styles = {
-    bottomContainer: {
-        borderTopWidth: 1,
-        borderTopColor: "#ccc",
-        paddingVertical: 10,
-        paddingHorizontal: 5,
-    }
 }
 
 export default CustomDrawerContent;

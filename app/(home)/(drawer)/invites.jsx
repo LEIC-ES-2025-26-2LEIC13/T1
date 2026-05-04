@@ -4,12 +4,11 @@ import { useInvite } from '../../../hooks/useInvite';
 import ThemedInvite from '../../../components/ThemedInvite';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../../constants/Colors';
+import EmptyState from '../../../components/EmptyState';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
     const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
     const isDark = colorScheme === 'dark';
 
     const handleAccept = async (invite) => {
@@ -33,22 +32,6 @@ const Invites = () => {
             setHasNewInvites(false)
         }
     )
-
-    const EmptyState = () => (
-        <View style={styles.emptyContainer}>
-            <Ionicons
-                name="mail-open-outline"
-                size={64}
-                color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
-            />
-            <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                No pending invites
-            </Text>
-            <Text style={[styles.emptySubtitle, { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }]}>
-                When someone invites you to a project, it will appear here
-            </Text>
-        </View>
-    );
 
     return (
         <ThemedView style={styles.container}>
@@ -77,12 +60,20 @@ const Invites = () => {
             <FlatList
                 data={invites}
                 keyExtractor={(item) => item.id}
+
                 contentContainerStyle={[
                     styles.list,
                     (!invites || invites.length === 0) && styles.listEmpty
                 ]}
+
                 showsVerticalScrollIndicator={false}
-                ListEmptyComponent={<EmptyState />}
+
+                ListEmptyComponent={<EmptyState 
+                    title="No pending invites" 
+                    subtitle="When someone invites you to a project, it will appear here" 
+                    iconName="email-open-outline" />
+                }
+
                 renderItem={({ item }) => (
 					<ThemedInvite
 						projectName={item.projectName}
@@ -129,25 +120,5 @@ const styles = StyleSheet.create({
     },
     listEmpty: {
         flex: 1,
-    },
-
-    // Empty state
-    emptyContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingBottom: 80,
-        gap: 10,
-    },
-    emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginTop: 8,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        textAlign: 'center',
-        maxWidth: 240,
-        lineHeight: 20,
-    },
+    }
 });

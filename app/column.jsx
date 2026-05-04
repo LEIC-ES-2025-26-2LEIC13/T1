@@ -9,6 +9,7 @@ import TaskModal from '../components/TaskModal';
 import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
+import EmptyState from "../components/EmptyState";
 
 export default function Column({ projectId, projectName, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
@@ -153,7 +154,11 @@ export default function Column({ projectId, projectName, columnData }) {
                         />
                     )}
                     ListEmptyComponent={
-                        <ThemedText style={styles.empty}>No tasks yet</ThemedText>
+                        <EmptyState
+                            title="No tasks yet"
+                            subtitle="Use the button below to create your first task in this column"
+                            iconName="note"
+                        />
                     }
                     contentContainerStyle={styles.list}
                 />
@@ -217,12 +222,6 @@ const styles = StyleSheet.create({
 
     list: {
         flexGrow: 1,
-    },
-
-    empty: {
-        textAlign: 'center',
-        marginTop: 20,
-        color: '#888',
     },
 
     btn: {

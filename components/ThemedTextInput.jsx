@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, useColorScheme, View } from 'react-native'
+import { Pressable, StyleSheet, TextInput, useColorScheme, View } from 'react-native'
 import { Colors } from '../constants/Colors'
 import ThemedIcon from './ThemedIcon'
 
@@ -16,6 +16,19 @@ const ThemedTextInput = ({
 }) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+
+    const rightIconComponent = () => {
+        if (onRightIconPress) {
+            return (
+                <Pressable onPress={onRightIconPress}>
+                    <ThemedIcon name={rightIcon} onPress={onRightIconPress} style={styles.rightIcon} />
+                </Pressable>
+            )
+        }
+        
+        return <ThemedIcon name={rightIcon} style={styles.rightIcon} />
+    
+    }
 
     return (
         <View style={[
@@ -42,7 +55,8 @@ const ThemedTextInput = ({
             {...props}
         />
 
-        {rightIcon && <ThemedIcon name={rightIcon} onPress={onRightIconPress} style={styles.rightIcon} />}
+        
+        {rightIcon && rightIconComponent()}
         </View>
     )
 }

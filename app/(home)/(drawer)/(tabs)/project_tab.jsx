@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import { Alert, View, StyleSheet, useColorScheme, FlatList, ActivityIndicator } from 'react-native';
 import { Colors } from '../../../../constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 import { useProject } from '../../../../hooks/useProject';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import CreateProjectModal from '../../../../components/CreateProjectModal';
+import EmptyState from '../../../../components/EmptyState';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
 
     const [projectModalVisible, setProjectModalVisible] = useState(false);
     const { projects, createProject, isLoadingProjects } = useProject();
@@ -47,21 +46,6 @@ const Projects = () => {
     };
 
     const borderColors = ["#4694fb", "#a950fa", "#d75bfb", "#f8d768"];
-    const EmptyState = () => (
-        <View style={styles.emptyContainer}>
-            <Ionicons
-                name="folder-open"
-                size={64}
-                color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
-            />
-            <ThemedText style={styles.emptyTitle}>
-                No projects
-            </ThemedText>
-            <ThemedText style={[styles.emptySubtitle, { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }]}>
-                When you create a project or accept an invite to one, it will appear here
-            </ThemedText>
-        </View>
-    )
 
     return (
         <View style={[styles.container, { backgroundColor: theme.background }] }>
@@ -73,22 +57,26 @@ const Projects = () => {
                 :
 
                 <FlatList
-                data={projects}
-                style={styles.list}
-                contentContainerStyle={[
-                    styles.list,
-                    (!projects || projects.length === 0) && styles.listEmpty
-                ]}
-                keyExtractor={(item, index) => `${item.title}-${index}`}
-                ListEmptyComponent={<EmptyState />}
-                renderItem={({ item, index }) => (
-                    <ThemedProject
-                        projectId={item.id}
-                        name={item.title}
-                        description={item.description}
-                        borderColor={borderColors[index % borderColors.length]}
-                    />
-                )}
+                    data={projects}
+                    style={styles.list}
+                    contentContainerStyle={[
+                        styles.list,
+                        (!projects || projects.length === 0) && styles.listEmpty
+                    ]}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
+                    ListEmptyComponent={<EmptyState
+                        title="No projects"
+                        subtitle="When you create a project or accept an invite to one, it will appear here"
+                        iconName="folder-open"
+                    />}
+                    renderItem={({ item, index }) => (
+                        <ThemedProject
+                            projectId={item.id}
+                            name={item.title}
+                            description={item.description}
+                            borderColor={borderColors[index % borderColors.length]}
+                        />
+                    )}
                 />
             }
             
@@ -142,32 +130,13 @@ const styles = StyleSheet.create({
         bottom: 20,
         alignSelf: 'center',
         marginBottom: 0,
-            zIndex: 10,
-            elevation: 4,
+        zIndex: 10,
+        elevation: 4,
     },
 
-  btnText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-
-  emptyContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingBottom: 80,
-        gap: 10,
-    },
-    emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginTop: 8,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        textAlign: 'center',
-        maxWidth: 240,
-        lineHeight: 20,
+    btnText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     }
 })

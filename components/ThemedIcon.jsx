@@ -4,7 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Colors } from '../constants/Colors';
 
 
-const ThemedIcon = ({name, size=20, onPrimary=false, ...props}) => {
+const ThemedIcon = ({name, size=22, onPrimary=false, ...props}) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
     
