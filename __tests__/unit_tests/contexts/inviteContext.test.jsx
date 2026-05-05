@@ -1,153 +1,85 @@
-import { renderHook, waitFor} from "@testing-library/react-native";
-import { getDocs, onSnapshot, query, where, addDoc, collection } from "firebase/firestore";
-import { InviteProvider } from "../../../contexts/inviteContext";
-import {useInvite} from "../../../hooks/useInvite";
-import { db } from "../../../firebase/firebaseConfig";
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+import React, { useContext } from 'react'
+import { renderHook, act } from '@testing-library/react-native'
+import { ProjectContext, ProjectProvider } from '../../../contexts/projectContext'
+import { projectService } from '../../../api/projectService'
+import { useAuth } from '../../../hooks/useAuth'
 
-
-// Mock functions and database
-jest.mock('firebase/firestore', () => ({
-  addDoc: jest.fn(),
-  collection: jest.fn(() => 'invites'), // The name is irrelevant because the collection is itself mocked
-  deleteDoc: jest.fn(),
-  doc: jest.fn(),
-  updateDoc: jest.fn(),
-  onSnapshot: jest.fn(),
-  query: jest.fn(),
-  where: jest.fn(),
-  getDocs: jest.fn(),
-}));
-
-jest.mock('../../../firebase/firebaseConfig', () => ({
-  db: {},
+jest.mock('../../../api/projectService', () => ({
+    projectService: {
+        subscribeToUserProjects: jest.fn(),
+        createProject: jest.fn(),
+        updateProject: jest.fn(),
+        deleteProject: jest.fn(),
+        kickMember: jest.fn()
+    }
 }))
 
 jest.mock('../../../hooks/useAuth', () => ({
-  useAuth: () => ({
-    user: { uid: 'user1' }, // User must not be null, to bypass the first check
-  }),
-}));
+    useAuth: jest.fn()
+}))
 
-describe('InviteContext', () => {
-    // Clear mocks before each test
+describe('ProjectContext', () => {
+    let wrapper
+
     beforeEach(() => {
-        jest.resetAllMocks()
+        jest.clearAllMocks()
+        wrapper = ({ children }) => <ProjectProvider>{children}</ProjectProvider>
     })
 
-    test('loads invites from Firestore', async () => {
-        // Create a mock user that will be recieving the invite
-        const mockUser = { uid: 'user1' };
-        // The listener will only check the callback
-        const mockInvites = [
-            {
-                id: 'invite1',
-                data: () => ({ receiverId: 'user1', projectId: 'project1' }),
-            },
-        ];
-        onSnapshot.mockImplementation((ref, callback) => {
-            callback({ docs: mockInvites });
-            return jest.fn();
-        });
+    it('should clear projects if user is missing', () => {
+        useAuth.mockReturnValue({ user: null })
+        const { result } = renderHook(() => useContext(ProjectContext), { wrapper })
 
-        const wrapper = ({ children }) => (
-            <InviteProvider>
-                {children}
-            </InviteProvider>
-        );
-
-        const { result } = renderHook(() => useInvite(), { wrapper });
-
-        // Check for length
-        // waitFor is needed becaus the state update is itself async
-        await waitFor(() => {
-            expect(result.current.invites).toHaveLength(1);
-        });
-
-        // Check for content
-        expect(result.current.invites[0]).toEqual({
-            id: 'invite1',
-            receiverId: 'user1',
-            projectId: 'project1',
-        });
+        expect(result.current.projects).toEqual([])
+        expect(projectService.subscribeToUserProjects).not.toHaveBeenCalled()
     })
 
-    test('does not load invites if user is not logged in', async () => {
-        // Mock useAuth to return null user, to simulate a user that is not logged in 
-        jest.mock('../../../hooks/useAuth', () => ({
-            useAuth: () => ({
-                user: { uid: null },
-            }),
-        }))
-
-        const wrapper = ({ children }) => (
-            <InviteProvider>
-                {children}
-            </InviteProvider>
-        );
-
-        const { result } = renderHook(() => useInvite(), { wrapper });
-
+    it('should fetch user projects', () => {
+        useAuth.mockReturnValue({ user: { uid: 'u1', email: 'test@test.com' } })
+        const mockUnsubscribe = jest.fn()
         
-        // Check that invites is empty
-        await waitFor(() => {
-            expect(result.current.invites).toHaveLength(0);
-        });
+        projectService.subscribeToUserProjects.mockImplementation((uid, callback) => {
+            callback([{ id: 'p1', title: 'Project 1' }])
+            return mockUnsubscribe
+        })
 
-        // Its supposed to have been called once for cleanup of the listener
-        expect(onSnapshot).toHaveBeenCalledTimes(1);
+        const { result, unmount } = renderHook(() => useContext(ProjectContext), { wrapper })
+
+        expect(projectService.subscribeToUserProjects).toHaveBeenCalledWith('u1', expect.any(Function))
+        expect(result.current.projects).toEqual([{ id: 'p1', title: 'Project 1' }])
+        
+        unmount()
+        expect(mockUnsubscribe).toHaveBeenCalled()
     })
 
-    test('sendInvite throws error if invite already exists', async () => {
-        // If getDocs contains something, the invite was already done
-        // In this case simply consider that getDoc returns something after the query
-        getDocs.mockResolvedValueOnce(
-            { empty: false}
-        )
+    describe('API Actions', () => {
+        let currentResult
 
-        const wrapper = ({ children }) => (
-            <InviteProvider>
-                {children}
-            </InviteProvider>
-        );
+        beforeEach(() => {
+            useAuth.mockReturnValue({ user: { uid: 'u1', email: 'test@test.com' } })
+            const { result } = renderHook(() => useContext(ProjectContext), { wrapper })
+            currentResult = result
+        })
 
-        const { result } = renderHook(() => useInvite(), { wrapper });
+        it('should call createProject API', async () => {
+            await act(() => currentResult.current.createProject({ title: 'New Project' }))
+            expect(projectService.createProject).toHaveBeenCalledWith('u1', 'test@test.com', { title: 'New Project' })
+        })
 
-        // sendingRandom data in this case is not relevant since getDoc was already mocked to return somehting
+        it('should call updateProject API', async () => {
+            await act(() => currentResult.current.updateProject('p1', { title: 'Updated' }))
+            expect(projectService.updateProject).toHaveBeenCalledWith('p1', { title: 'Updated' })
+        })
 
-        expect(result.current.sendInvite({
-            receiverId: 'user2',
-            projectId: 'project1',
-        })).rejects.toThrow('Invite already sent to this user for this project');
-    })
+        it('should call deleteProject API', async () => {
+            await act(() => currentResult.current.deleteProject('p1'))
+            expect(projectService.deleteProject).toHaveBeenCalledWith('p1')
+        })
 
-    test('sendInvite calls addDoc with correct data', async () => {
-        // If getDocs is empty, the invite can be sent
-        getDocs.mockResolvedValueOnce(
-            { empty: true}
-        )
-
-        const wrapper = ({ children }) => (
-            <InviteProvider>
-                {children}
-            </InviteProvider>
-        );
-
-        const { result } = renderHook(() => useInvite(), { wrapper });
-
-        const inviteData = {
-            receiverId: 'user2',
-            projectId: 'project1',
-        }
-
-        await result.current.sendInvite(inviteData);
-
-        // Expecting that the database function was called with correct arguments
-        expect(addDoc).toHaveBeenCalledWith(
-            expect(collection).toHaveBeenCalledWith(db, 'invites'),
-            expect.objectContaining({
-                ...inviteData,
-                createdAt: expect.any(Date),
-            })
-        )
+        it('should call kickMember API', async () => {
+            await act(() => currentResult.current.kickMember('p1', 'm1'))
+            expect(projectService.kickMember).toHaveBeenCalledWith('p1', 'm1')
+        })
     })
 })
