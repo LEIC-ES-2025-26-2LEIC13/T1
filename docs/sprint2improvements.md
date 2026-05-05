@@ -68,7 +68,7 @@ For that same reason, a new api service was created: `columnsService`, that is r
 Inside `project.jsx` a PagerView was introduced to allow column swiping, facilitating the navigation inside each project (much appreciated for mobile users). Also new modals and components were created to allow users to create, edit and delete columns. This refactor made the code much more modular and organized inside `project.jsx` file as the code had to many responsibilities before. Still a refactor is needed to further separate the concerns of the file, but for now, the code is much more organized and easier to understand.
 
 # Implement database path helper
-To avoid hardcoding database paths throughout the codebase, a helper function was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes.
+To avoid hardcoding database paths throughout the codebase, `pathHelper.js` was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes. Logic is now consistent and self contained inside the helper, improving code readability and maintainability.
 
 ## Acceptance tests
 * There is a new subdirectory `subflows/` inside the [acceptance tests directory](../__tests__/acceptance_tests/) that includes reusable test flows that can be used to compose other tests.
