@@ -1,11 +1,10 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, getDoc, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
+import { addDoc, deleteDoc, getDocs, getDoc, onSnapshot, query, Timestamp, where, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-import { COLLECTIONS, SUBCOLLECTIONS } from '../constants/Collections';
+import { pathHelper } from "./pathHelper";
 
 export const inviteService = {
     subscribeToUserInvites: (userId, onUpdate) => {
-        const userRef = doc(db, COLLECTIONS.USERS, userId);
-        const invitesQuery = query(collection(userRef, SUBCOLLECTIONS.USER_INVITES));
+        const invitesQuery = query(pathHelper.userInvites(userId));
     
         return onSnapshot(invitesQuery, (snapshot) => {
             const fetchedInvites = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -15,11 +14,9 @@ export const inviteService = {
 
 
     sendInvite: async ({ senderId, senderEmail, receiverId, projectId, projectName }) => {
-        const receiverRef = doc(db, COLLECTIONS.USERS, receiverId)
-
         // Checking if an invite was already sent to that user
         const existingInviteQuery = query(
-            collection(receiverRef, SUBCOLLECTIONS.USER_INVITES),
+            pathHelper.userInvites(receiverId),
             where('projectId', '==', projectId)
         )
 
@@ -29,8 +26,7 @@ export const inviteService = {
         }
 
         // Checking if the user is already in that project
-        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
-        const projectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, receiverId)
+        const projectUserRef = pathHelper.projectUser(projectId, receiverId)
         
         const projectUserSnap = await getDoc(projectUserRef)
         if (projectUserSnap.exists()) {
@@ -38,7 +34,7 @@ export const inviteService = {
         }
     
         // Add a document to the userInvites subcollection
-        await addDoc(collection(receiverRef, SUBCOLLECTIONS.USER_INVITES), {
+        await addDoc(pathHelper.userInvites(receiverId), {
             senderId: senderId,
             senderEmail: senderEmail,
             projectId: projectId,
@@ -50,14 +46,13 @@ export const inviteService = {
 
     acceptInvite: async (userId, userEmail, { id, projectId }) => {
         // Just references / paths to documents, not actual documents
-        const receiverRef = doc(db, COLLECTIONS.USERS,  userId) // respective document of the user in the users collection
-        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId) // respective document of the project in the projects collection
+        const projectRef = pathHelper.project(projectId) // respective document of the project in the projects collection
 
         // Executes atomically (all operations succeed or all operations fail)
         await runTransaction(db, async (transaction) => {
 
             // Refers to the pending invite
-            const inviteRef = doc(receiverRef, SUBCOLLECTIONS.USER_INVITES, id)
+            const inviteRef = pathHelper.userInvite(userId, id)
 
             // Actual document (snapshot of it) within the transaction
             // Reads must happen before writes in transactions
@@ -72,8 +67,8 @@ export const inviteService = {
             const { title, description } = projectSnap.data()
 
             // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
-            const newUserProjectRef = doc(receiverRef, SUBCOLLECTIONS.USER_PROJECTS, projectId)
-            const newProjectUserRef = doc(projectRef, SUBCOLLECTIONS.PROJECT_USERS, userId)
+            const newUserProjectRef = pathHelper.userProject(userId, projectId)
+            const newProjectUserRef = pathHelper.projectUser(projectId, userId)
             
             // Writes after reads:
 
@@ -96,6 +91,6 @@ export const inviteService = {
 
     ignoreInvite: async (userId, inviteId)  => {
         // alternating collection/document path sequence
-        await deleteDoc(doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_INVITES, inviteId));
+        await deleteDoc(pathHelper.userInvite(userId, inviteId));
     }
 }

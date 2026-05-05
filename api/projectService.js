@@ -3,6 +3,7 @@ import { db } from '../firebase/firebaseConfig';
 import { batchDelete } from './batchDeleteHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
 import { columnService } from "./columnService";
+import { pathHelper } from "./pathHelper";
 
 function normalizeProjectData({ title, description }) {
     return {
@@ -32,10 +33,10 @@ function normalizeProjectUpdates( { title, description }) {
 
 export const projectService = {
     subscribeToUserProjects: (userId, onUpdate) => {
-        const userRef = doc(db, COLLECTIONS.USERS, userId)
+        const userProjectsCollection = pathHelper.userProjects(userId)
         // Gets projects in which the current user is envolved
-        const userProjects = query(collection(userRef, SUBCOLLECTIONS.USER_PROJECTS))
-
+        const userProjects = query(userProjectsCollection)
+        
         return onSnapshot(userProjects, (userProjectsSnap) => {
             const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
                 id: doc.id,
@@ -101,7 +102,7 @@ export const projectService = {
         refsToDelete.push(...await columnService.allColumnsRefsToDelete(projectId))
 
         // Find all projectUsers inside the project to be deleted
-        const projectUsersRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS)
+        const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnapshot = await getDocs(projectUsersRef)
 
         // for each projectUsers doc
@@ -123,7 +124,7 @@ export const projectService = {
     },
 
     getProjectUsers: async (projectId) => {
-        const projectUsersRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS)
+        const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnap = await getDocs(projectUsersRef)
         
         // Generate a new array of the fetched documents, with a new field id 
@@ -134,8 +135,8 @@ export const projectService = {
     },
 
     kickMember: async (projectId, userId) => {
-        const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId)
-        const projectUserRef = doc(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS, userId)
+        const userProjectRef = pathHelper.userProject(userId, projectId)
+        const projectUserRef = pathHelper.projectUser(projectId, userId)
 
         // Using batch to perform the deletions atomically
         const batch = writeBatch(db)
@@ -146,7 +147,7 @@ export const projectService = {
     },
 
     projectHasNoMembers: async (projectId) => {
-        const projectUsersRef = collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS)
+        const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnap = await getDocs(projectUsersRef)
         return projectUsersSnap.empty
     }

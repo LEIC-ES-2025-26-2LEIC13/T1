@@ -1,0 +1,38 @@
+import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
+import { collection, doc } from "firebase/firestore";
+import { db } from '../firebase/firebaseConfig';
+
+// Allows to centralize the logic of building document references and collection references, minimizing repetition
+export const pathHelper = {
+
+    user: (userId) => doc(db, COLLECTIONS.USERS, userId),
+
+    userInvites: (userId) => collection(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_INVITES),
+
+    userInvite: (userId, inviteId) => doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_INVITES, inviteId),
+
+    // Project Related
+    userProjects: (userId) => collection(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS),
+
+    userProject: (userId, projectId) => doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId),
+
+    project: (projectId) => doc(db, COLLECTIONS.PROJECTS, projectId),
+
+    projectUser: (projectId, userId) => doc(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS, userId),
+
+    projectUsers: (projectId) => collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_USERS),
+
+    projectColumns: (projectId) =>
+        collection(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_COLUMNS),
+
+    projectColumn: (projectId, columnId) =>
+        doc(db, COLLECTIONS.PROJECTS, projectId, SUBCOLLECTIONS.PROJECT_COLUMNS, columnId),
+
+    columnTasks: (projectId, columnId) => 
+        collection(db, COLLECTIONS.PROJECTS, projectId, 
+            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS),
+
+    task: (projectId, columnId, taskId) =>
+        doc(db, COLLECTIONS.PROJECTS, projectId, 
+            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS, taskId),
+}
