@@ -1,21 +1,31 @@
-import { Alert, FlatList, StyleSheet, View, Text, useColorScheme } from 'react-native';
-import ThemedView from '../../../components/ThemedView';
-import { useInvite } from '../../../hooks/useInvite';
-import ThemedInvite from '../../../components/ThemedInvite';
+import { FlatList, StyleSheet, View, Text, useColorScheme } from 'react-native';
+import React, { useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import ThemedView from '../../../components/ThemedView';
+import ThemedInvite from '../../../components/ThemedInvite';
 import EmptyState from '../../../components/EmptyState';
+import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
+import { useInvite } from '../../../hooks/useInvite';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
     const colorScheme = useColorScheme();
     const isDark = colorScheme === 'dark';
 
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
+
     const handleAccept = async (invite) => {
         try {
           	await acceptInvite(invite)
         } catch (error) {
-          	Alert.alert('Error', error.message)
+          	showAlert(ALERT_TYPES.ERROR, 'Accept Invite Failed', error.message)
         }
     };
 
@@ -23,7 +33,7 @@ const Invites = () => {
         try {
             await ignoreInvite(invite)
         } catch (error) {
-            Alert.alert('Error', error.message)
+            showAlert(ALERT_TYPES.ERROR, 'Ignore Invite Failed', error.message)
         }
     }
 
@@ -82,6 +92,12 @@ const Invites = () => {
 						onIgnore={() => handleIgnore(item)}
 					/>
                 )}
+            />
+
+            <ThemedAlert 
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
             />
         </ThemedView>
     );

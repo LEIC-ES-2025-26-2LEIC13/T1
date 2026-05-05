@@ -10,6 +10,7 @@ import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-nati
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 import EmptyState from "../components/EmptyState";
+import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert";
 
 export default function Column({ projectId, projectName, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
@@ -29,6 +30,13 @@ export default function Column({ projectId, projectName, columnData }) {
         label: '',
     })
 
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ title: '', message: '' });
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    }
 
     // Listener to single column task updates
     useEffect(() => {
@@ -54,7 +62,7 @@ export default function Column({ projectId, projectName, columnData }) {
             setEditColumnModalVisible(false)
         }
         catch (error) {
-            Alert.alert('Column Update Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Column Update Failed", error.message)
         }
     }
     const openEditColumnModal = () => setEditColumnModalVisible(true)
@@ -96,7 +104,7 @@ export default function Column({ projectId, projectName, columnData }) {
             closeTaskCreationModal()
         }
         catch (error) {
-            Alert.alert('Task Creation Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Task Creation Failed", error.message)
         }
     }
 
@@ -106,7 +114,7 @@ export default function Column({ projectId, projectName, columnData }) {
             closeTaskDetails()
         }
         catch (error) {
-            Alert.alert('Delete Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Delete Task Failed", error.message)
         }
     }
 
@@ -193,6 +201,12 @@ export default function Column({ projectId, projectName, columnData }) {
                 columnName={column.name}
                 onClose={closeTaskDetails}
                 deleteTask={handleDeleteTask}
+            />
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
             />
         </View>
     )

@@ -24,7 +24,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
 
             <ModalBody>
 
-                 <PillsContainer>
+                <PillsContainer>
                     <Pill projectName={projectName}/>
                     <Pill columnName={columnName}/>
                     {

@@ -11,6 +11,7 @@ import BrandingContainer from '../../components/auth/BrandingContainer'
 import AuthBody from '../../components/auth/AuthBody'
 import AuthField from '../../components/auth/AuthField'
 import AuthFooter from '../../components/auth/AuthFooter'
+import ThemedAlert, { ALERT_TYPES } from '../../components/ThemedAlert'
 
 const Register = () => {
     const [email, setEmail] = useState("")
@@ -22,19 +23,28 @@ const Register = () => {
     const { isLoading, register } = useAuth()
     const router = useRouter()
 
+    // Alert
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message });
+		setAlertVisible(true);
+	};
+
     const handleSubmit = async () => {
         if (!email || !password || !confirmPassword) {
-            Alert.alert("Missing fields", "Please fill in all fields.")
+            showAlert(ALERT_TYPES.WARNING, "Missing fields", "Please fill in all fields.")
             return
         }
 
         if (password !== confirmPassword) {
-            Alert.alert("Password mismatch", "Passwords do not match. Please try again.")
+            showAlert(ALERT_TYPES.WARNING, "Password mismatch", "Passwords do not match. Please try again.")
             return
         }
 
         if (password.length < 6) {
-            Alert.alert("Weak password", "Password must be at least 6 characters long.")
+            showAlert(ALERT_TYPES.WARNING, "Weak password", "Password must be at least 6 characters long.")
             return
         }
 
@@ -93,7 +103,7 @@ const Register = () => {
                     onPress={handleSubmit}
                     disabled={isLoading}
                 >
-                    <ThemedText bold onPrimary style={{ fontSize: 18 }}>Register</ThemedText>
+                    <ThemedText bold onPrimary>Register</ThemedText>
                 </ThemedButton>
 
                 <AuthFooter
@@ -103,6 +113,12 @@ const Register = () => {
                     isLoading={isLoading}
                 />
             </AuthBody>
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)}
+            />
         </>
     )
 }

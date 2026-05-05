@@ -28,7 +28,6 @@ export default function EditColumnModal({ visible, onClose, onEdit, columnData})
                 <FormField
                     labelName="COLUMN TITLE"
                     placeholder="Enter new column title"
-                    value={editedColumn.name}
                     onChangeText={(value) => handleChange('name', value)}
                 />
 

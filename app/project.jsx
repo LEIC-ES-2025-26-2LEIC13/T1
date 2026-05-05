@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +20,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CreateColumnModal from '../components/CreateColumnModal';
 import ThemedIcon from '../components/ThemedIcon';
 import EmptyState from '../components/EmptyState';
+import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
 
 export default function ProjectScreen() {
   	const router = useRouter()
@@ -46,6 +47,15 @@ export default function ProjectScreen() {
 	const projectId = params.projectId
 	const currentProject = projects.find((project) => project.id === projectId)
 	const currentProjectName = currentProject?.title ?? 'Project'
+
+	// Alert
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message });
+		setAlertVisible(true);
+	};
 	
 	// sets projectId for Task context
 	useEffect(() => {
@@ -72,7 +82,7 @@ export default function ProjectScreen() {
 	// Then update the useEffect dependency array:
 	useEffect(() => {
 		if (!currentProject && !deleting) {
-			Alert.alert('Access Lost', 'This project is not accessible anymore. You may have been removed or the project may have been deleted.');
+			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.");
 			handleGoBack();
 		}
 	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
@@ -95,7 +105,7 @@ export default function ProjectScreen() {
 		const trimmedTarget = inviteTarget.trim().toLowerCase()
 
 		if (!trimmedTarget) {
-			Alert.alert('Missing user', 'Please enter a valid email.')
+			showAlert(ALERT_TYPES.ERROR, "Missing user", "Please enter a valid email.")
 			return
 		}
 
@@ -103,17 +113,17 @@ export default function ProjectScreen() {
 			const receiverUser = await userService.getUserByEmail(trimmedTarget)
 
 			if (!receiverUser) {
-				Alert.alert('User not found', 'No registered user matches that email.')
+				showAlert(ALERT_TYPES.ERROR, "User not found", "No registered user matches that email.")
 				return
 			}
 
 			if (receiverUser.id === user.uid) {
-				Alert.alert('Invalid invite', 'You cannot invite yourself.')
+				showAlert(ALERT_TYPES.ERROR, "Invalid invite", "You cannot invite yourself.")
 				return
 			}
 
 			if (!currentProject?.id) {
-				Alert.alert('Project unavailable', 'Unable to find this project.')
+				showAlert(ALERT_TYPES.ERROR, "Project unavailable", "Unable to find this project.")
 				return
 			}
 
@@ -126,7 +136,7 @@ export default function ProjectScreen() {
 			})
 			
 		} catch (error) {
-			Alert.alert('Invite failed', error.message)
+			showAlert(ALERT_TYPES.ERROR, "Invite failed", error.message)
 			return
 		}
 
@@ -173,7 +183,7 @@ export default function ProjectScreen() {
 			await createColumn(columnData)
 			closeCreateColumnModal()
 		} catch (error) {
-			Alert.alert('Column creation failed', error.message)
+			showAlert(ALERT_TYPES.ERROR, "Column creation failed", error.message)
 		}
 	}
 
@@ -196,7 +206,7 @@ export default function ProjectScreen() {
 				alertMessage = `Successfully kicked ${userEmail}.`
 			}
 
-			Alert.alert('Success', alertMessage)
+			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage)
 		}
 		catch (error) {
 			console.log('Kick fail', error.message)
@@ -328,6 +338,13 @@ export default function ProjectScreen() {
 					onClose={handleCloseMembersModal}
 					onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
 				/>
+
+				<ThemedAlert
+					visible={alertVisible} 
+					alert={alert} 
+					onConfirm={() => setAlertVisible(false)} 
+           	 	/>
+				
 			</SafeAreaView>
 		</>
 	)

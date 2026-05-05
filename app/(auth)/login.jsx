@@ -11,6 +11,7 @@ import BrandingContainer from '../../components/auth/BrandingContainer'
 import AuthFooter from '../../components/auth/AuthFooter'
 import AuthField from '../../components/auth/AuthField'
 import AuthBody from '../../components/auth/AuthBody'
+import ThemedAlert, { ALERT_TYPES } from '../../components/ThemedAlert'
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -20,9 +21,18 @@ const Login = () => {
     const { login, isLoading } = useAuth()
     const router = useRouter()
 
+    // Alert
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+	const showAlert = (type, title, message) => {
+		setAlert({ type, title, message });
+		setAlertVisible(true);
+	};
+
     const handleSubmit = async () => {
         if (!email || !password) {
-            Alert.alert("Missing fields", "Please enter both email and password.")
+            showAlert(ALERT_TYPES.ERROR, 'Missing fields', 'Please enter both email and password.');
             return
         }
 
@@ -69,7 +79,7 @@ const Login = () => {
                     onPress={handleSubmit}
                     disabled={isLoading}
                 >
-                    <ThemedText bold onPrimary style={{ fontSize: 18 }}>Login</ThemedText>
+                    <ThemedText bold onPrimary>Login</ThemedText>
                 </ThemedButton>
 
                 <AuthFooter
@@ -79,6 +89,13 @@ const Login = () => {
                     isLoading={isLoading}
                 />
             </AuthBody>
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)}
+
+            />
         </>
     )
 }

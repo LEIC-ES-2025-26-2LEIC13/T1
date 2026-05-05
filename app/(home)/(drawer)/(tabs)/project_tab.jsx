@@ -7,6 +7,7 @@ import ThemedProject from '../../../../components/ThemedProject';
 import ThemedButton from '../../../../components/ThemedButton';
 import CreateProjectModal from '../../../../components/CreateProjectModal';
 import EmptyState from '../../../../components/EmptyState';
+import ThemedAlert, { ALERT_TYPES } from '../../../../components/ThemedAlert';
 
 const Projects = () => {
     const colorScheme = useColorScheme();
@@ -15,6 +16,14 @@ const Projects = () => {
     const [projectModalVisible, setProjectModalVisible] = useState(false);
     const { projects, createProject, isLoadingProjects } = useProject();
 
+    // Alert
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message });
+		setAlertVisible(true);
+	};
 
     const [ project, setProject ] = React.useState({
         title: '',
@@ -29,7 +38,7 @@ const Projects = () => {
     const openProjectModal = () => setProjectModalVisible(true);
 
     const closeProjectModal = () => {
-        setProjectModalVisible(false);
+        setProjectModalVisible(false)
         setProject({
             title: '',
             description: '',
@@ -38,10 +47,10 @@ const Projects = () => {
 
     const handleCreateProject = async (project) => {
         try {
-            await createProject(project);
-            closeProjectModal();
+            await createProject(project)
+            closeProjectModal()
         } catch (error) {
-            Alert.alert('Error', error.message);
+            showAlert(ALERT_TYPES.ERROR, 'Create Project Failed', error.message)
         }
     };
 
@@ -94,6 +103,12 @@ const Projects = () => {
                 onCreate={handleCreateProject}
                 project={project}
                 onChange={handleProjectChange}
+            />
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)}
             />
 
         </View>
