@@ -1,10 +1,10 @@
 import { Drawer } from "expo-router/drawer";
 import {useColorScheme} from "react-native";
 import { Colors } from "../../../constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
-import DrawerThemedButton from "../../../components/DrawerThemedButton";
 import CustomDrawerContent from "../../../components/CustomDrawerContent";
 import { useInvite } from "../../../hooks/useInvite";
+import ThemedIcon from "../../../components/ThemedIcon";
+import { commonHeaderOptions } from "../../../constants/navigationStyles";
 
 export default function DrawerLayout() {
     const colorScheme = useColorScheme();
@@ -16,38 +16,25 @@ export default function DrawerLayout() {
         <Drawer
             drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={{
-                headerStyle: { backgroundColor: theme.navBackground },
-                headerTintColor: theme.title,
-                headerTitleAlign: "left",
+                ...commonHeaderOptions(theme, hasNewInvites),
+                
+                drawerActiveTintColor: theme.iconColorFocused, // color for the icon and label of the currently active drawer item
+                drawerInactiveTintColor: theme.iconColor, // color for the icon and label of all inactive drawer items
 
-                    headerTitleStyle: {
-                        color: theme.title,
-                        fontWeight: "700",
-                        fontSize: 30,
-                        lineHeight: 34,
-                        marginLeft: 10,
-                    },
-
-                    drawerActiveTintColor: theme.iconColorFocused,
-                    drawerInactiveTintColor: theme.iconColor,
-
-                    drawerStyle: {
-                        backgroundColor: theme.navBackground,
-                    },
-
-                    headerLeft: () => <DrawerThemedButton showNotification={hasNewInvites}/>
-                }}
-            >
+                drawerStyle: {
+                    backgroundColor: theme.navBackground,
+                }
+            }}
+        >
             <Drawer.Screen
                 name="(tabs)"
                 options={{
                     title: "Home",
                     headerShown: false,
                     drawerIcon: ({ focused, color }) => (
-                        <Ionicons
+                        <ThemedIcon
                             testID="home-drawer-screen"
                             name={focused ? "home" : "home-outline"}
-                            size={24}
                             color={color}
                         />
                     ),
@@ -59,10 +46,9 @@ export default function DrawerLayout() {
                 options={{
                     title: "My Tasks",
                     drawerIcon: ({ focused, color }) => (
-                        <Ionicons
+                        <ThemedIcon
                             testID="tasks-drawer-screen"
-                            name={focused ? "checkmark-circle" : "checkmark-circle-outline"}
-                            size={24}
+                            name={focused ? "check-circle" : "check-circle-outline"}
                             color={color}
                         />
                     ),
@@ -74,10 +60,9 @@ export default function DrawerLayout() {
                 options={{
                     title: "Calendar",
                     drawerIcon: ({ focused, color }) => (
-                        <Ionicons
+                        <ThemedIcon
                             testID="calendar-drawer-screen"
-                            name={focused ? "calendar" : "calendar-outline"}
-                            size={24}
+                            name={focused ? "calendar-month" : "calendar-month-outline"}
                             color={color}
                         />
                     ),
@@ -89,10 +74,9 @@ export default function DrawerLayout() {
                 options={{
                     title: "Invites",
                     drawerIcon: ({ focused, color }) => (
-                        <Ionicons
+                        <ThemedIcon
                             testID={hasNewInvites ? "invites-with-notification" : "invites-drawer-screen"}
-                            name={focused ? "mail" : (hasNewInvites ? "mail-unread-outline" : "mail-outline")}
-                            size={24}
+                            name={focused ? "email" : (hasNewInvites ? "email-alert-outline" : "email-outline")}
                             color={color}
                         />
                     ),
@@ -104,10 +88,9 @@ export default function DrawerLayout() {
                 options={{
                     title: "Settings",
                     drawerIcon: ({ focused, color }) => (
-                        <Ionicons
+                        <ThemedIcon
                             testID="settings-drawer-screen"
-                            name={focused ? "settings" : "settings-outline"}
-                            size={24}
+                            name={focused ? "cog" : "cog-outline"}
                             color={color}
                         />
                     ),

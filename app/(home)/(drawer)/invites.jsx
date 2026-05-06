@@ -1,22 +1,29 @@
-import { Alert, FlatList, StyleSheet, View, Text, useColorScheme } from 'react-native';
-import ThemedView from '../../../components/ThemedView';
-import { useInvite } from '../../../hooks/useInvite';
-import ThemedInvite from '../../../components/ThemedInvite';
+import { FlatList, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../../constants/Colors';
+import ThemedView from '../../../components/ThemedView';
+import ThemedInvite from '../../../components/ThemedInvite';
+import EmptyState from '../../../components/EmptyState';
+import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
+import { useInvite } from '../../../hooks/useInvite';
+import Pill from '../../../components/modal/Pill';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
+
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
 
     const handleAccept = async (invite) => {
         try {
           	await acceptInvite(invite)
         } catch (error) {
-          	Alert.alert('Error', error.message)
+          	showAlert(ALERT_TYPES.ERROR, 'Accept Invite Failed', error.message)
         }
     };
 
@@ -24,7 +31,7 @@ const Invites = () => {
         try {
             await ignoreInvite(invite)
         } catch (error) {
-            Alert.alert('Error', error.message)
+            showAlert(ALERT_TYPES.ERROR, 'Ignore Invite Failed', error.message)
         }
     }
 
@@ -34,55 +41,33 @@ const Invites = () => {
         }
     )
 
-    const EmptyState = () => (
-        <View style={styles.emptyContainer}>
-            <Ionicons
-                name="mail-open-outline"
-                size={64}
-                color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
-            />
-            <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                No pending invites
-            </Text>
-            <Text style={[styles.emptySubtitle, { color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }]}>
-                When someone invites you to a project, it will appear here
-            </Text>
-        </View>
-    );
-
     return (
         <ThemedView style={styles.container}>
 
-            {/* Invite count pill */}
-            {invites && invites.length > 0 && (
-                <View style={styles.countRow}>
-                    <View style={[styles.countPill, {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
-                    }]}>
-                        <Ionicons
-                            name="mail-outline"
-                            size={13}
-                            color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)'}
-                            style={{ marginRight: 5 }}
-                        />
-                        <Text style={[styles.countText, {
-                            color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)'
-                        }]}>
-                            {invites.length} pending {invites.length === 1 ? 'invite' : 'invites'}
-                        </Text>
-                    </View>
-                </View>
-            )}
-
             <FlatList
+                ListHeaderComponent={
+                    <Pill
+                        name={`${invites.length} pending ${invites.length === 1 ? 'invite' : 'invites'}`}
+                        iconName="email-outline"
+                    />
+                }
+
                 data={invites}
                 keyExtractor={(item) => item.id}
+
                 contentContainerStyle={[
                     styles.list,
                     (!invites || invites.length === 0) && styles.listEmpty
                 ]}
+
                 showsVerticalScrollIndicator={false}
-                ListEmptyComponent={<EmptyState />}
+                
+                ListEmptyComponent={<EmptyState 
+                    title="No pending invites" 
+                    subtitle="When someone invites you to a project, it will appear here" 
+                    iconName="email-open-outline" />
+                }
+
                 renderItem={({ item }) => (
 					<ThemedInvite
 						projectName={item.projectName}
@@ -91,6 +76,12 @@ const Invites = () => {
 						onIgnore={() => handleIgnore(item)}
 					/>
                 )}
+            />
+
+            <ThemedAlert 
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
             />
         </ThemedView>
     );
@@ -101,53 +92,14 @@ export default Invites;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: 16
     },
-
-    // Count pill
-    countRow: {
-        paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 4,
-        alignItems: 'flex-start',
-    },
-    countPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 50,
-    },
-    countText: {
-        fontSize: 13,
-        fontWeight: '500',
-    },
-
-    // List
+    
     list: {
-        padding: 16,
-        paddingBottom: 32,
+        paddingVertical: 16,
     },
+    
     listEmpty: {
         flex: 1,
-    },
-
-    // Empty state
-    emptyContainer: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingBottom: 80,
-        gap: 10,
-    },
-    emptyTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginTop: 8,
-    },
-    emptySubtitle: {
-        fontSize: 14,
-        textAlign: 'center',
-        maxWidth: 240,
-        lineHeight: 20,
-    },
+    }
 });

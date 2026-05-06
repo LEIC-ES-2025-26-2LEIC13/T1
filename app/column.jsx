@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react"
 import Task from "../components/ThemedTask";
-import {useColumn}  from '../hooks/useColumn'
+import { useColumn } from '../hooks/useColumn'
 import { taskService } from '../api/taskService';
 import ThemedText from "../components/ThemedText";
 import ThemedButton from "../components/ThemedButton";
 import OverflowMenu from '../components/OverflowMenu';
 import TaskModal from '../components/TaskModal';
-import { View, FlatList, ActivityIndicator, StyleSheet, Alert} from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
+import EmptyState from "../components/EmptyState";
+import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert";
 
-export default function Column({projectId, columnData}) {
+export default function Column({ projectId, projectName, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
         id: columnData.id,
@@ -18,16 +20,23 @@ export default function Column({projectId, columnData}) {
     })
     const [tasks, setTasks] = useState([])
     const [isLoadingTasks, setIsLoadingTasks] = useState(false)
-    const [ taskModalCreationVisible, setTaskModalCreationVisible ] = useState(false)
+    const [taskModalCreationVisible, setTaskModalCreationVisible] = useState(false)
     const [taskDetailsVisible, setTaskDetailsVisible] = useState(false)
     const [editColumnModalVisible, setEditColumnModalVisible] = useState(false)
     const [selectedTask, setSelectedTask] = useState(null)
-    const [task, setTask] = useState({
+    const [task, setTask] = useState({ // this state holds each task field while the user fills out a form when creating a task, e.g.
         name: '',
         description: '',
         label: '',
     })
 
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ title: '', message: '' });
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    }
 
     // Listener to single column task updates
     useEffect(() => {
@@ -53,31 +62,32 @@ export default function Column({projectId, columnData}) {
             setEditColumnModalVisible(false)
         }
         catch (error) {
-            Alert.alert('Column Update Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Column Update Failed", error.message)
         }
     }
     const openEditColumnModal = () => setEditColumnModalVisible(true)
 
     const closeEditColumnModal = () => setEditColumnModalVisible(false)
 
+    // used for updating task state fields inside CreateTaskModal (as the user fills the create task form)
     const handleTaskChange = (field, value) => {
-		setTask((prev) => ({ ...prev, [field]: value }));
-	};
+        setTask((prev) => ({ ...prev, [field]: value }));
+    };
 
     // Task Creation Modal
-	const openTaskCreationModal = () => setTaskModalCreationVisible(true)
+    const openTaskCreationModal = () => setTaskModalCreationVisible(true)
 
-	const closeTaskCreationModal = () => {
-		setTaskModalCreationVisible(false)
-		setTask({
-			name: '',
-			description: '',
-			label: '',
-		})
-	}
+    const closeTaskCreationModal = () => {
+        setTaskModalCreationVisible(false)
+        setTask({
+            name: '',
+            description: '',
+            label: '',
+        })
+    }
 
     // Task Details Modal
-    
+
     const openTaskDetails = (taskItem) => {
         setSelectedTask(taskItem)
         setTaskDetailsVisible(true)
@@ -94,7 +104,7 @@ export default function Column({projectId, columnData}) {
             closeTaskCreationModal()
         }
         catch (error) {
-            Alert.alert('Task Creation Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Task Creation Failed", error.message)
         }
     }
 
@@ -104,7 +114,7 @@ export default function Column({projectId, columnData}) {
             closeTaskDetails()
         }
         catch (error) {
-            Alert.alert('Delete Failed', error.message)
+            showAlert(ALERT_TYPES.ERROR, "Delete Task Failed", error.message)
         }
     }
 
@@ -119,19 +129,19 @@ export default function Column({projectId, columnData}) {
                         {
                             id: 'edit',
                             title: 'Edit column name',
-                            icon: 'create',
+                            icon: 'pencil',
                             onPress: () => openEditColumnModal()
                         },
-                        { 
-                            id: 'delete', 
-                            title: 'Delete column', 
-                            icon: 'remove-circle',
+                        {
+                            id: 'delete',
+                            title: 'Delete column',
+                            icon: 'delete',
                             confirm: {
                                 title: 'Delete column',
                                 message: 'Are you sure you want to delete this column? All related data will be lost.',
                             },
-                            destructive: true, 
-                            onPress: () => deleteColumn(column.id) 
+                            destructive: true,
+                            onPress: () => deleteColumn(column.id)
                         }
                     ]}
                 />
@@ -152,7 +162,11 @@ export default function Column({projectId, columnData}) {
                         />
                     )}
                     ListEmptyComponent={
-                        <ThemedText style={styles.empty}>No tasks yet</ThemedText>
+                        <EmptyState
+                            title="No tasks yet"
+                            subtitle="Use the button below to create your first task in this column"
+                            iconName="note"
+                        />
                     }
                     contentContainerStyle={styles.list}
                 />
@@ -161,7 +175,7 @@ export default function Column({projectId, columnData}) {
             {/* Create Task Button */}
             <ThemedButton onPress={openTaskCreationModal} style={styles.btn}>
                 <ThemedText style={styles.btnText}>+ Add Task</ThemedText>
-			</ThemedButton>
+            </ThemedButton>
 
             <EditColumnModal
                 visible={editColumnModalVisible}
@@ -172,17 +186,27 @@ export default function Column({projectId, columnData}) {
 
             {/* Modals — scoped to this column */}
             <CreateTaskModal
-				isVisible={taskModalCreationVisible}
-				onClose={closeTaskCreationModal}
-				onCreate={handleCreateTask}
-				task={task}
-				onChange={handleTaskChange}
-			/>
+                visible={taskModalCreationVisible}
+                task={task}
+                projectName={projectName}
+                columnName={column.name}
+                onClose={closeTaskCreationModal}
+                onCreate={handleCreateTask}
+                onChange={handleTaskChange}
+            />
             <TaskModal
                 visible={taskDetailsVisible}
                 task={selectedTask}
+                projectName={projectName}
+                columnName={column.name}
                 onClose={closeTaskDetails}
                 deleteTask={handleDeleteTask}
+            />
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
             />
         </View>
     )
@@ -214,19 +238,13 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
 
-    empty: {
-        textAlign: 'center',
-        marginTop: 20,
-        color: '#888',
-    },
-
     btn: {
         marginTop: 10,
         backgroundColor: '#007bff',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
-    }, 
+    },
     btnText: {
         color: 'white',
         fontWeight: 'bold',

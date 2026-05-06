@@ -1,172 +1,65 @@
 import React from 'react';
-import { Text, StyleSheet, useColorScheme, } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import AppModal from './AppModal';
-import ThemedButton from './ThemedButton';
-import ThemedText from './ThemedText';
-import ThemedView from './ThemedView';
-import { Colors } from '../constants/Colors';
+import ModalHeader from './modal/ModalHeader';
+import FormField from './FormField';
+import ModalBody from './modal/ModalBody';
+import PillsContainer from './modal/PillsContainer';
+import Pill from './modal/Pill';
+import { LABELS } from '../constants/Labels';
+import ModalActions from './modal/ModalActions';
 
-export default function TaskModal({ visible, onClose, task, deleteTask}) {
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
+export default function TaskModal({ visible, task, projectName, columnName, onClose, deleteTask }) {
 
-    const description = task?.description?.trim()
-        ? task.description
-        : 'No description was provided for this task.';
+    // The corresponding icon for the task label
+    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon;
 
     return (
         <AppModal visible={visible}>
 
-            <ThemedView style={styles.header}>
-                <ThemedView style={styles.headerLeft}>
-                    <ThemedView style={[styles.iconWrap, { backgroundColor: isDark ? 'rgba(70,148,251,0.15)' : 'rgba(70,148,251,0.1)' }]}>
-                        <Ionicons name="checkbox-outline" size={20} color="#4694fb" />
-                    </ThemedView>
-                    <ThemedText title={true} style={[styles.title, { color: theme.text }]}>Task Details</ThemedText>
-                </ThemedView>
+            <ModalHeader
+                heading="Task Details"
+                iconName="checkbox-outline"
+                onClose={onClose}
+            />
 
-                <ThemedButton style={styles.closeBtn} onPress={onClose}>
-                    <Ionicons name="close" size={20} color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'} />
-                </ThemedButton>
-            </ThemedView>
+            <ModalBody>
 
-            <ThemedView style={[styles.divider, { backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }]} />
+                <PillsContainer>
+                    <Pill projectName={projectName}/>
+                    <Pill columnName={columnName}/>
+                    {
+                        task?.label && <Pill name={task.label} iconName={labelIcon}/>
+                    }
+                </PillsContainer>
 
-            <ThemedView style={styles.body}>
-                <ThemedView style={styles.sectionCard}>
-                    <ThemedText style={styles.sectionLabel}>DESCRIPTION</ThemedText>
-                    <ThemedText style={styles.sectionBody}>{description}</ThemedText>
-                </ThemedView>
+                <FormField
+                    labelName="TASK NAME"
+                    value={task?.name}
+                    readOnly
+                />
 
-                <ThemedView style={styles.infoGrid}>
-                    <ThemedView style={styles.infoCard}>
-                        <Ionicons name="pricetag-outline" size={16} color="#4694fb" />
-                        <ThemedText style={styles.infoLabel}>LABEL</ThemedText>
-                        <ThemedText style={styles.infoValue}>{task?.label || 'None'}</ThemedText>
-                    </ThemedView>
+                <FormField
+                    labelName="DESCRIPTION"
+                    placeholder="No description provided."
+                    value={task?.description}
+                    multiline
+                    readOnly
+                />
 
-                    <ThemedView style={styles.infoCard}>
-                        <Ionicons name="people-sharp" size={16} color="#4694fb" />
-                        <ThemedText style={styles.infoLabel}>ASSIGNED</ThemedText>
-                        <ThemedText style={styles.infoValue}>{task?.assignedTo || 'No one'}</ThemedText>
-                    </ThemedView>
-                </ThemedView>
+                <FormField // Will probably be a dropdown list of members
+                    labelName="ASSIGNED TO"
+                    value={task?.assignedTo || "No one"}
+                    readOnly
+                />
 
-                <ThemedButton   
-                    onPress={() => deleteTask(task.id)} 
-                    style={styles.btn}
-                >
-                    <Text style={styles.btnText}>Task Finished</Text>
-                </ThemedButton>
-            </ThemedView>
-            
+            </ModalBody>
+                    
+            <ModalActions
+                onCancel={onClose}
+                primaryActionName="Finish Task"
+                primaryActionIconName="check"
+                onPrimaryActionPress={() => deleteTask(task.id)}
+            />
         </AppModal>
     );
 }
-
-const styles = StyleSheet.create({
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 14,
-    },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        flex: 1,
-    },
-    iconWrap: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        fontWeight: '700',
-        letterSpacing: 0.2,
-    },
-    closeBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'transparent',
-        padding: 0,
-    },
-    divider: {
-        height: 1,
-    },
-    body: {
-        paddingHorizontal: 20,
-        paddingTop: 18,
-        paddingBottom: 20,
-    },
-    sectionCard: {
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(70,148,251,0.08)',
-    },
-    sectionLabel: {
-        fontSize: 11,
-        fontWeight: '600',
-        letterSpacing: 0.8,
-        marginBottom: 7,
-        color: '#6b7280',
-    },
-    sectionBody: {
-        fontSize: 15,
-        lineHeight: 22,
-    },
-    infoGrid: {
-        flexDirection: 'row',
-        gap: 10,
-        marginBottom: 4,
-    },
-    infoCard: {
-        flex: 1,
-        borderRadius: 16,
-        padding: 14,
-        borderWidth: 1,
-        borderColor: 'rgba(70,148,251,0.08)',
-    },
-    infoLabel: {
-        fontSize: 11,
-        fontWeight: '600',
-        letterSpacing: 0.8,
-        marginTop: 10,
-        textTransform: 'uppercase',
-    },
-    infoValue: {
-        marginTop: 4,
-        fontSize: 14,
-        fontWeight: '700',
-    },
-        btn: {
-                width: '85%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 12,
-                alignSelf: 'center',
-                marginTop: 12,
-                marginBottom: 20,
-                borderRadius: 10,
-        },
-
-        btnText: {
-                color: 'white',
-                fontSize: 16,
-                fontWeight: 'bold',
-        }
-});

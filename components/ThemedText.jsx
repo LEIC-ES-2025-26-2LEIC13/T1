@@ -1,7 +1,7 @@
-import { Text, useColorScheme } from 'react-native'
+import { StyleSheet, Text, useColorScheme } from 'react-native'
 import { Colors } from '../constants/Colors'
 
-const ThemedText = ({ style, title=false, ...props}) => {
+const ThemedText = ({ style, title=false, bold=false, onPrimary=false,...props}) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -9,10 +9,21 @@ const ThemedText = ({ style, title=false, ...props}) => {
 
     return (
         <Text 
-            style={[{ color: textColor }, style]} 
+            style={[
+                { color: textColor },
+                bold && styles.bold,
+                onPrimary && { color: theme.onPrimary },
+                style]} 
             {...props}
         />
     )
 }
 
 export default ThemedText
+
+const styles = StyleSheet.create({
+    bold: {
+        fontWeight: '600',
+        fontSize: 15
+    }
+})

@@ -1,11 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Alert, Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/Colors';
-import InviteWorkspaceModal from '../components/InviteWorkspaceModal';
+import InviteProjectModal from '../components/InviteProjectModal';
 import ThemedText from "../components/ThemedText";
 import { useProject } from '../hooks/useProject';
 import { useAuth } from '../hooks/useAuth';
@@ -19,6 +18,9 @@ import PagerView from 'react-native-pager-view';
 import Column from './column';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CreateColumnModal from '../components/CreateColumnModal';
+import ThemedIcon from '../components/ThemedIcon';
+import EmptyState from '../components/EmptyState';
+import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
 
 export default function ProjectScreen() {
   	const router = useRouter()
@@ -46,9 +48,14 @@ export default function ProjectScreen() {
 	const currentProject = projects.find((project) => project.id === projectId)
 	const currentProjectName = currentProject?.title ?? 'Project'
 
-	const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
+	// Alert
+	const [alertVisible, setAlertVisible] = useState(false);
+	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message });
+		setAlertVisible(true);
+	};
 	
 	// sets projectId for Task context
 	useEffect(() => {
@@ -75,7 +82,7 @@ export default function ProjectScreen() {
 	// Then update the useEffect dependency array:
 	useEffect(() => {
 		if (!currentProject && !deleting) {
-			Alert.alert('Access Lost', 'This project is not accessible anymore. You may have been removed or the project may have been deleted.');
+			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.");
 			handleGoBack();
 		}
 	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
@@ -98,7 +105,7 @@ export default function ProjectScreen() {
 		const trimmedTarget = inviteTarget.trim().toLowerCase()
 
 		if (!trimmedTarget) {
-			Alert.alert('Missing user', 'Please enter a valid email.')
+			showAlert(ALERT_TYPES.ERROR, "Missing user", "Please enter a valid email.")
 			return
 		}
 
@@ -106,33 +113,31 @@ export default function ProjectScreen() {
 			const receiverUser = await userService.getUserByEmail(trimmedTarget)
 
 			if (!receiverUser) {
-				Alert.alert('User not found', 'No registered user matches that email.')
+				showAlert(ALERT_TYPES.ERROR, "User not found", "No registered user matches that email.")
 				return
 			}
 
 			if (receiverUser.id === user.uid) {
-				Alert.alert('Invalid invite', 'You cannot invite yourself.')
+				showAlert(ALERT_TYPES.ERROR, "Invalid invite", "You cannot invite yourself.")
 				return
 			}
 
 			if (!currentProject?.id) {
-				Alert.alert('Project unavailable', 'Unable to find this project.')
+				showAlert(ALERT_TYPES.ERROR, "Project unavailable", "Unable to find this project.")
 				return
 			}
 
-		try {
 			await sendInvite({
 				senderId: user.uid,
 				senderEmail: user.email,
 				receiverId: receiverUser.id,
 				projectId: currentProject.id,
-				projectName: currentProject.title,
-			});
+				projectName: currentProjectName,
+			})
+			
 		} catch (error) {
-			Alert.alert('Invite failed', error.message);
-			return; // still executes the finally block
-		} finally {
-			handleCloseInviteModal();
+			showAlert(ALERT_TYPES.ERROR, "Invite failed", error.message)
+			return
 		}
 
 		Toast.show({
@@ -142,10 +147,9 @@ export default function ProjectScreen() {
 			position: 'top',
 			visibilityTime: 1500,
 			topOffset: 100,
-		});
-		} catch (error) {
-			Alert.alert('Invalid invite', error.message)
-		}
+		})
+
+		handleCloseInviteModal()
 	}
 
 	const handleProjectDelete = async () => {
@@ -179,7 +183,7 @@ export default function ProjectScreen() {
 			await createColumn(columnData)
 			closeCreateColumnModal()
 		} catch (error) {
-			Alert.alert('Column creation failed', error.message)
+			showAlert(ALERT_TYPES.ERROR, "Column creation failed", error.message)
 		}
 	}
 
@@ -202,35 +206,12 @@ export default function ProjectScreen() {
 				alertMessage = `Successfully kicked ${userEmail}.`
 			}
 
-			Alert.alert('Success', alertMessage)
+			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage)
 		}
 		catch (error) {
 			console.log('Kick fail', error.message)
 		}
     }
-
-	const EmptyColumnsState = () => (
-		<View style={styles.emptyContainer}>
-			<MaterialCommunityIcons
-			name="view-column-outline"
-			size={64}
-			color={isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}
-			/>
-
-			<ThemedText style={[styles.emptyTitle, { color: theme.text }]}>
-			No columns yet
-			</ThemedText>
-
-			<ThemedText
-			style={[
-				styles.emptySubtitle,
-				{ color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }
-			]}
-			> Create your first column to start organizing tasks in this project
-			</ThemedText>
-		</View>
-	)
-
 
   	return (
 		<>
@@ -250,7 +231,7 @@ export default function ProjectScreen() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					}}>
-						<Ionicons testID="project-arrow-back" name="arrow-back" size={24} color={palette.title} />
+						<ThemedIcon name="arrow-left"/>
 					</Pressable>
 				),
 
@@ -270,7 +251,7 @@ export default function ProjectScreen() {
 							justifyContent: 'center',
 							alignItems: 'center',
 						}}>
-							<Ionicons testID="see-members-icon" name="people" size={24} color={palette.title} />
+							<ThemedIcon testID="see-members-icon" name="account-multiple" size={24}/>
 						</Pressable>
 
 						<OverflowMenu
@@ -279,13 +260,13 @@ export default function ProjectScreen() {
 								{
 									id: 'invite-member',
 									title: 'Invite member',
-									icon: 'person-add',
+									icon: 'account-plus',
 									onPress: () => handleInvitePress(),
 								},
 								{
 									id: 'delete-project',
 									title: 'Delete project',
-									icon: 'remove-circle',
+									icon: 'delete',
 									confirm: {
 										title: 'Delete project',
 										message: 'Are you sure you want to delete this project? All related data will be lost.',
@@ -311,28 +292,28 @@ export default function ProjectScreen() {
 
 
 			<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-				{columns.length === 0 ? <EmptyColumnsState /> : null}
-				{ // Had to add a special case for 1 column because the pager crashed with only 1 page
-				columns.length === 1 ? 
-					<View key={columns[0].id} style={{ flex: 1, padding: 16 }} collapsable={false}>
+				{
+				columns.length === 0 ?
+				<EmptyState
+					title="No columns yet"
+					subtitle="Create your first column to start organizing tasks in this project"
+					iconName="view-column-outline"
+				/> 
+
+				: 
+
+				<PagerView style={{ flex: 1 }} initialPage={0}>
+					{columns.map((item) => (
+					<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
 						<Column
 							projectId={projectId}
-							columnData={columns[0]} // Pass the entire column data instead of just the name
+							projectName={currentProjectName}
+							columnData={item} // Pass the entire column data instead of just the name
 						/>
-					</View> 
-					
-					: 
-
-					<PagerView style={{ flex: 1 }} initialPage={0}>
-						{columns.map((item) => (
-						<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
-							<Column
-								projectId={projectId}
-								columnData={item} // Pass the entire column data instead of just the name
-							/>
-						</View>
-						))}
-					</PagerView>}
+					</View>
+					))}
+				</PagerView>
+				}
 
 				<CreateColumnModal
 					visible={createColumnModalVisible}
@@ -342,87 +323,57 @@ export default function ProjectScreen() {
 					columnData={columnData}
 				/>
 
-				<InviteWorkspaceModal
+				<InviteProjectModal
 					visible={inviteModalVisible}
 					value={inviteTarget}
 					onChangeText={setInviteTarget}
 					onClose={handleCloseInviteModal}
 					onInvite={handleSendInvite}
-					workspaceName={currentProjectName}
+					projectName={currentProjectName}
 				/>
 
 				<SeeMembersModal
-				visible={seeMembersModalVisible}
-				getProjectUsers={() => projectService.getProjectUsers(projectId)}
-				onClose={handleCloseMembersModal}
-				onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
+					visible={seeMembersModalVisible}
+					getProjectUsers={() => projectService.getProjectUsers(projectId)}
+					onClose={handleCloseMembersModal}
+					onKickMember={(userId, userEmail) => handleKickMember(projectId, userId, userEmail)}
 				/>
+
+				<ThemedAlert
+					visible={alertVisible} 
+					alert={alert} 
+					onConfirm={() => setAlertVisible(false)} 
+           	 	/>
+				
 			</SafeAreaView>
 		</>
 	)
 }
 
 const styles = StyleSheet.create({
-  container: {
-	flex: 1,
-  },
-
-  btn:{
-	width: '85%',
-
-	flexDirection: 'row',
-	alignItems: 'center',
-	justifyContent: 'center',
-
-	padding: 12,
-
-	position: 'absolute',
-	bottom: 20,
-	alignSelf: 'center',
-
-	marginBottom: 20,
-  },
-
-  btnText: {
-	color: 'white',
-	fontSize: 16,
-	fontWeight: 'bold',
-  },
-  emptyContainer: {
-  flex: 1,
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  paddingHorizontal: 24,
-},
-
-	emptyTitle: {
-	fontSize: 20,
-	fontWeight: '600',
-	marginTop: 10,
+	container: {
+		flex: 1,
 	},
 
-	emptySubtitle: {
-	fontSize: 14,
-	textAlign: 'center',
-	maxWidth: 260,
-	lineHeight: 20,
-	marginTop: 6,
+	btn: {
+		width: '85%',
+
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+
+		padding: 12,
+
+		position: 'absolute',
+		bottom: 20,
+		alignSelf: 'center',
+
+		marginBottom: 20,
 	},
 
-	emptyAction: {
-	marginTop: 18,
-	flexDirection: 'row',
-	alignItems: 'center',
-	justifyContent: 'center',
-	paddingHorizontal: 16,
-	paddingVertical: 12,
-	borderRadius: 999,
-	gap: 8,
-	},
-
-	emptyActionText: {
-	color: '#fff',
-	fontSize: 14,
-	fontWeight: '600',
-	},
+	btnText: {
+		color: 'white',
+		fontSize: 16,
+		fontWeight: 'bold',
+	}
 });

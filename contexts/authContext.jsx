@@ -1,12 +1,23 @@
-import { createContext, useState, useEffect, useMemo } from "react"
+import { createContext, useState, useEffect, useMemo, useCallback } from "react"
 import { authService } from "../api/authService"
-import { Alert } from "react-native"
+import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
 
 export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [isLoading, setIsLoading] = useState(true)
+
+    const [alertVisible, setAlertVisible] = useState(false)
+    const [alert, setAlert] = useState({ title: '', message: '', type: ALERT_TYPES.ERROR })
+
+
+    const showAlert = useCallback((type, title, message) => {
+        setAlert({ type, title, message })
+        setAlertVisible(true)
+    }, [])
+
+    const closeAlert = () => setAlertVisible(false)
 
     // Keep user logged in
     useEffect(() => {
@@ -21,7 +32,7 @@ export function AuthProvider({ children }) {
         return unsub
     }, [])
 
-    async function login(email, password) {
+    const login = useCallback(async (email, password) => {
         setIsLoading(true)
         try {
             await authService.login(email, password, setUser)
@@ -48,22 +59,22 @@ export function AuthProvider({ children }) {
                 case 'auth/network-request-failed':
                     errorMessage = "Network error. Please check your internet connection."
                     break
-                default:
+                default:    
                     errorMessage = error.message
             }
 
-            Alert.alert("Login Error", errorMessage)
+            showAlert(ALERT_TYPES.ERROR, "Login Error", errorMessage)
 
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [showAlert])
 
-    async function register(email, password) {
+    const register = useCallback(async (email, password) => {
         setIsLoading(true)
         try {
             await authService.register(email, password, setUser)
-            Alert.alert("Success", "Account created successfully!")
+            showAlert(ALERT_TYPES.SUCCESS, "Success", "Account created successfully!")
 
         } catch (error) {
             let errorMessage = error.message
@@ -76,14 +87,14 @@ export function AuthProvider({ children }) {
             } else if (error.code === 'auth/operation-not-allowed') {
                 errorMessage = "Account creation is currently disabled. Please try again later."
             }
-            Alert.alert("Registration Error", errorMessage)
+            showAlert(ALERT_TYPES.ERROR, "Registration Error", errorMessage)
 
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [showAlert])
 
-    async function logout() {
+    const logout = useCallback(async () => {
         setIsLoading(true)
         try {
             authService.logout()
@@ -94,7 +105,7 @@ export function AuthProvider({ children }) {
         } finally {
             setIsLoading(false)
         }
-    }
+    }, [])
 
     const value = useMemo(() => ({
         user,
@@ -102,11 +113,16 @@ export function AuthProvider({ children }) {
         login,
         register,
         logout
-    }), [user, isLoading])
+    }), [user, isLoading, login, register, logout])
 
     return (
         <AuthContext.Provider value={value}>
             {children}
+            <ThemedAlert 
+                visible={alertVisible} 
+                alert={alert} 
+                onConfirm={closeAlert} 
+            />
         </AuthContext.Provider>
     )
 }

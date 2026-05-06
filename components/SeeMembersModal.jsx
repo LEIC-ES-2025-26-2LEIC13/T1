@@ -1,10 +1,13 @@
-import { useColorScheme, FlatList, View, Pressable, StyleSheet, Text } from "react-native";
+import { FlatList, View, StyleSheet, useColorScheme } from "react-native";
 import { useState, useEffect, useCallback } from "react";
-import { Colors } from "../constants/Colors";
-import { Ionicons } from '@expo/vector-icons';
 import AppModal from "./AppModal";
 import { useAuth } from "../hooks/useAuth";
 import OverflowMenu from "./OverflowMenu";
+import ModalHeader from "./modal/ModalHeader";
+import ThemedIcon from "./ThemedIcon";
+import ThemedText from "./ThemedText";
+import Spacer from "./Spacer";
+import { Colors } from "../constants/Colors";
 
 
 function putCurrUserFirst(userEmail, members) {
@@ -22,15 +25,9 @@ function putCurrUserFirst(userEmail, members) {
     return res
 }
 
-export default function SeeMembersModal({
-    visible,
-    getProjectUsers,
-    onClose,
-    onKickMember
-}) {
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
+export default function SeeMembersModal({visible, getProjectUsers, onClose, onKickMember}) {
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
 
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
@@ -38,8 +35,8 @@ export default function SeeMembersModal({
     const updateMembers = useCallback(async () => {
         if (visible) {
             try {
-                const projectUsers = await getProjectUsers()
-                const membersWithCurUserFirst = putCurrUserFirst(user.email, projectUsers)
+                const projectMembers = await getProjectUsers()
+                const membersWithCurUserFirst = putCurrUserFirst(user.email, projectMembers)
                 setMembers(membersWithCurUserFirst)
             } catch (error) {
                 console.error(error.message)
@@ -60,145 +57,89 @@ export default function SeeMembersModal({
         }
     }
 
-    return (
-        <AppModal visible={visible}>
-            {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerLeft}>
-                    <View style={[styles.iconWrap, {
-                        backgroundColor: isDark ? 'rgba(70,148,251,0.15)' : 'rgba(70,148,251,0.1)'
-                    }]}>
-                        <Ionicons name="people-outline" size={20} color="#4694fb" />
-                    </View>
-                    <Text style={[styles.title, { color: theme.text }]}>Project Members</Text>
-                </View>
-                <Pressable
-                    onPress={onClose}
-                    style={styles.closeBtn}
-                    testID="see-members-close"
-                >
-                    <Ionicons
-                        testID="see-members-close-icon"
-                        name="close"
-                        size={20}
-                        color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'}
-                    />
-                </Pressable>
-            </View>
-
-            {/* Divider */}
-            <View style={[styles.divider, {
-                backgroundColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
-            }]} />
-            {/* Body */}
+    const MemberList = ({ members }) => {
+        return (
+        <>
             <FlatList
-                contentContainerStyle={styles.body}
                 data={members}
-                keyExtractor={(item) => item.id?.toString() || item.email}
-                renderItem={({ item }) => (                       
-                    <View style={[styles.memberItem, { borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
-                        <Ionicons 
-                            name="person-circle-outline" 
-                            size={22} 
-                            color={isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'}
-                            style={{ marginRight: 10 }}
-                        />
-                        <Text style={[styles.memberEmail, { color: theme.text, flex: 1 }]}>
-                            {item.email === user.email ? `Me (${item.email})` : item.email}
-                        </Text>
-                        
-                        <OverflowMenu
-                            testID={`overflow-menu-${item.email}`}
-                            iconColor={isDark ? 'rgba(255,255,255,0.7)' : '#111'}
-                            menuOffset={40} // margin top of the menu popup to avoid hiding the ellipsis icon
-                            actions={[
-                                item.email === user.email ? 
-                                {
-                                    id: 'leave-project',
-                                    title: 'Leave project',
-                                    icon: 'exit',
-                                    confirm: {
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <>                     
+                        <View style={[styles.memberItem, { borderColor: theme.borders }]}>
+
+                            <ThemedIcon
+                                name="account-circle"
+                                style={{ marginRight: 10 }}
+                            />
+                            
+                            <ThemedText bold style={{ flex: 1 }} numberOfLines={1}>
+                                {item.email === user.email ? `Me (${item.email})` : item.email}
+                            </ThemedText>
+                            
+                            <OverflowMenu
+                                testID={`overflow-menu-${item.email}`}
+
+                                actions={[
+                                    {
+                                        id: 'leave-project',
                                         title: 'Leave project',
-                                        message: `Are you sure you want to leave this project?`
-                                    },
-                                    destructive: true,
-                                    onPress: () => kickAndUpdate(item.id, item.email),
-                                } 
-                                : 
-                                {
-                                    id: 'kick-member',
-                                    title: 'Kick member',
-                                    icon: 'person-remove',
-                                    confirm: {
+                                        icon: 'exit-to-app',
+                                        confirm: {
+                                            title: 'Leave project',
+                                            message: `Are you sure you want to leave this project?`
+                                        },
+                                        destructive: true,
+                                        hidden: item.email !== user.email, // only shows this option for the current user
+                                        onPress: () => kickAndUpdate(item.id, item.email),
+                                    }, 
+                                    {
+                                        id: 'kick-member',
                                         title: 'Kick member',
-                                        message: `Are you sure you want to kick ${item.email} from this project?`
-                                    },
-                                    destructive: true,
-                                    onPress: () => kickAndUpdate(item.id, item.email),
-                                }
-                            ]}
-                        />
-                    </View> 
+                                        icon: 'account-remove',
+                                        confirm: {
+                                            title: 'Kick member',
+                                            message: `Are you sure you want to kick ${item.email} from this project?`
+                                        },
+                                        destructive: true,
+                                        hidden: item.email === user.email,
+                                        onPress: () => kickAndUpdate(item.id, item.email),
+                                    }
+                                ]}
+                            />
+                        </View>
+                    </>
                 )}
             />
+        </>    
+        )
+    }
+
+
+    return (
+        <AppModal visible={visible}>
+
+            <ModalHeader
+                heading="Project Members"
+                iconName="account-multiple"
+                onClose={onClose}
+            />
+
+            <Spacer height={10} />
+            <MemberList members={members}/>
+            
         </AppModal>
     );
 
 }
 
 const styles = StyleSheet.create({
-    // Header
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingTop: 20,
-        paddingBottom: 14,
-    },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-    },
-    iconWrap: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 17,
-        fontWeight: '700',
-        letterSpacing: 0.2,
-    },
-    closeBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    // Divider
-    divider: {
-        height: 1,
-    },
-
-    // Body
-    body: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-    },
     memberItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-    },
-    memberEmail: {
-        fontSize: 15,
-        fontWeight: '500',
-    },
+        borderWidth: 1,
+        borderRadius: 8,
+        marginVertical: 5,
+        paddingHorizontal: 18,
+        paddingVertical: 15,
+    }
 });

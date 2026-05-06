@@ -1,13 +1,11 @@
 import {useNavigation} from "expo-router";
-import {Pressable, useColorScheme} from "react-native";
+import {Pressable} from "react-native";
 import {DrawerActions} from "@react-navigation/routers";
-import {Ionicons} from "@expo/vector-icons";
 import {Colors} from "../constants/Colors";
+import ThemedIcon from "./ThemedIcon";
 
 
 const DrawerThemedButton = ({ showNotification }) =>{
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
 
     const navigation = useNavigation();
     return (
@@ -15,12 +13,18 @@ const DrawerThemedButton = ({ showNotification }) =>{
             <Pressable
                 testID="drawer-hamburger-button"
                 onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-                style={{ marginLeft: 10}}
+                style={{ marginLeft: 20}}
             >
-                <Ionicons name="menu" size={28} color={theme.iconColor} />
+                <ThemedIcon name="menu" size={28} />
             </Pressable>
 
-            {showNotification ? <Ionicons testID="notification-bell" name="notifications" size={15} color={Colors.warning} /> : <></>}
+            {showNotification ? 
+            <ThemedIcon 
+                testID="notification-bell" 
+                name="bell" 
+                size={15} 
+                color={Colors.warning} 
+            /> : null}
         </>
 
     );

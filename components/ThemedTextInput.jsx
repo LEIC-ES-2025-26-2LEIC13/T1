@@ -1,57 +1,87 @@
-import { TextInput, useColorScheme, View } from 'react-native'
+import { Pressable, StyleSheet, TextInput, useColorScheme, View } from 'react-native'
 import { Colors } from '../constants/Colors'
-import Ionicons from '@expo/vector-icons/Ionicons'
+import ThemedIcon from './ThemedIcon'
 
 const ThemedTextInput = ({
-  style,
-  containerStyle,
-  testID,
-  leftIcon,
-  rightIcon,
-  ...props
+    style,
+    containerStyle,
+    testID,
+    placeholder,
+    leftIcon,
+    rightIcon,
+    onRightIconPress,
+    readOnly,
+    multiline,
+    ...props
 }) => {
-  const colorScheme = useColorScheme()
-  const theme = Colors[colorScheme] ?? Colors.light
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
 
-  return (
-    <View style={[{ position: 'relative' }, containerStyle]}>
-      {leftIcon ? (
-        <Ionicons
-          name={leftIcon}
-          size={20}
-          color={theme.text}
-          style={{ position: 'absolute', left: 16, top: 18, zIndex: 1 }}
+    const rightIconComponent = () => {
+        if (onRightIconPress) {
+            return (
+                <Pressable onPress={onRightIconPress}>
+                    <ThemedIcon name={rightIcon} onPress={onRightIconPress} style={styles.rightIcon} />
+                </Pressable>
+            )
+        }
+        
+        return <ThemedIcon name={rightIcon} style={styles.rightIcon} />
+    
+    }
+
+    return (
+        <View style={[
+            { borderColor: theme.borders, backgroundColor: theme.background },
+            styles.container,
+            containerStyle
+            ]}>
+        {leftIcon && <ThemedIcon name={leftIcon} style={styles.leftIcon} />}
+        
+        <TextInput
+            testID={testID}
+            placeholder={placeholder}
+            readOnly={readOnly}
+            multiline={multiline}
+            scrollEnabled={false}
+            style={[
+            {
+                backgroundColor: theme.background,
+                color: theme.text
+            },
+            styles.input,
+            style
+            ]}
+            {...props}
         />
-      ) : null}
 
-      <TextInput
-        testID={testID}
-        style={[
-          {
-            backgroundColor: theme.background,
-            color: theme.text,
-            padding: 20,
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: colorScheme === 'dark' ? '#374151' : '#d1d5db',
-            paddingLeft: leftIcon ? 46 : 20,
-            paddingRight: rightIcon ? 46 : 20
-          },
-          style
-        ]}
-        {...props}
-      />
-
-      {rightIcon ? (
-        <Ionicons
-          name={rightIcon}
-          size={20}
-          color={theme.text}
-          style={{ position: 'absolute', right: 16, top: 18, zIndex: 1 }}
-        />
-      ) : null}
-    </View>
-  )
+        
+        {rightIcon && rightIconComponent()}
+        </View>
+    )
 }
 
 export default ThemedTextInput
+
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+        borderRadius: 10,
+        borderWidth: 1,
+        overflow: 'hidden'
+    },
+    leftIcon: {
+        paddingLeft: 16
+    },
+    rightIcon: {
+        paddingRight: 16
+    },
+    input: {
+        flex: 1,
+        padding: 16
+    }
+})
+    
