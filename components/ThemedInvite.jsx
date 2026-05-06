@@ -19,11 +19,11 @@ const ThemedInvite = ({ projectName, sender, onAccept, onIgnore }) => {
 
             <View style={styles.buttons}>
                 <ThemedButton style={[styles.button, { backgroundColor: Colors.warning } ]} onPress={onIgnore}>
-                    <ThemedText title={true} style={styles.buttonText}>Ignore</ThemedText>
+                    <ThemedText bold onPrimary>Ignore</ThemedText>
                 </ThemedButton>
 
                 <ThemedButton style={[styles.button, styles.accept]} onPress={onAccept}>
-                    <ThemedText title={true} style={styles.buttonText}>Accept</ThemedText>
+                    <ThemedText bold onPrimary>Accept</ThemedText>
                 </ThemedButton>
             </View>
         </View>
@@ -51,10 +51,11 @@ const styles = StyleSheet.create({
     },
 
     label: {
-        fontSize: 12,
-        opacity: 0.7,
-        textTransform: 'uppercase',
-        letterSpacing: 0.4,
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.8,
+        textTransform:  'uppercase',
+        opacity: 0.7
     },
 
     value: {
@@ -64,15 +65,5 @@ const styles = StyleSheet.create({
 
     button: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-
-    buttonText: {
-        color: '#ffffff',
-        fontSize: 15,
-        fontWeight: 'bold',
-    },
+    }
 })

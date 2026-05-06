@@ -1,17 +1,15 @@
-import { FlatList, StyleSheet, View, Text, useColorScheme } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import ThemedView from '../../../components/ThemedView';
 import ThemedInvite from '../../../components/ThemedInvite';
 import EmptyState from '../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
 import { useInvite } from '../../../hooks/useInvite';
+import Pill from '../../../components/modal/Pill';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
-    const colorScheme = useColorScheme();
-    const isDark = colorScheme === 'dark';
 
     const [alertVisible, setAlertVisible] = useState(false);
     const [alert, setAlert] = useState({ type: '', title: '', message: '' });
@@ -46,28 +44,14 @@ const Invites = () => {
     return (
         <ThemedView style={styles.container}>
 
-            {/* Invite count pill */}
-            {invites && invites.length > 0 && (
-                <View style={styles.countRow}>
-                    <View style={[styles.countPill, {
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
-                    }]}>
-                        <Ionicons
-                            name="mail-outline"
-                            size={13}
-                            color={isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)'}
-                            style={{ marginRight: 5 }}
-                        />
-                        <Text style={[styles.countText, {
-                            color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)'
-                        }]}>
-                            {invites.length} pending {invites.length === 1 ? 'invite' : 'invites'}
-                        </Text>
-                    </View>
-                </View>
-            )}
-
             <FlatList
+                ListHeaderComponent={
+                    <Pill
+                        name={`${invites.length} pending ${invites.length === 1 ? 'invite' : 'invites'}`}
+                        iconName="email-outline"
+                    />
+                }
+
                 data={invites}
                 keyExtractor={(item) => item.id}
 
@@ -77,7 +61,7 @@ const Invites = () => {
                 ]}
 
                 showsVerticalScrollIndicator={false}
-
+                
                 ListEmptyComponent={<EmptyState 
                     title="No pending invites" 
                     subtitle="When someone invites you to a project, it will appear here" 
@@ -108,32 +92,13 @@ export default Invites;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: 16
     },
-
-    // Count pill
-    countRow: {
-        paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 4,
-        alignItems: 'flex-start',
-    },
-    countPill: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 50,
-    },
-    countText: {
-        fontSize: 13,
-        fontWeight: '500',
-    },
-
-    // List
+    
     list: {
-        padding: 16,
-        paddingBottom: 32,
+        paddingVertical: 16,
     },
+    
     listEmpty: {
         flex: 1,
     }

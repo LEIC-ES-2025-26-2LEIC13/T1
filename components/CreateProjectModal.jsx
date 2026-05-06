@@ -35,6 +35,7 @@ export default function CreateProjectModal({
                     placeholder="Enter project description (optional)"
                     value={project.description}
                     onChangeText={(value) => onChange('description', value)}
+                    multiline
                 />
                 
             </ModalBody>

@@ -1,14 +1,14 @@
-import { StyleSheet, useColorScheme, Pressable, View, Text, Platform, TouchableNativeFeedback } from 'react-native'
+import { StyleSheet, useColorScheme, Pressable, View, Text } from 'react-native'
 import { Colors } from "../constants/Colors";
 import ThemedText from "./ThemedText";
 import { useRouter } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
+import ThemedIcon from './ThemedIcon';
 
 const ThemedProject = ({ name, description, borderColor, href, projectId, testID }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
-    const isDark = colorScheme === 'dark'
 
     const handlePress = () => {
         if (projectId) {
@@ -19,7 +19,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     const gradientColors = [borderColor, `${borderColor}22`]
 
     const CardContent = (
-        <View>
+        <View style={[styles.cardInner, { backgroundColor: theme.navBackground }]}>
             <LinearGradient
                 colors={gradientColors}
                 start={{ x: 0, y: 0 }}
@@ -27,73 +27,44 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                 style={styles.accentBar}
             />
             <View style={styles.content}>
-                <ThemedText title={true} style={styles.name}>{name}</ThemedText>
+                <ThemedText title bold style={styles.name}>
+                    {name}
+                </ThemedText>
 
                 {description ? (
-                    <ThemedText style={[
-                        styles.description,
-                        { color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)' }
-                    ]}>
+                    <ThemedText style={styles.description}>
                         {description}
                     </ThemedText>
                 ) : null}
 
                 <View style={styles.footer}>
-                    <Text style={[styles.openLabel, { color: borderColor }]}>Open →</Text>
+                    <Text style={[styles.openLabel, { color: borderColor }]}>Open</Text>
+                    <ThemedIcon name="open-in-new" size={18} style={{ color: borderColor }}/>
                 </View>
             </View>
         </View>
     )
-
-    if (Platform.OS === 'android') {
-        return (
-            <View style={styles.container}>
-                <View style={[styles.cardInner, { backgroundColor: theme.navBackground }]}>
-                    <TouchableNativeFeedback
-                        onPress={handlePress}
-                        testID={testID}
-                        background={TouchableNativeFeedback.Ripple(`${borderColor}33`, false)}
-                    >
-                        {CardContent}
-                    </TouchableNativeFeedback>
-                </View>
-            </View>
-        )
-    }
 
     return (
         <Pressable
             onPress={handlePress}
             testID={testID}
             style={({ pressed }) => [
-                styles.container,
+                { marginVertical: 6 },
                 {
                     opacity: pressed ? 0.85 : 1,
                     transform: [{ scale: pressed ? 0.985 : 1 }],
                 }
             ]}
-        >
-            <View style={[styles.cardInner, { backgroundColor: theme.navBackground }]}>
-                {CardContent}
-            </View>
+        > 
+            {CardContent}
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginVertical: 6,
-        marginHorizontal: 16,
-        borderRadius: 14,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-    },
-
     cardInner: {
-        borderRadius: 14,
+        borderRadius: 8,
         overflow: 'hidden',
     },
 
@@ -108,8 +79,6 @@ const styles = StyleSheet.create({
 
     name: {
         fontSize: 17,
-        fontWeight: '700',
-        letterSpacing: 0.2,
         marginBottom: 6,
     },
 
@@ -122,6 +91,8 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: 5
     },
 
     openLabel: {

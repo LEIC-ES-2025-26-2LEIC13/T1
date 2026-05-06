@@ -3,7 +3,7 @@ export const Colors = {
     warning: "#e82929",
 
     dark: {
-        text: "#d1d5db",
+        text: "#a0a3a8",
         title: "#f9fafb",
         background: "#15203a",
         navBackground: "#111827",
@@ -24,3 +24,5 @@ export const Colors = {
         borders: "rgba(0, 0, 0, 0.1)"
     }
 }
+
+export const ProjectColors = ["#3b82f6", "#8f3af6"]

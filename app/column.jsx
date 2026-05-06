@@ -6,7 +6,7 @@ import ThemedText from "../components/ThemedText";
 import ThemedButton from "../components/ThemedButton";
 import OverflowMenu from '../components/OverflowMenu';
 import TaskModal from '../components/TaskModal';
-import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 import EmptyState from "../components/EmptyState";
