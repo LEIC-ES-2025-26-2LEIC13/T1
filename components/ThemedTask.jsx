@@ -43,7 +43,13 @@ export default function ThemedTask({ task, onPress}) {
     return (
         <Pressable
             onPress={onPress}
-            style={styles.touch}
+            style={({ pressed }) => [
+                {marginVertical: 6}, 
+                {
+                    opacity: pressed ? 0.85 : 1,
+                    transform: [{ scale: pressed ? 0.985 : 1 }],
+                }
+            ]}
         >
             {card}
         </Pressable>
@@ -53,46 +59,8 @@ export default function ThemedTask({ task, onPress}) {
 const styles = StyleSheet.create({
     card: {
         padding: 16,
-        borderRadius: 10,
+        borderRadius: 6,
         borderWidth: 1,
         gap: 10
-    },
-
-    topRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        marginBottom: 6,
-        gap: 8,
-    },
-    title: {
-        fontSize: 16,
-        fontWeight: "700",
-        flex: 1,
-    },
-    label: {
-        paddingVertical: 2,
-        paddingHorizontal: 8,
-        borderRadius: 4,
-        alignSelf: "flex-start",
-    },
-    labelText: {
-        fontSize: 11,
-        color: "white",
-        fontWeight: "bold",
-    },
-    touch: {
-        marginVertical: 6,
-    },
-    
-    cardOuter: {
-        borderRadius: 12,
-        borderWidth: 1,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
-    },
+    }
 });

@@ -163,6 +163,7 @@ export default function Column({ projectId, projectName, columnData }) {
 
             <Spacer height={15}/>
             <Divider />
+            <Spacer height={10}/>
 
             {/* Task List */}
             {isLoadingTasks ? 

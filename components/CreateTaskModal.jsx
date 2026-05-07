@@ -73,6 +73,7 @@ export default function CreateTaskModal({
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(task)}
                 primaryActionDisabled={!task.name.trim()} // .trim() to ignore whitespace
+                secondaryActionName="Close"
             />
         </AppModal>
     );

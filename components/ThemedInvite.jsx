@@ -1,11 +1,13 @@
 import { StyleSheet, View, useColorScheme } from 'react-native'
 import { Colors } from "../constants/Colors"
 import ThemedText from './ThemedText'
-import ThemedButton from './ThemedButton'
+import ModalActions from './modal/ModalActions'
 
 const ThemedInvite = ({ projectName, sender, onAccept, onIgnore }) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+
+
 
     return (
         <View style={[styles.card, { backgroundColor: theme.navBackground }] }>
@@ -17,15 +19,14 @@ const ThemedInvite = ({ projectName, sender, onAccept, onIgnore }) => {
                 <ThemedText style={styles.value}>{sender}</ThemedText>
             </View>
 
-            <View style={styles.buttons}>
-                <ThemedButton style={[styles.button, { backgroundColor: Colors.warning } ]} onPress={onIgnore}>
-                    <ThemedText bold onPrimary>Ignore</ThemedText>
-                </ThemedButton>
-
-                <ThemedButton style={[styles.button, styles.accept]} onPress={onAccept}>
-                    <ThemedText bold onPrimary>Accept</ThemedText>
-                </ThemedButton>
-            </View>
+            <ModalActions
+                onCancel={onIgnore}
+                primaryActionName="Accept"
+                primaryActionIconName="check"
+                onPrimaryActionPress={onAccept}
+                secondaryActionName="Ignore"
+                customStyle={{ paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 }}
+            />
         </View>
     )
 }

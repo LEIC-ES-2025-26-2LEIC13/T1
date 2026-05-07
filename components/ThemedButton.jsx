@@ -1,15 +1,13 @@
-import { Pressable, StyleSheet, useColorScheme } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { Colors } from '../constants/Colors'
 
-const ThemedButton = ({ style, disabled=false, cancel=false,...props }) => {
-    const colorScheme = useColorScheme()
-    const theme = Colors[colorScheme] ?? Colors.light
+const ThemedButton = ({ style, disabled=false,...props }) => {
+    
     return (
         <Pressable
             disabled={disabled}
             style={({ pressed }) => [
                 styles.btn,
-                cancel && { backgroundColor: theme.borders},
                 pressed && styles.pressed,
                 {
                     opacity: pressed ? 0.85 : 1,
