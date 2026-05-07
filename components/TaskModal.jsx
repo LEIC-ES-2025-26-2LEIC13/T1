@@ -4,7 +4,7 @@ import ModalHeader from './modal/ModalHeader';
 import FormField from './FormField';
 import ModalBody from './modal/ModalBody';
 import PillsContainer from './modal/PillsContainer';
-import Pill from './modal/Pill';
+import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
 import ModalActions from './modal/ModalActions';
 
@@ -24,7 +24,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
 
             <ModalBody>
 
-                <PillsContainer>
+                <PillsContainer style={{ marginBottom: 15 }}>
                     <Pill projectName={projectName}/>
                     <Pill columnName={columnName}/>
                     {

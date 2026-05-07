@@ -5,8 +5,10 @@ import ThemedIcon from './ThemedIcon';
 import ThemedText from './ThemedText';
 import { Colors } from '../constants/Colors';
 import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
+import Divider from './Divider';
+import Spacer from './Spacer';
 
-export default function OverflowMenu({ testID, actions = [] }) {
+export default function OverflowMenu({ testID, actions = [], customColor }) {
 
     // Alert
     const [alertVisible, setAlertVisible] = useState(false);
@@ -32,6 +34,7 @@ export default function OverflowMenu({ testID, actions = [] }) {
 
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+    const filteredActions = actions.filter(action => !action.hidden)
 
     return (
         <>
@@ -40,26 +43,33 @@ export default function OverflowMenu({ testID, actions = [] }) {
                 <ThemedIcon name="dots-vertical"/>
             </MenuTrigger>
 
-            <MenuOptions customStyles={{optionsContainer: [styles.optionsContainer, { backgroundColor: theme.navBackground }]}}>
-                {actions
-                .filter(action => !action.hidden)
-                .map(action => (
+            <MenuOptions customStyles={{optionsContainer: [styles.optionsContainer, { 
+                backgroundColor: customColor ?? theme.navBackground,
+                borderColor: theme.borders
+                }]}}>
+                {filteredActions.map((action, index) => (
                     <MenuOption
                     key={action.id}
                     onSelect={() => handleSelect(action)}
                     >
-                    <View style={styles.option}>
-                        <ThemedText style={[ action.destructive && { color: Colors.warning }]}>
-                        {action.title}
-                        </ThemedText>
+                        <View style={styles.option}>
+                            <ThemedText style={[ action.destructive && { color: Colors.warning }]}>
+                            {action.title}
+                            </ThemedText>
 
-                        {action.icon ? (
-                        <ThemedIcon
-                            name={action.icon}
-                            style={[ action.destructive && { color: Colors.warning }]}
-                        />
-                        ) : null}
-                    </View>
+                            {action.icon ? (
+                            <ThemedIcon
+                                name={action.icon}
+                                style={[ action.destructive && { color: Colors.warning }]}
+                            />
+                            ) : null}
+                        </View>
+                        {index < filteredActions.length - 1 && (
+                            <>
+                                <Spacer height={5} />
+                                <Divider />
+                            </>
+                        )}
                     </MenuOption>
                 ))}
             </MenuOptions>
@@ -84,14 +94,15 @@ export default function OverflowMenu({ testID, actions = [] }) {
 
 const styles = StyleSheet.create({
     optionsContainer: {
+        borderWidth: 1,
+        paddingHorizontal: 14,
         borderRadius: 10,
         paddingVertical: 6,
         width: 190,
         marginTop: 40, // downward offset from the trigger component
     },
     option: {
-        paddingHorizontal: 14,
-        paddingVertical: 12,
+        paddingVertical: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between'

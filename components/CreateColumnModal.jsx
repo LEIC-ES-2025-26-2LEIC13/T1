@@ -38,6 +38,7 @@ export default function CreateColumnModal({
                 primaryActionName="Create"
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(columnData)}
+                primaryActionDisabled={!columnData.name.trim()} // .trim() to ignore whitespace
             />
         </AppModal>
     );

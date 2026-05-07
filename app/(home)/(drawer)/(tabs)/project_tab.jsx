@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import { Colors, ProjectColors } from '../../../../constants/Colors';
+import { StyleSheet, FlatList } from 'react-native';
+import { ProjectColors } from '../../../../constants/Colors';
 import { useProject } from '../../../../hooks/useProject';
 import ThemedText from '../../../../components/ThemedText';
 import ThemedProject from '../../../../components/ThemedProject';
@@ -10,6 +10,7 @@ import EmptyState from '../../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../../components/ThemedAlert';
 import ThemedView from '../../../../components/ThemedView';
 import ThemedIcon from '../../../../components/ThemedIcon';
+import LoadingScreen from '../../../../components/LoadingScreen'
 
 const Projects = () => {
 
@@ -60,59 +61,61 @@ const Projects = () => {
             {
                 isLoadingProjects ?
 
-                <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 15, fontSize: 16 }}/>
+                <LoadingScreen loadingText="Loading Projects..."/>
 
                 :
+                <>
+                    <FlatList
+                        data={projects}
+                        keyExtractor={(item, index) => `${item.title}-${index}`}
 
-                <FlatList
-                    data={projects}
-                    keyExtractor={(item, index) => `${item.title}-${index}`}
+                        contentContainerStyle={[
+                            styles.list,
+                            (projects.length === 0) && styles.listEmpty
+                        ]}
 
-                    contentContainerStyle={[
-                        styles.list,
-                        (!projects || projects.length === 0) && styles.listEmpty
-                    ]}
+                        showsVerticalScrollIndicator={false}
 
-                    showsVerticalScrollIndicator={false}
+                        ListEmptyComponent={<EmptyState
+                            title="No projects"
+                            subtitle="When you create a project or accept an invite to one, it will appear here"
+                            iconName="folder-open"
+                        />}
 
-                    ListEmptyComponent={<EmptyState
-                        title="No projects"
-                        subtitle="When you create a project or accept an invite to one, it will appear here"
-                        iconName="folder-open"
-                    />}
+                        renderItem={({ item, index }) => (
+                            <ThemedProject
+                                projectId={item.id}
+                                name={item.title}
+                                description={item.description}
+                                borderColor={ProjectColors[index % ProjectColors.length]}
+                            />
+                        )}
+                    />
+                
+                
+                    <ThemedButton
+                        style={{ marginBottom: 16 }}
+                        disabled={isLoadingProjects}
+                        onPress={openProjectModal}>
+                        <ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} /> 
+                        <ThemedText bold onPrimary>Create Project</ThemedText>
+                    </ThemedButton>
 
-                    renderItem={({ item, index }) => (
-                        <ThemedProject
-                            projectId={item.id}
-                            name={item.title}
-                            description={item.description}
-                            borderColor={ProjectColors[index % ProjectColors.length]}
-                        />
-                    )}
-                />
+                    <CreateProjectModal
+                        visible={projectModalVisible}
+                        onClose={closeProjectModal}
+                        onCreate={handleCreateProject}
+                        project={project}
+                        onChange={handleProjectChange}
+                    />
+
+                    <ThemedAlert
+                        visible={alertVisible}
+                        alert={alert}
+                        onConfirm={() => setAlertVisible(false)}
+                    />
+                </>
             }
-            
-            <ThemedButton
-                style={{ marginBottom: 16 }}
-                disabled={isLoadingProjects}
-                onPress={openProjectModal}>
-                <ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} /> 
-                <ThemedText bold onPrimary>Create Project</ThemedText>
-            </ThemedButton>
-
-            <CreateProjectModal
-                visible={projectModalVisible}
-                onClose={closeProjectModal}
-                onCreate={handleCreateProject}
-                project={project}
-                onChange={handleProjectChange}
-            />
-
-            <ThemedAlert
-                visible={alertVisible}
-                alert={alert}
-                onConfirm={() => setAlertVisible(false)}
-            />
 
         </ThemedView>
     );
@@ -132,12 +135,6 @@ const styles = StyleSheet.create({
 
     listEmpty: {
         flex: 1,
-        justifyContent: 'center',
-    },
-
-    btnText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
+        marginTop: 50
     }
 })

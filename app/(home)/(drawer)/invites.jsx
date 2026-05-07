@@ -6,7 +6,7 @@ import ThemedInvite from '../../../components/ThemedInvite';
 import EmptyState from '../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
 import { useInvite } from '../../../hooks/useInvite';
-import Pill from '../../../components/modal/Pill';
+import Pill from '../../../components/Pill';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
@@ -49,6 +49,7 @@ const Invites = () => {
                     <Pill
                         name={`${invites.length} pending ${invites.length === 1 ? 'invite' : 'invites'}`}
                         iconName="email-outline"
+                        style={{ marginBottom: 15 }}
                     />
                 }
 

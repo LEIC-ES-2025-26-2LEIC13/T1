@@ -41,7 +41,7 @@ function RootNavigator() {
           </Stack>
           <AppToast />
           
-          {isLoading && (<LoadingScreen/>)}
+          {isLoading && (<LoadingScreen loadingText="Logging in..."/>)}
       </>
   )
 }

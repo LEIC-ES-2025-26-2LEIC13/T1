@@ -1,7 +1,6 @@
 import { addDoc, deleteDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
-import { columnService } from "./columnService";
 
 function normalizeTaskData({ name, description, label }) {
     return {

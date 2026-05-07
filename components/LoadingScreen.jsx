@@ -4,13 +4,13 @@ import ThemedView from './ThemedView'
 import ThemedText from './ThemedText'
 import { Colors } from '../constants/Colors'
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ loadingText }) => {
     return (
         <View style={[styles.loadingOverlay, StyleSheet.absoluteFill]}>
             <ThemedView style={styles.loadingCard}>
                 <ActivityIndicator size='large' color={ Colors.primary } />
                 <ThemedText bold style={styles.loadingText}>
-                    Loading...
+                    {loadingText}
                 </ThemedText>
             </ThemedView>
         </View>

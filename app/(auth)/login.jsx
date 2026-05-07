@@ -1,4 +1,3 @@
-import { Alert } from 'react-native'
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
@@ -57,6 +56,7 @@ const Login = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     leftIcon="email"
+                    onPrimary
                 />
 
 
@@ -70,6 +70,7 @@ const Login = () => {
                     rightIcon={showPassword ? "eye" : "eye-off"}
                     onRightIconPress={() => setShowPassword(!showPassword)}
                     secureTextEntry={!showPassword}
+                    onPrimary
                 />
 
                 <Spacer height={25} />

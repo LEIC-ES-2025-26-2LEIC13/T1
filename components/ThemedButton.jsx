@@ -6,15 +6,16 @@ const ThemedButton = ({ style, disabled=false, cancel=false,...props }) => {
     const theme = Colors[colorScheme] ?? Colors.light
     return (
         <Pressable
+            disabled={disabled}
             style={({ pressed }) => [
                 styles.btn,
                 cancel && { backgroundColor: theme.borders},
                 pressed && styles.pressed,
-                disabled && styles.disabled,
                 {
                     opacity: pressed ? 0.85 : 1,
                     transform: [{ scale: pressed ? 0.985 : 1}],
                 },
+                disabled && styles.disabled,
                 style
             ]} // processed from left to right
             {...props}

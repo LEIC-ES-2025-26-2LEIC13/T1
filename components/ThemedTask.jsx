@@ -1,8 +1,10 @@
 import React from 'react';
-import { useColorScheme, StyleSheet, View, Pressable} from "react-native";
+import { useColorScheme, StyleSheet, Pressable} from "react-native";
 import ThemedText from "./ThemedText";
 import ThemedView from "./ThemedView";
 import { Colors } from "../constants/Colors";
+import Pill from './Pill';
+import { LABELS } from '../constants/Labels';
 
 // Colors for the labels
 const LABEL_COLORS = {
@@ -15,33 +17,26 @@ const LABEL_COLORS = {
 export default function ThemedTask({ task, onPress}) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
-    const isDark = colorScheme === 'dark';
 
     const labelBgColor = LABEL_COLORS[task.label] || LABEL_COLORS.default;
 
     const card = (
-        <ThemedView
-            style={[
-                styles.card,
-                {
-                    backgroundColor: theme.navBackground,
-                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                }
-            ]}
-        >
-            <View style={styles.topRow}>
-                <ThemedText title={true} style={styles.title} numberOfLines={2}>
-                    {task.name}
-                </ThemedText>
-
-                {!!task.label && (
-                    <View style={[styles.label, { backgroundColor: labelBgColor }]}>
-                        <ThemedText style={styles.labelText}>
-                            {task.label}
-                        </ThemedText>
-                    </View>
-                )}
-            </View>
+        <ThemedView style={[ styles.card, { borderColor: theme.borders }]}
+>
+            
+            <ThemedText title bold>{task.name}</ThemedText>
+            
+            {task.description && (
+            <ThemedText>{task.description}</ThemedText>
+            )}
+            
+            {task.label && (
+                <Pill
+                    name={task.label}
+                    iconName={LABELS.find(label => label.name === task.label)?.icon}
+                />
+            )}
+            
         </ThemedView>
     );
 
@@ -58,15 +53,11 @@ export default function ThemedTask({ task, onPress}) {
 const styles = StyleSheet.create({
     card: {
         padding: 16,
-        borderRadius: 12,
+        borderRadius: 10,
         borderWidth: 1,
-
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 2,
+        gap: 10
     },
+
     topRow: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -92,8 +83,8 @@ const styles = StyleSheet.create({
     },
     touch: {
         marginVertical: 6,
-        marginHorizontal: 16,
     },
+    
     cardOuter: {
         borderRadius: 12,
         borderWidth: 1,

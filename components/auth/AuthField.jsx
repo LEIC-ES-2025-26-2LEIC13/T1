@@ -3,10 +3,10 @@ import React from 'react'
 import ThemedText from '../ThemedText'
 import ThemedTextInput from '../ThemedTextInput'
 
-const AuthField = ({ labelName, placeholder, testID, value, onChangeText, keyboardType, autoCapitalize, leftIcon, rightIcon, onRightIconPress, secureTextEntry }) => {
+const AuthField = ({ labelName, placeholder, testID, value, onChangeText, keyboardType, autoCapitalize, leftIcon, rightIcon, onRightIconPress, secureTextEntry, onPrimary }) => {
     return (
         <View style={styles.inputContainer}>
-            <ThemedText style={styles.inputLabel}>{labelName}</ThemedText>
+            <ThemedText onPrimary={onPrimary} style={styles.inputLabel}>{labelName}</ThemedText>
             <ThemedTextInput
                 testID={testID}
                 placeholder={placeholder}

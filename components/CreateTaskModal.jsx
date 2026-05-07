@@ -1,6 +1,6 @@
 import AppModal from './AppModal';
 import ModalHeader from './modal/ModalHeader';
-import Pill from './modal/Pill';
+import Pill from './Pill';
 import ModalBody from './modal/ModalBody';
 import FormField from './FormField';
 import PillsContainer from './modal/PillsContainer';
@@ -32,7 +32,7 @@ export default function CreateTaskModal({
 
             <ModalBody>
 
-                <PillsContainer>
+                <PillsContainer style={{ marginBottom: 15 }}>
                     <Pill projectName={projectName}/>
                     <Pill columnName={columnName}/>
                 </PillsContainer>
@@ -72,6 +72,7 @@ export default function CreateTaskModal({
                 primaryActionName="Create"
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(task)}
+                primaryActionDisabled={!task.name.trim()} // .trim() to ignore whitespace
             />
         </AppModal>
     );

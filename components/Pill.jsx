@@ -1,37 +1,43 @@
 import { Pressable, StyleSheet, useColorScheme, View } from 'react-native'
 import React from 'react'
-import ThemedIcon from '../ThemedIcon'
-import ThemedText from '../ThemedText'
-import { Colors } from '../../constants/Colors'
+import ThemedIcon from './ThemedIcon'
+import ThemedText from './ThemedText'
+import { Colors } from '../constants/Colors'
 
-const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected }) => {
+const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected, style }) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
     const Content = ({ isSelected }) => {
         return (
             <>
-                <ThemedIcon onPrimary={isSelected}
+                {(projectName || columnName || iconName) ? (
+                    <ThemedIcon onPrimary={isSelected}
                     name={projectName ? "folder-open-outline" : (columnName ? "table-column" : iconName)}  
                     size={13}
                     style={{ marginRight: 5 }}
-                />
+                    />
+                ) : null}
+
                 <ThemedText style={styles.name} onPrimary={isSelected} >
                     {projectName ?? columnName ?? name}
                 </ThemedText>
             </>
         )
     }
+    
+
+    
 
     return (
         pressable ?
-            <Pressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }]} 
+            <Pressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, style]} 
                     onPress={onPress}>
                 <Content isSelected={isSelected}/>
             </Pressable>
 
         :
-            <View style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }]}>
+            <View style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, style]}>
                 <Content/>
             </View>
     )
@@ -46,8 +52,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         paddingHorizontal: 10,
         paddingVertical: 5,
-        borderRadius: 50,
-        marginBottom: 18,
+        borderRadius: 20,
     },
     name: {
         fontSize: 13,

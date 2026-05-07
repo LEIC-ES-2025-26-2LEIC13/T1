@@ -6,14 +6,18 @@ import ThemedIcon from '../ThemedIcon'
 import { Colors } from '../../constants/Colors'
 
 // For two actions: "Cancel" and "Accept/Create/..."
-const ModalActions = ({onCancel, primaryActionName, primaryActionIconName, onPrimaryActionPress}) => {
+const ModalActions = ({onCancel, primaryActionName, primaryActionIconName, onPrimaryActionPress, primaryActionDisabled}) => {
     return (
         <View style={styles.actions}>
             <ThemedButton style={styles.actionButton} cancel onPress={onCancel}>
                 <ThemedText bold>Cancel</ThemedText>
             </ThemedButton>
 
-            <ThemedButton style={[styles.actionButton, styles.primaryActionButton]} onPress={onPrimaryActionPress}>
+            <ThemedButton 
+                style={[styles.actionButton, !primaryActionDisabled && styles.primaryActionButton]}
+                onPress={onPrimaryActionPress}
+                disabled={primaryActionDisabled}
+            >
                 <ThemedIcon name={primaryActionIconName} onPrimary style={{ marginRight: 6 }}/>
                 <ThemedText bold onPrimary>{primaryActionName}</ThemedText>
             </ThemedButton>

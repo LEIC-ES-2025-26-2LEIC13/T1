@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppModal from './AppModal';
 import ModalHeader from "./modal/ModalHeader";
 import ModalBody from "./modal/ModalBody";
@@ -7,14 +7,15 @@ import ModalActions from "./modal/ModalActions";
 
 export default function EditColumnModal({ visible, onClose, onEdit, columnData}) {
 
-    const [editedColumn, setEditedColumn] = useState(columnData);
+    const [editName, setEditName] = useState('');
 
+    useEffect(() => {
+        if (visible) {
+            setEditName(''); // Always reset to empty string when modal opens
+        }
+    }, [visible]);
 
-    const handleChange = (field, value) => {
-        setEditedColumn((prev) => ({ ...prev, [field]: value }))
-    };
-
-     return (
+    return (
         <AppModal visible={visible}>
 
             <ModalHeader
@@ -28,7 +29,8 @@ export default function EditColumnModal({ visible, onClose, onEdit, columnData})
                 <FormField
                     labelName="COLUMN TITLE"
                     placeholder="Enter new column title"
-                    onChangeText={(value) => handleChange('name', value)}
+                    onChangeText={(value) => setEditName(value)}
+                    value={editName}
                 />
 
             </ModalBody>
@@ -37,7 +39,8 @@ export default function EditColumnModal({ visible, onClose, onEdit, columnData})
                 onCancel={onClose}
                 primaryActionName="Edit"
                 primaryActionIconName="pencil"
-                onPrimaryActionPress={() => onEdit(editedColumn)}
+                onPrimaryActionPress={() => onEdit({ ...columnData, name: editName })}
+                primaryActionDisabled={!editName.trim()} // .trim() to ignore whitespace
             />
 
         </AppModal>

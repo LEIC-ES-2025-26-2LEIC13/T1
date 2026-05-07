@@ -67,7 +67,9 @@ const styles = StyleSheet.create({
     },
 
     alertMessage: {
-        fontSize: 16, lineHeight: 25
+        textAlign: 'center',
+        fontSize: 16,
+        lineHeight: 25
     },
 
     alertActions: {

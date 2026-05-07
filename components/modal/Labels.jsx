@@ -1,10 +1,10 @@
 import React from 'react'
-import Pill from './Pill'
+import Pill from '../Pill'
 import PillsContainer from './PillsContainer'
 
 const Labels = ({ labels, currentLabel, onChange }) => {
   return (
-    <PillsContainer>
+    <PillsContainer style={{ marginBottom: 15 }}>
         {labels.map((label) => {
             const isSelected = (currentLabel === label.name)
 

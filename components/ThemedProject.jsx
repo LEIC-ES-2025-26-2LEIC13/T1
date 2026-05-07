@@ -16,7 +16,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
         }
     }
 
-    const gradientColors = [borderColor, `${borderColor}22`]
+    const gradientColors = [borderColor, `${borderColor}55`]
 
     const CardContent = (
         <View style={[styles.cardInner, { backgroundColor: theme.navBackground }]}>

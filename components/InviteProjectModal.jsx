@@ -3,7 +3,7 @@ import ModalHeader from './modal/ModalHeader';
 import ModalBody from './modal/ModalBody';
 import FormField from './FormField';
 import ModalActions from './modal/ModalActions';
-import Pill from './modal/Pill';
+import Pill from './Pill';
 
 export default function InviteProjectModal({
     visible,
@@ -27,6 +27,7 @@ export default function InviteProjectModal({
 
                 <Pill
                     projectName={projectName}
+                    style={ {marginBottom: 15 } }
                 />
 
                 <FormField
@@ -47,6 +48,7 @@ export default function InviteProjectModal({
                 primaryActionName="Send Invite"
                 primaryActionIconName="send"
                 onPrimaryActionPress={onInvite}
+                primaryActionDisabled={!value.trim()} // .trim() to ignore whitespace
             />
         </AppModal>
     );

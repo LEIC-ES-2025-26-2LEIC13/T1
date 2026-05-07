@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { Pressable, StyleSheet, View, FlatList, useWindowDimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../constants/Colors';
 import InviteProjectModal from '../components/InviteProjectModal';
 import ThemedText from "../components/ThemedText";
 import { useProject } from '../hooks/useProject';
@@ -14,21 +12,20 @@ import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
 import OverflowMenu from '../components/OverflowMenu';
 import SeeMembersModal from '../components/SeeMembersModal';
-import PagerView from 'react-native-pager-view';
 import Column from './column';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CreateColumnModal from '../components/CreateColumnModal';
 import ThemedIcon from '../components/ThemedIcon';
 import EmptyState from '../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
+import ThemedView from '../components/ThemedView';
+import ThemedButton from '../components/ThemedButton';
 
 export default function ProjectScreen() {
   	const router = useRouter()
+	const { width } = useWindowDimensions()
 	const params = useLocalSearchParams() // Routing parameters of the current screen
 	// For example: /project?projectId=abc -> params.projectId will be abc
 
-	const scheme = useColorScheme()
-	const palette = Colors[scheme] ?? Colors.light
 
   	const { projects, deleteProject, kickMember } = useProject(); // user 
 	const [deleting, setDeleting] = useState(false) 
@@ -183,7 +180,7 @@ export default function ProjectScreen() {
 			await createColumn(columnData)
 			closeCreateColumnModal()
 		} catch (error) {
-			showAlert(ALERT_TYPES.ERROR, "Column creation failed", error.message)
+			showAlert(ALERT_TYPES.ERROR, "Column Creation Failed", error.message)
 		}
 	}
 
@@ -209,7 +206,7 @@ export default function ProjectScreen() {
 			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage)
 		}
 		catch (error) {
-			console.log('Kick fail', error.message)
+			console.log('Kick Failed', error.message)
 		}
     }
 
@@ -218,102 +215,127 @@ export default function ProjectScreen() {
 			<Stack.Screen
 				options={{
 
-				headerTitle: () => (
-					<ThemedText title={true} style={{ fontSize: 18, fontWeight: 'bold' }}>
-						{currentProjectName}
-					</ThemedText>
-				),
+					headerTitle: () => (
+						<ThemedText title bold style={{ fontSize: 20 }}>
+							{currentProjectName}
+						</ThemedText>
+					),
 
-				headerLeft: () => (
-					<Pressable onPress={handleGoBack} hitSlop={10} style={{
-					width: 40,
-					height: 40,
-					justifyContent: 'center',
-					alignItems: 'center',
-					}}>
-						<ThemedIcon name="arrow-left"/>
-					</Pressable>
-				),
-
-				headerRight: () => (
-					<>
-						<Pressable onPress={openCreateColumnModal} hitSlop={10} style={{
-							width: 40,
-							height: 40,
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-							<MaterialCommunityIcons name="table-column-plus-after" size={24} color="black" />
+					headerLeft: () => (
+						<Pressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
+							<ThemedIcon name="arrow-left"/>
 						</Pressable>
-						<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
-							width: 40,
-							height: 40,
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-							<ThemedIcon testID="see-members-icon" name="account-multiple" size={24}/>
-						</Pressable>
+					),
 
-						<OverflowMenu
-							testID="project-overflow-menu"
-							actions={[
-								{
-									id: 'invite-member',
-									title: 'Invite member',
-									icon: 'account-plus',
-									onPress: () => handleInvitePress(),
-								},
-								{
-									id: 'delete-project',
-									title: 'Delete project',
-									icon: 'delete',
-									confirm: {
-										title: 'Delete project',
-										message: 'Are you sure you want to delete this project? All related data will be lost.',
+					headerRight: () => (
+						<>
+							<Pressable onPress={openCreateColumnModal} style={{ paddingHorizontal: 5 }}>
+								<ThemedIcon name="table-column-plus-after" />
+							</Pressable>
+							<Pressable onPress={handleSeeMembersPress} style={{ paddingHorizontal: 12 }}>
+								<ThemedIcon testID="see-members-icon" name="account-multiple"/>
+							</Pressable>
+
+							<OverflowMenu
+								testID="project-overflow-menu"
+								actions={[
+									{
+										id: 'invite-member',
+										title: 'Invite member',
+										icon: 'account-plus',
+										onPress: () => handleInvitePress(),
 									},
-									destructive: true, // If we place a string of text that is not null, 
-									// it will be marked as a destructive action
-									onPress: () => handleProjectDelete(),
-								}
-							]}
-						/>
-					</>
-				),
-				headerStyle: {
-					backgroundColor: palette.navBackground,
-					borderBottomWidth: 1,
-					borderBottomColor: '#e5e7eb',
-				},
-				headerTintColor: palette.title,
-				headerShadowVisible: false,
-			}}
+									{
+										id: 'delete-project',
+										title: 'Delete project',
+										icon: 'delete',
+										confirm: {
+											title: 'Delete Project',
+											message: 'Are you sure you want to delete this project? All related data will be lost.',
+										},
+										destructive: true, // If we place a string of text that is not null, 
+										// it will be marked as a destructive action
+										onPress: () => handleProjectDelete(),
+									}
+								]}
+							/>
+						</>
+					)				
+				}}
 			/>
 
 
 
-			<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-				{
-				columns.length === 0 ?
-				<EmptyState
-					title="No columns yet"
-					subtitle="Create your first column to start organizing tasks in this project"
-					iconName="view-column-outline"
-				/> 
+			<ThemedView style={styles.container}>
+				
+				<FlatList
+					data={columns}
+					keyExtractor={(item) => item.id}
 
-				: 
+					contentContainerStyle={[
+						{padding: 16},
+						(columns.length === 0) && { flex: 1, marginTop: 50 }
+					]}
 
-				<PagerView style={{ flex: 1 }} initialPage={0}>
-					{columns.map((item) => (
-					<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
-						<Column
-							projectId={projectId}
-							projectName={currentProjectName}
-							columnData={item} // Pass the entire column data instead of just the name
-						/>
-					</View>
-					))}
-				</PagerView>
-				}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					
+					snapToOffsets={
+						columns.length > 1 
+						? columns.map((_, i) => {
+							const colWidth = width * 0.87;
+							const spacing = 12; // matching the marginRight in renderItem
+							
+							// 1. First column: aligned to the left
+							if (i === 0) return 0;
+							
+							// 2. Last column: aligned to the right
+							if (i === columns.length - 1) {
+								// total content width: left padding + items + margins + right padding
+								const totalWidth = 32 + (columns.length * colWidth) + ((columns.length - 1) * spacing);
+								return totalWidth - width;
+							}
+							
+							// 3. Middle columns: perfectly centered
+							const itemLeft = 16 + i * (colWidth + spacing);
+							const centerOffset = itemLeft - (width - colWidth) / 2;
+							return centerOffset;
+						  })
+						: undefined
+					}
+
+					decelerationRate="fast"
+
+					ListEmptyComponent={<EmptyState
+						title="No columns yet"
+						subtitle="Create your first column to start organizing tasks in this project"
+						iconName="view-column-outline"
+					/>}
+					
+					renderItem={({ item, index }) => {
+						const columnWidth = columns.length === 1 ? width - 32 : width * 0.87;
+						const marginRight = index === columns.length - 1 ? 0 : 12;
+						
+						return (
+							<View style={{ width: columnWidth, marginRight }}>
+								<Column
+									projectId={projectId}
+									projectName={currentProjectName}
+									columnData={item}
+								/>
+							</View>
+						);
+					}}
+				/>
+
+				{columns.length === 0 && (
+					<ThemedButton
+						style={{ margin: 20 }}
+						onPress={openCreateColumnModal}>
+						<ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} /> 
+						<ThemedText bold onPrimary>Create Column</ThemedText>
+					</ThemedButton>
+				)}
 
 				<CreateColumnModal
 					visible={createColumnModalVisible}
@@ -345,35 +367,13 @@ export default function ProjectScreen() {
 					onConfirm={() => setAlertVisible(false)} 
            	 	/>
 				
-			</SafeAreaView>
+			</ThemedView>
 		</>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-	},
-
-	btn: {
-		width: '85%',
-
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-
-		padding: 12,
-
-		position: 'absolute',
-		bottom: 20,
-		alignSelf: 'center',
-
-		marginBottom: 20,
-	},
-
-	btnText: {
-		color: 'white',
-		fontSize: 16,
-		fontWeight: 'bold',
+		flex: 1
 	}
 });
