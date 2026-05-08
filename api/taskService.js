@@ -1,11 +1,14 @@
 import { addDoc, deleteDoc,onSnapshot, Timestamp } from "firebase/firestore";
 import { pathHelper } from "./pathHelper";
 
-function normalizeTaskData({ name, description, label }) {
+function normalizeTaskData({ name, description, label, assignedMembers }) {
     return {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
         label: label?.trim() ?? '',
+        assignedMembers: Array.isArray(assignedMembers) 
+            ? assignedMembers.map(m => ({ id: m.id, email: m.email })) 
+            : [],
     }
 }
 

@@ -11,6 +11,7 @@ import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 import EmptyState from "../components/EmptyState";
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert";
+import {projectService} from "../api/projectService";
 
 export default function Column({ projectId, projectName, columnData }) {
     const { deleteColumn, updateColumn } = useColumn()
@@ -28,6 +29,7 @@ export default function Column({ projectId, projectName, columnData }) {
         name: '',
         description: '',
         label: '',
+        assignedMembers: [],
     })
 
     // Alert
@@ -83,6 +85,7 @@ export default function Column({ projectId, projectName, columnData }) {
             name: '',
             description: '',
             label: '',
+            assignedMembers: [],
         })
     }
 
@@ -193,6 +196,7 @@ export default function Column({ projectId, projectName, columnData }) {
                 onClose={closeTaskCreationModal}
                 onCreate={handleCreateTask}
                 onChange={handleTaskChange}
+                getProjectUsers={() => projectService.getProjectUsers(projectId)}
             />
             <TaskModal
                 visible={taskDetailsVisible}
