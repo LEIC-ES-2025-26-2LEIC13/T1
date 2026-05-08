@@ -7,11 +7,13 @@ import PillsContainer from './modal/PillsContainer';
 import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
 import ModalActions from './modal/ModalActions';
+import { LabelColors } from '../constants/Colors';
 
 export default function TaskModal({ visible, task, projectName, columnName, onClose, deleteTask }) {
 
     // The corresponding icon for the task label
-    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon;
+    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon
+    const labelColor = LabelColors[task?.label] || LabelColors.default;
 
     return (
         <AppModal visible={visible}>
@@ -28,7 +30,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
                     <Pill projectName={projectName}/>
                     <Pill columnName={columnName}/>
                     {
-                        task?.label && <Pill name={task.label} iconName={labelIcon}/>
+                        task?.label && <Pill name={task.label} iconName={labelIcon} customStyle={{ backgroundColor: `${labelColor}50` }}/>
                     }
                 </PillsContainer>
 

@@ -7,6 +7,7 @@ import EmptyState from '../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
 import { useInvite } from '../../../hooks/useInvite';
 import Pill from '../../../components/Pill';
+import Toast from 'react-native-toast-message';
 
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
@@ -24,7 +25,18 @@ const Invites = () => {
           	await acceptInvite(invite)
         } catch (error) {
           	showAlert(ALERT_TYPES.ERROR, 'Accept Invite Failed', error.message)
+            await ignoreInvite(invite) // delete the invite
+            return
         }
+
+        Toast.show({
+            type: 'default',
+            text1: 'Invite accepted',
+            text2: `You have joined ${invite.projectName}. This project will now appear in your projects list.`,
+            position: 'top',
+            visibilityTime: 4000,
+            topOffset: 110,
+        })
     };
 
     const handleIgnore = async (invite) => {
@@ -49,7 +61,7 @@ const Invites = () => {
                     <Pill
                         name={`${invites.length} pending ${invites.length === 1 ? 'invite' : 'invites'}`}
                         iconName="email-outline"
-                        style={{ marginBottom: 15 }}
+                        customStyle={{ marginBottom: 15 }}
                     />
                 }
 

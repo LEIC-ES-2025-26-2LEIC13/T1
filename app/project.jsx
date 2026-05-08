@@ -29,6 +29,7 @@ export default function ProjectScreen() {
 
   	const { projects, deleteProject, kickMember } = useProject(); // user 
 	const [deleting, setDeleting] = useState(false) 
+	const [leaving, setLeaving] = useState(false)
   	const { user } = useAuth();
 
 	const { columns, setActiveProjectId, createColumn} = useColumn()
@@ -47,10 +48,10 @@ export default function ProjectScreen() {
 
 	// Alert
 	const [alertVisible, setAlertVisible] = useState(false);
-	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+	const [alert, setAlert] = useState({ type: '', title: '', message: '', onConfirm: null });
 
-	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
-		setAlert({ type, title, message });
+	const showAlert = (type, title, message, onConfirm = null) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message, onConfirm });
 		setAlertVisible(true);
 	};
 	
@@ -62,7 +63,16 @@ export default function ProjectScreen() {
 			setActiveProjectId('')
 		}
 	}, [projectId, setActiveProjectId])
-	
+
+
+	useEffect(() => {
+		if (!currentProject && !deleting && !leaving) {
+			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.", () => {
+				handleGoBack();
+			});
+		}
+	}, [currentProject, handleGoBack, deleting, leaving]);
+
 
 	const handleGoBack = useCallback(() => {
 		try {
@@ -76,14 +86,7 @@ export default function ProjectScreen() {
 		}
 	}, [router]); // Add router as a dependency
 
-	// Then update the useEffect dependency array:
-	useEffect(() => {
-		if (!currentProject && !deleting) {
-			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.");
-			handleGoBack();
-		}
-	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
-
+	
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true)
 
@@ -138,7 +141,7 @@ export default function ProjectScreen() {
 		}
 
 		Toast.show({
-			type: 'success',
+			type: 'default',
 			text1: 'Invite sent',
 			text2: `Invitation sent to ${trimmedTarget}.`,
 			position: 'top',
@@ -151,12 +154,15 @@ export default function ProjectScreen() {
 
 	const handleProjectDelete = async () => {
 		try {
-			setDeleting(true)
+			setDeleting(true) // prevents the "Access Lost" alert from showing
 			await deleteProject(projectId)
-			handleGoBack()
+			showAlert(ALERT_TYPES.SUCCESS, "Success", "Successfully deleted the project.", () => {
+				handleGoBack()
+			})
 		}
 		catch (error) {
-			console.log('Delete Failed', error.message)
+			setDeleting(false)
+			showAlert(ALERT_TYPES.ERROR, "Deletion Failed", error.message)
 		}
 	}
 
@@ -187,26 +193,38 @@ export default function ProjectScreen() {
 	// Column related handlers
 	const handleKickMember = async (projectId, userId, userEmail) => {
 		try {
+			if (userId === user.uid) {
+				setLeaving(true)
+			}
+
+			// eu acho que este kickMember está a fazer com o utilizador saia do projeto.
 			await kickMember(projectId, userId)
 
 			let alertMessage
+			let onAlertConfirm = null
+			
 			if (userId === user.uid) {
 				alertMessage = "Successfully left the project."
-				handleGoBack() // navigate away when leaving project
+				onAlertConfirm = async () => {
+					handleGoBack() // navigate away when leaving project
 
-				// To prevent unaccessible projects (leaks)
-				if (await projectService.projectHasNoMembers(projectId)) {
-					await projectService.deleteProject(projectId)
+					// To prevent unaccessible projects (leaks)
+					if (await projectService.projectHasNoMembers(projectId)) {
+						await projectService.deleteProject(projectId)
+					}
 				}
 
 			} else {
 				alertMessage = `Successfully kicked ${userEmail}.`
 			}
 
-			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage)
+			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage, onAlertConfirm)
 		}
 		catch (error) {
-			console.log('Kick Failed', error.message)
+			if (userId === user.uid) {
+				setLeaving(false)
+			}
+			showAlert(ALERT_TYPES.ERROR, "Kick Operation Failed", error.message)
 		}
     }
 
@@ -279,7 +297,7 @@ export default function ProjectScreen() {
 
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					
+
 					snapToOffsets={
 						columns.length > 1 
 						? columns.map((_, i) => {
@@ -364,7 +382,12 @@ export default function ProjectScreen() {
 				<ThemedAlert
 					visible={alertVisible} 
 					alert={alert} 
-					onConfirm={() => setAlertVisible(false)} 
+					onConfirm={() => {
+						setAlertVisible(false);
+						if (alert.onConfirm) {
+							alert.onConfirm();
+						}
+					}} 
            	 	/>
 				
 			</ThemedView>

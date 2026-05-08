@@ -26,3 +26,10 @@ export const Colors = {
 }
 
 export const ProjectColors = ["#3b82f6", "#8f3af6"]
+
+export const LabelColors = {
+    "Work": "#4F46E5",
+    "Urgent": "#DC2626",
+    "Idea": "#059669",  
+    "default": "#aaa20c"
+}

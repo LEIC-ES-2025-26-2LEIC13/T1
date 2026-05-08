@@ -4,7 +4,7 @@ import ThemedIcon from './ThemedIcon'
 import ThemedText from './ThemedText'
 import { Colors } from '../constants/Colors'
 
-const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected, style }) => {
+const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected, customStyle }) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -31,13 +31,13 @@ const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isS
 
     return (
         pressable ?
-            <Pressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, style]} 
+            <Pressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, customStyle]} 
                     onPress={onPress}>
                 <Content isSelected={isSelected}/>
             </Pressable>
 
         :
-            <View style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, style]}>
+            <View style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, customStyle]}>
                 <Content/>
             </View>
     )

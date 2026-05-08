@@ -19,7 +19,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     const gradientColors = [borderColor, `${borderColor}55`]
 
     const CardContent = (
-        <View style={[styles.cardInner, { backgroundColor: theme.navBackground }]}>
+        <View style={[styles.card, { backgroundColor: theme.navBackground }]}>
             <LinearGradient
                 colors={gradientColors}
                 start={{ x: 0, y: 0 }}
@@ -63,9 +63,10 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
 }
 
 const styles = StyleSheet.create({
-    cardInner: {
+    card: {
         borderRadius: 8,
         overflow: 'hidden',
+        boxShadow: "0px 2px 2px rgba(0, 0, 0, 0.15)"
     },
 
     accentBar: {

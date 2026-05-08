@@ -27,7 +27,7 @@ export default function InviteProjectModal({
 
                 <Pill
                     projectName={projectName}
-                    style={ {marginBottom: 15 } }
+                    customStyle={ {marginBottom: 15 } }
                 />
 
                 <FormField
