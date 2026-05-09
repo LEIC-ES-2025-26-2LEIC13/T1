@@ -12,12 +12,6 @@ function normalizeProjectData({ title, description }) {
     }
 }
 
-function validateProjectTitle({ title }) {
-    if (!title) {
-        throw new Error('Please enter a project title')
-    }
-}
-
 function normalizeProjectUpdates( { title, description }) {
     if (title !== undefined) {
         title = (title ?? '').trim();
@@ -49,7 +43,6 @@ export const projectService = {
 
     createProject: async (userId, userEmail, projectData) => {
         const normalizedProjectData = normalizeProjectData(projectData)
-        validateProjectTitle(normalizedProjectData)
 
         const batch = writeBatch(db); // creates a write batch
 

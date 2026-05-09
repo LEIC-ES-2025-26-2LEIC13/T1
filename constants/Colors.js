@@ -3,7 +3,7 @@ export const Colors = {
     warning: "#e82929",
 
     dark: {
-        text: "#a0a3a8",
+        text: "#a5a8ad",
         title: "#f9fafb",
         background: "#15203a",
         navBackground: "#111827",
@@ -26,3 +26,10 @@ export const Colors = {
 }
 
 export const ProjectColors = ["#3b82f6", "#8f3af6"]
+
+export const LabelColors = {
+    "Work": "#4F46E5",
+    "Urgent": "#DC2626",
+    "Idea": "#059669",  
+    "default": "#aaa20c"
+}

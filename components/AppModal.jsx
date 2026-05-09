@@ -3,9 +3,9 @@ import {Modal, StyleSheet, Keyboard, View} from 'react-native';
 import ThemedView from './ThemedView';
 import { MenuProvider } from 'react-native-popup-menu';
 
-export default function AppModal({ visible, children }) {
+export default function AppModal({ visible, children, onClose }) {
     return (
-        <Modal transparent animationType="fade" visible={visible}>
+        <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
             <MenuProvider skipInstanceCheck>
                 <View
                     style={styles.overlay}

@@ -77,7 +77,7 @@ export default function DrawerLayout() {
                         <ThemedIcon
                             testID={hasNewInvites ? "invites-with-notification" : "invites-drawer-screen"}
                             name={focused ? "email" : (hasNewInvites ? "email-alert-outline" : "email-outline")}
-                            color={color}
+                            color={hasNewInvites ? Colors.warning : color}
                         />
                     ),
                 }}

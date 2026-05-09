@@ -1,4 +1,3 @@
-import { Alert } from 'react-native'
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'

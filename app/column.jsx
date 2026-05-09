@@ -1,19 +1,29 @@
 import { useState, useEffect } from "react"
-import Task from "../components/ThemedTask";
+import ThemedTask from "../components/ThemedTask";
 import { useColumn } from '../hooks/useColumn'
 import { taskService } from '../api/taskService';
 import ThemedText from "../components/ThemedText";
 import ThemedButton from "../components/ThemedButton";
 import OverflowMenu from '../components/OverflowMenu';
 import TaskModal from '../components/TaskModal';
-import { View, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, useColorScheme } from 'react-native';
 import CreateTaskModal from '../components/CreateTaskModal';
 import EditColumnModal from '../components/EditColumnModal';
 import EmptyState from "../components/EmptyState";
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert";
-import {projectService} from "../api/projectService";
+import LoadingScreen from "../components/LoadingScreen";
+import { Colors } from "../constants/Colors";
+import Divider from "../components/Divider";
+import Spacer from "../components/Spacer";
+import ThemedIcon from "../components/ThemedIcon";
+import { projectService } from "../api/projectService";
+
 
 export default function Column({ projectId, projectName, columnData }) {
+
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
+
     const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
         id: columnData.id,
@@ -122,12 +132,17 @@ export default function Column({ projectId, projectName, columnData }) {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.navBackground, borderColor: theme.borders }]} >
 
             {/* Column Header */}
             <View style={styles.header}>
-                <ThemedText style={styles.columnName}>{column.name}</ThemedText>
+
+                <ThemedText bold style={{ fontSize: 18 }}>
+                    {column.name}
+                </ThemedText>
+
                 <OverflowMenu
+                    customColor={theme.background}
                     actions={[
                         {
                             id: 'edit',
@@ -140,7 +155,7 @@ export default function Column({ projectId, projectName, columnData }) {
                             title: 'Delete column',
                             icon: 'delete',
                             confirm: {
-                                title: 'Delete column',
+                                title: 'Delete Column',
                                 message: 'Are you sure you want to delete this column? All related data will be lost.',
                             },
                             destructive: true,
@@ -150,68 +165,80 @@ export default function Column({ projectId, projectName, columnData }) {
                 />
             </View>
 
+            <Spacer height={15}/>
+            <Divider />
+            <Spacer height={10}/>
+
             {/* Task List */}
-            {isLoadingTasks ? (
-                <ActivityIndicator />
-            ) : (
-                <FlatList
-                    data={tasks}
-                    keyExtractor={(item) => item.id}
-                    showsVerticalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <Task
-                            task={item}
-                            onPress={() => openTaskDetails(item)}  // modal state lives here now
-                        />
-                    )}
-                    ListEmptyComponent={
-                        <EmptyState
-                            title="No tasks yet"
-                            subtitle="Use the button below to create your first task in this column"
-                            iconName="note"
-                        />
-                    }
-                    contentContainerStyle={styles.list}
-                />
-            )}
+            {isLoadingTasks ? 
+                <LoadingScreen loadingText="Loading tasks..." />
+             :
+                <>
+                    <FlatList
+                        data={tasks}
+                        keyExtractor={(item) => item.id}
 
-            {/* Create Task Button */}
-            <ThemedButton onPress={openTaskCreationModal} style={styles.btn}>
-                <ThemedText style={styles.btnText}>+ Add Task</ThemedText>
-            </ThemedButton>
+                        contentContainerStyle={
+                            styles.list,
+                            (tasks.length === 0) && { flex: 1 }
+                        }
 
-            <EditColumnModal
-                visible={editColumnModalVisible}
-                onClose={closeEditColumnModal}
-                onEdit={handleEditColumn}
-                columnData={column}
-            />
+                        showsVerticalScrollIndicator={false}
 
-            {/* Modals — scoped to this column */}
-            <CreateTaskModal
-                visible={taskModalCreationVisible}
-                task={task}
-                projectName={projectName}
-                columnName={column.name}
-                onClose={closeTaskCreationModal}
-                onCreate={handleCreateTask}
-                onChange={handleTaskChange}
-                getProjectUsers={() => projectService.getProjectUsers(projectId)}
-            />
-            <TaskModal
-                visible={taskDetailsVisible}
-                task={selectedTask}
-                projectName={projectName}
-                columnName={column.name}
-                onClose={closeTaskDetails}
-                deleteTask={handleDeleteTask}
-            />
+                        renderItem={({ item }) => (
+                            <ThemedTask
+                                task={item}
+                                onPress={() => openTaskDetails(item)}  // modal state lives here now
+                            />
+                        )}
+                        ListEmptyComponent={
+                            <EmptyState
+                                title="No tasks yet"
+                                subtitle="Create the first task in this column using the button below"
+                                iconName="note"
+                            />
+                        }
+                    />
 
-            <ThemedAlert
-                visible={alertVisible}
-                alert={alert}
-                onConfirm={() => setAlertVisible(false)} 
-            />
+                    
+                    <ThemedButton onPress={openTaskCreationModal}>
+                        <ThemedIcon name="plus" onPrimary/>
+                        <ThemedText bold onPrimary>Create Task</ThemedText>
+                    </ThemedButton>
+
+                    <EditColumnModal
+                        visible={editColumnModalVisible}
+                        onClose={closeEditColumnModal}
+                        onEdit={handleEditColumn}
+                        columnData={column}
+                    />
+
+                    <CreateTaskModal
+                        visible={taskModalCreationVisible}
+                        task={task}
+                        projectName={projectName}
+                        columnName={column.name}
+                        onClose={closeTaskCreationModal}
+                        onCreate={handleCreateTask}
+                        onChange={handleTaskChange}
+                        getProjectUsers={() => projectService.getProjectUsers(projectId)}
+                    />
+                    <TaskModal
+                        visible={taskDetailsVisible}
+                        task={selectedTask}
+                        projectName={projectName}
+                        columnName={column.name}
+                        onClose={closeTaskDetails}
+                        deleteTask={handleDeleteTask}
+                    />
+
+                    <ThemedAlert
+                        visible={alertVisible}
+                        alert={alert}
+                        onConfirm={() => setAlertVisible(false)} 
+                    />
+                </>
+            }
         </View>
     )
 }
@@ -220,38 +247,18 @@ export default function Column({ projectId, projectName, columnData }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f0f0f0',
         borderRadius: 8,
-        padding: 10,
-        margin: 5,
+        borderWidth: 1,
+        padding: 20,
+        marginVertical: 10
     },
 
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-
-    columnName: {
-        fontSize: 18,
-        fontWeight: 'bold',
     },
 
     list: {
-        flexGrow: 1,
-    },
-
-    btn: {
-        marginTop: 10,
-        backgroundColor: '#007bff',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-    },
-    btnText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
+        paddingVertical: 16
     }
 })

@@ -1,4 +1,3 @@
-import { Alert } from 'react-native'
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useRouter } from 'expo-router'
@@ -45,7 +44,6 @@ const Login = () => {
 
             <BrandingContainer style={{ top: '12%' }}/>
 
-
             <AuthBody style={{ paddingBottom: 90 }}> 
 
                 <AuthField
@@ -57,6 +55,7 @@ const Login = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     leftIcon="email"
+                    onPrimary
                 />
 
 
@@ -70,6 +69,7 @@ const Login = () => {
                     rightIcon={showPassword ? "eye" : "eye-off"}
                     onRightIconPress={() => setShowPassword(!showPassword)}
                     secureTextEntry={!showPassword}
+                    onPrimary
                 />
 
                 <Spacer height={25} />

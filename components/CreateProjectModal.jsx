@@ -13,7 +13,7 @@ export default function CreateProjectModal({
 }) {
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="New Project"
@@ -46,6 +46,7 @@ export default function CreateProjectModal({
                 primaryActionName="Create"
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(project)}
+                primaryActionDisabled={!project.title.trim()} // .trim() to ignore whitespace
             />
 
         </AppModal>

@@ -1,9 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../constants/Colors';
 import InviteProjectModal from '../components/InviteProjectModal';
 import ThemedText from "../components/ThemedText";
 import { useProject } from '../hooks/useProject';
@@ -14,24 +12,22 @@ import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
 import OverflowMenu from '../components/OverflowMenu';
 import SeeMembersModal from '../components/SeeMembersModal';
-import PagerView from 'react-native-pager-view';
-import Column from './column';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import CreateColumnModal from '../components/CreateColumnModal';
 import ThemedIcon from '../components/ThemedIcon';
-import EmptyState from '../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
+import ThemedView from '../components/ThemedView';
+import Columns from '../components/Columns';
+import AnimatedPressable from '../components/AnimatedPressable';
 
 export default function ProjectScreen() {
   	const router = useRouter()
 	const params = useLocalSearchParams() // Routing parameters of the current screen
 	// For example: /project?projectId=abc -> params.projectId will be abc
 
-	const scheme = useColorScheme()
-	const palette = Colors[scheme] ?? Colors.light
 
   	const { projects, deleteProject, kickMember } = useProject(); // user 
 	const [deleting, setDeleting] = useState(false) 
+	const [leaving, setLeaving] = useState(false)
   	const { user } = useAuth();
 
 	const { columns, setActiveProjectId, createColumn} = useColumn()
@@ -50,10 +46,10 @@ export default function ProjectScreen() {
 
 	// Alert
 	const [alertVisible, setAlertVisible] = useState(false);
-	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+	const [alert, setAlert] = useState({ type: '', title: '', message: '', onConfirm: null });
 
-	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
-		setAlert({ type, title, message });
+	const showAlert = (type, title, message, onConfirm = null) => { // function to call when an alert needs to be shown
+		setAlert({ type, title, message, onConfirm });
 		setAlertVisible(true);
 	};
 	
@@ -65,7 +61,16 @@ export default function ProjectScreen() {
 			setActiveProjectId('')
 		}
 	}, [projectId, setActiveProjectId])
-	
+
+
+	useEffect(() => {
+		if (!currentProject && !deleting && !leaving) {
+			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.", () => {
+				handleGoBack();
+			});
+		}
+	}, [currentProject, handleGoBack, deleting, leaving]);
+
 
 	const handleGoBack = useCallback(() => {
 		try {
@@ -79,14 +84,7 @@ export default function ProjectScreen() {
 		}
 	}, [router]); // Add router as a dependency
 
-	// Then update the useEffect dependency array:
-	useEffect(() => {
-		if (!currentProject && !deleting) {
-			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.");
-			handleGoBack();
-		}
-	}, [currentProject, handleGoBack, deleting]); // Add handleGoBack here
-
+	
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true)
 
@@ -141,7 +139,7 @@ export default function ProjectScreen() {
 		}
 
 		Toast.show({
-			type: 'success',
+			type: 'default',
 			text1: 'Invite sent',
 			text2: `Invitation sent to ${trimmedTarget}.`,
 			position: 'top',
@@ -154,12 +152,15 @@ export default function ProjectScreen() {
 
 	const handleProjectDelete = async () => {
 		try {
-			setDeleting(true)
+			setDeleting(true) // prevents the "Access Lost" alert from showing
 			await deleteProject(projectId)
-			handleGoBack()
+			showAlert(ALERT_TYPES.SUCCESS, "Success", "Successfully deleted the project.", () => {
+				handleGoBack()
+			})
 		}
 		catch (error) {
-			console.log('Delete Failed', error.message)
+			setDeleting(false)
+			showAlert(ALERT_TYPES.ERROR, "Deletion Failed", error.message)
 		}
 	}
 
@@ -183,33 +184,45 @@ export default function ProjectScreen() {
 			await createColumn(columnData)
 			closeCreateColumnModal()
 		} catch (error) {
-			showAlert(ALERT_TYPES.ERROR, "Column creation failed", error.message)
+			showAlert(ALERT_TYPES.ERROR, "Column Creation Failed", error.message)
 		}
 	}
 
 	// Column related handlers
 	const handleKickMember = async (projectId, userId, userEmail) => {
 		try {
+			if (userId === user.uid) {
+				setLeaving(true)
+			}
+
+			// eu acho que este kickMember está a fazer com o utilizador saia do projeto.
 			await kickMember(projectId, userId)
 
 			let alertMessage
+			let onAlertConfirm = null
+			
 			if (userId === user.uid) {
 				alertMessage = "Successfully left the project."
-				handleGoBack() // navigate away when leaving project
+				onAlertConfirm = async () => {
+					handleGoBack() // navigate away when leaving project
 
-				// To prevent unaccessible projects (leaks)
-				if (await projectService.projectHasNoMembers(projectId)) {
-					await projectService.deleteProject(projectId)
+					// To prevent unaccessible projects (leaks)
+					if (await projectService.projectHasNoMembers(projectId)) {
+						await projectService.deleteProject(projectId)
+					}
 				}
 
 			} else {
 				alertMessage = `Successfully kicked ${userEmail}.`
 			}
 
-			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage)
+			showAlert(ALERT_TYPES.SUCCESS, "Success", alertMessage, onAlertConfirm)
 		}
 		catch (error) {
-			console.log('Kick fail', error.message)
+			if (userId === user.uid) {
+				setLeaving(false)
+			}
+			showAlert(ALERT_TYPES.ERROR, "Kick Operation Failed", error.message)
 		}
     }
 
@@ -218,102 +231,65 @@ export default function ProjectScreen() {
 			<Stack.Screen
 				options={{
 
-				headerTitle: () => (
-					<ThemedText title={true} style={{ fontSize: 18, fontWeight: 'bold' }}>
-						{currentProjectName}
-					</ThemedText>
-				),
+					headerTitle: () => (
+						<ThemedText title bold style={{ fontSize: 20 }}>
+							{currentProjectName}
+						</ThemedText>
+					),
 
-				headerLeft: () => (
-					<Pressable onPress={handleGoBack} hitSlop={10} style={{
-					width: 40,
-					height: 40,
-					justifyContent: 'center',
-					alignItems: 'center',
-					}}>
-						<ThemedIcon name="arrow-left"/>
-					</Pressable>
-				),
+					headerLeft: () => (
+						<AnimatedPressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
+							<ThemedIcon name="arrow-left"/>
+						</AnimatedPressable>
+					),
 
-				headerRight: () => (
-					<>
-						<Pressable onPress={openCreateColumnModal} hitSlop={10} style={{
-							width: 40,
-							height: 40,
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-							<MaterialCommunityIcons name="table-column-plus-after" size={24} color="black" />
-						</Pressable>
-						<Pressable onPress={handleSeeMembersPress} hitSlop={10} style={{
-							width: 40,
-							height: 40,
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}>
-							<ThemedIcon testID="see-members-icon" name="account-multiple" size={24}/>
-						</Pressable>
+					headerRight: () => (
+						<>
+							<AnimatedPressable onPress={openCreateColumnModal} style={{ paddingHorizontal: 5 }}>
+								<ThemedIcon name="table-column-plus-after" />
+							</AnimatedPressable>
+							<AnimatedPressable onPress={handleSeeMembersPress} style={{ paddingHorizontal: 12 }}>
+								<ThemedIcon testID="see-members-icon" name="account-multiple"/>
+							</AnimatedPressable>
 
-						<OverflowMenu
-							testID="project-overflow-menu"
-							actions={[
-								{
-									id: 'invite-member',
-									title: 'Invite member',
-									icon: 'account-plus',
-									onPress: () => handleInvitePress(),
-								},
-								{
-									id: 'delete-project',
-									title: 'Delete project',
-									icon: 'delete',
-									confirm: {
-										title: 'Delete project',
-										message: 'Are you sure you want to delete this project? All related data will be lost.',
+							<OverflowMenu
+								testID="project-overflow-menu"
+								actions={[
+									{
+										id: 'invite-member',
+										title: 'Invite member',
+										icon: 'account-plus',
+										onPress: () => handleInvitePress(),
 									},
-									destructive: true, // If we place a string of text that is not null, 
-									// it will be marked as a destructive action
-									onPress: () => handleProjectDelete(),
-								}
-							]}
-						/>
-					</>
-				),
-				headerStyle: {
-					backgroundColor: palette.navBackground,
-					borderBottomWidth: 1,
-					borderBottomColor: '#e5e7eb',
-				},
-				headerTintColor: palette.title,
-				headerShadowVisible: false,
-			}}
+									{
+										id: 'delete-project',
+										title: 'Delete project',
+										icon: 'delete',
+										confirm: {
+											title: 'Delete Project',
+											message: 'Are you sure you want to delete this project? All related data will be lost.',
+										},
+										destructive: true, // If we place a string of text that is not null, 
+										// it will be marked as a destructive action
+										onPress: () => handleProjectDelete(),
+									}
+								]}
+							/>
+						</>
+					)				
+				}}
 			/>
 
 
 
-			<SafeAreaView style={[styles.container, { backgroundColor: palette.background }]}>
-				{
-				columns.length === 0 ?
-				<EmptyState
-					title="No columns yet"
-					subtitle="Create your first column to start organizing tasks in this project"
-					iconName="view-column-outline"
-				/> 
-
-				: 
-
-				<PagerView style={{ flex: 1 }} initialPage={0}>
-					{columns.map((item) => (
-					<View key={item.id} style={{ flex: 1, padding: 16 }} collapsable={false}>
-						<Column
-							projectId={projectId}
-							projectName={currentProjectName}
-							columnData={item} // Pass the entire column data instead of just the name
-						/>
-					</View>
-					))}
-				</PagerView>
-				}
+			<ThemedView style={styles.container}>
+				
+				<Columns
+					columns={columns}
+					projectId={projectId}
+					currentProjectName={currentProjectName}
+					openCreateColumnModal={openCreateColumnModal}
+				/>
 
 				<CreateColumnModal
 					visible={createColumnModalVisible}
@@ -342,38 +318,21 @@ export default function ProjectScreen() {
 				<ThemedAlert
 					visible={alertVisible} 
 					alert={alert} 
-					onConfirm={() => setAlertVisible(false)} 
+					onConfirm={() => {
+						setAlertVisible(false);
+						if (alert.onConfirm) {
+							alert.onConfirm();
+						}
+					}} 
            	 	/>
 				
-			</SafeAreaView>
+			</ThemedView>
 		</>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-	},
-
-	btn: {
-		width: '85%',
-
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-
-		padding: 12,
-
-		position: 'absolute',
-		bottom: 20,
-		alignSelf: 'center',
-
-		marginBottom: 20,
-	},
-
-	btnText: {
-		color: 'white',
-		fontSize: 16,
-		fontWeight: 'bold',
+		flex: 1
 	}
 });

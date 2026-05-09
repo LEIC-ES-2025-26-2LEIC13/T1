@@ -3,18 +3,20 @@ import AppModal from './AppModal';
 import ModalHeader from './modal/ModalHeader';
 import FormField from './FormField';
 import ModalBody from './modal/ModalBody';
-import PillsContainer from './modal/PillsContainer';
-import Pill from './modal/Pill';
+import PillsContainer from './PillsContainer';
+import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
 import ModalActions from './modal/ModalActions';
+import { LabelColors } from '../constants/Colors';
 
 export default function TaskModal({ visible, task, projectName, columnName, onClose, deleteTask }) {
 
     // The corresponding icon for the task label
-    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon;
+    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon
+    const labelColor = LabelColors[task?.label] || LabelColors.default;
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Task Details"
@@ -24,11 +26,11 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
 
             <ModalBody>
 
-                <PillsContainer>
+                <PillsContainer style={{ marginBottom: 15 }}>
                     <Pill projectName={projectName}/>
                     <Pill columnName={columnName}/>
                     {
-                        task?.label && <Pill name={task.label} iconName={labelIcon}/>
+                        task?.label && <Pill name={task.label} iconName={labelIcon} customStyle={{ backgroundColor: `${labelColor}50` }}/>
                     }
                 </PillsContainer>
 
