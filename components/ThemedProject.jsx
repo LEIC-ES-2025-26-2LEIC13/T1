@@ -1,9 +1,10 @@
-import { StyleSheet, useColorScheme, Pressable, View, Text } from 'react-native'
+import { StyleSheet, useColorScheme, View, Text } from 'react-native'
 import { Colors } from "../constants/Colors";
 import ThemedText from "./ThemedText";
 import { useRouter } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
 import ThemedIcon from './ThemedIcon';
+import AnimatedPressable from './AnimatedPressable';
 
 const ThemedProject = ({ name, description, borderColor, href, projectId, testID }) => {
     const router = useRouter()
@@ -46,19 +47,13 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     )
 
     return (
-        <Pressable
+        <AnimatedPressable
             onPress={handlePress}
             testID={testID}
-            style={({ pressed }) => [
-                { marginVertical: 6 },
-                {
-                    opacity: pressed ? 0.85 : 1,
-                    transform: [{ scale: pressed ? 0.985 : 1 }],
-                }
-            ]}
+            style={{ marginVertical: 6 }}
         > 
             {CardContent}
-        </Pressable>
+        </AnimatedPressable>
     )
 }
 

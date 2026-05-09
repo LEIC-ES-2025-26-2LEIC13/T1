@@ -5,6 +5,7 @@ import ThemedView from "./ThemedView";
 import { Colors, LabelColors } from "../constants/Colors";
 import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
+import AnimatedPressable from './AnimatedPressable';
 
 
 export default function ThemedTask({ task, onPress}) {
@@ -35,18 +36,12 @@ export default function ThemedTask({ task, onPress}) {
     );
 
     return (
-        <Pressable
+        <AnimatedPressable
             onPress={onPress}
-            style={({ pressed }) => [
-                {marginVertical: 6}, 
-                {
-                    opacity: pressed ? 0.85 : 1,
-                    transform: [{ scale: pressed ? 0.985 : 1 }]
-                }
-            ]}
+            style={ {marginVertical: 6}}
         >
             {card}
-        </Pressable>
+        </AnimatedPressable>
     );
 }
 

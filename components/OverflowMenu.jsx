@@ -7,6 +7,8 @@ import { Colors } from '../constants/Colors';
 import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
 import Divider from './Divider';
 import Spacer from './Spacer';
+import Animated from 'react-native-reanimated';
+import AnimatedPressable from './AnimatedPressable';
 
 export default function OverflowMenu({ testID, actions = [], customColor }) {
 
@@ -39,7 +41,7 @@ export default function OverflowMenu({ testID, actions = [], customColor }) {
     return (
         <>
             <Menu>
-            <MenuTrigger testID={testID} customStyles={{ TriggerTouchableComponent: Pressable }}>
+            <MenuTrigger testID={testID} customStyles={{ TriggerTouchableComponent: AnimatedPressable }}>
                 <ThemedIcon name="dots-vertical"/>
             </MenuTrigger>
 

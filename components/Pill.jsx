@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native'
+import { StyleSheet, useColorScheme, View } from 'react-native'
 import React from 'react'
 import ThemedIcon from './ThemedIcon'
 import ThemedText from './ThemedText'
 import { Colors } from '../constants/Colors'
+import AnimatedPressable from './AnimatedPressable'
 
 const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected, customStyle }) => {
     const colorScheme = useColorScheme()
@@ -27,14 +28,12 @@ const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isS
     }
     
 
-    
-
     return (
         pressable ?
-            <Pressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, customStyle]} 
+            <AnimatedPressable style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, customStyle]} 
                     onPress={onPress}>
                 <Content isSelected={isSelected}/>
-            </Pressable>
+            </AnimatedPressable>
 
         :
             <View style={[styles.pill, { backgroundColor: (isSelected ? Colors.primary : theme.borders) }, customStyle]}>

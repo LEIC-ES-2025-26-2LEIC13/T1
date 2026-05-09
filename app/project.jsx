@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, StyleSheet, View, FlatList, useWindowDimensions } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import InviteProjectModal from '../components/InviteProjectModal';
@@ -12,17 +12,15 @@ import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
 import OverflowMenu from '../components/OverflowMenu';
 import SeeMembersModal from '../components/SeeMembersModal';
-import Column from './column';
 import CreateColumnModal from '../components/CreateColumnModal';
 import ThemedIcon from '../components/ThemedIcon';
-import EmptyState from '../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
 import ThemedView from '../components/ThemedView';
-import ThemedButton from '../components/ThemedButton';
+import Columns from '../components/Columns';
+import AnimatedPressable from '../components/AnimatedPressable';
 
 export default function ProjectScreen() {
   	const router = useRouter()
-	const { width } = useWindowDimensions()
 	const params = useLocalSearchParams() // Routing parameters of the current screen
 	// For example: /project?projectId=abc -> params.projectId will be abc
 
@@ -240,19 +238,19 @@ export default function ProjectScreen() {
 					),
 
 					headerLeft: () => (
-						<Pressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
+						<AnimatedPressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
 							<ThemedIcon name="arrow-left"/>
-						</Pressable>
+						</AnimatedPressable>
 					),
 
 					headerRight: () => (
 						<>
-							<Pressable onPress={openCreateColumnModal} style={{ paddingHorizontal: 5 }}>
+							<AnimatedPressable onPress={openCreateColumnModal} style={{ paddingHorizontal: 5 }}>
 								<ThemedIcon name="table-column-plus-after" />
-							</Pressable>
-							<Pressable onPress={handleSeeMembersPress} style={{ paddingHorizontal: 12 }}>
+							</AnimatedPressable>
+							<AnimatedPressable onPress={handleSeeMembersPress} style={{ paddingHorizontal: 12 }}>
 								<ThemedIcon testID="see-members-icon" name="account-multiple"/>
-							</Pressable>
+							</AnimatedPressable>
 
 							<OverflowMenu
 								testID="project-overflow-menu"
@@ -286,74 +284,12 @@ export default function ProjectScreen() {
 
 			<ThemedView style={styles.container}>
 				
-				<FlatList
-					data={columns}
-					keyExtractor={(item) => item.id}
-
-					contentContainerStyle={[
-						{padding: 16},
-						(columns.length === 0) && { flex: 1, marginTop: 50 }
-					]}
-
-					horizontal
-					showsHorizontalScrollIndicator={false}
-
-					snapToOffsets={
-						columns.length > 1 
-						? columns.map((_, i) => {
-							const colWidth = width * 0.87;
-							const spacing = 12; // matching the marginRight in renderItem
-							
-							// 1. First column: aligned to the left
-							if (i === 0) return 0;
-							
-							// 2. Last column: aligned to the right
-							if (i === columns.length - 1) {
-								// total content width: left padding + items + margins + right padding
-								const totalWidth = 32 + (columns.length * colWidth) + ((columns.length - 1) * spacing);
-								return totalWidth - width;
-							}
-							
-							// 3. Middle columns: perfectly centered
-							const itemLeft = 16 + i * (colWidth + spacing);
-							const centerOffset = itemLeft - (width - colWidth) / 2;
-							return centerOffset;
-						  })
-						: undefined
-					}
-
-					decelerationRate="fast"
-
-					ListEmptyComponent={<EmptyState
-						title="No columns yet"
-						subtitle="Create your first column to start organizing tasks in this project"
-						iconName="view-column-outline"
-					/>}
-					
-					renderItem={({ item, index }) => {
-						const columnWidth = columns.length === 1 ? width - 32 : width * 0.87;
-						const marginRight = index === columns.length - 1 ? 0 : 12;
-						
-						return (
-							<View style={{ width: columnWidth, marginRight }}>
-								<Column
-									projectId={projectId}
-									projectName={currentProjectName}
-									columnData={item}
-								/>
-							</View>
-						);
-					}}
+				<Columns
+					columns={columns}
+					projectId={projectId}
+					currentProjectName={currentProjectName}
+					openCreateColumnModal={openCreateColumnModal}
 				/>
-
-				{columns.length === 0 && (
-					<ThemedButton
-						style={{ margin: 20 }}
-						onPress={openCreateColumnModal}>
-						<ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} /> 
-						<ThemedText bold onPrimary>Create Column</ThemedText>
-					</ThemedButton>
-				)}
 
 				<CreateColumnModal
 					visible={createColumnModalVisible}
