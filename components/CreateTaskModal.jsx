@@ -3,7 +3,7 @@ import ModalHeader from './modal/ModalHeader';
 import Pill from './Pill';
 import ModalBody from './modal/ModalBody';
 import FormField from './FormField';
-import PillsContainer from './modal/PillsContainer';
+import PillsContainer from './PillsContainer';
 import ModalActions from './modal/ModalActions';
 import { LABELS } from '../constants/Labels';
 import { LabelColors } from '../constants/Colors';

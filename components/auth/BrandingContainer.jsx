@@ -7,7 +7,7 @@ const BrandingContainer = ({ style }) => {
     return (
         <View style={[{ alignItems: 'center' }, style]}>
             <ThemedLogo/>
-            <ThemedText style={styles.slogan}>From students to students</ThemedText>
+            <ThemedText title style={styles.slogan}>From students to students</ThemedText>
         </View>
     )
 }

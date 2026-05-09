@@ -44,7 +44,6 @@ const Login = () => {
 
             <BrandingContainer style={{ top: '12%' }}/>
 
-
             <AuthBody style={{ paddingBottom: 90 }}> 
 
                 <AuthField

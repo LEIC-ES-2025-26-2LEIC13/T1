@@ -57,14 +57,6 @@ const Invites = () => {
         <ThemedView style={styles.container}>
 
             <FlatList
-                ListHeaderComponent={
-                    <Pill
-                        name={`${invites.length} pending ${invites.length === 1 ? 'invite' : 'invites'}`}
-                        iconName="email-outline"
-                        customStyle={{ marginBottom: 15 }}
-                    />
-                }
-
                 data={invites}
                 keyExtractor={(item) => item.id}
 
@@ -113,6 +105,6 @@ const styles = StyleSheet.create({
     },
     
     listEmpty: {
-        flex: 1,
+        flex: 1
     }
 });
