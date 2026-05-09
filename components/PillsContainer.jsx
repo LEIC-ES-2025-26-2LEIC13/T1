@@ -14,6 +14,7 @@ export default PillsContainer
 const styles = StyleSheet.create({
     pillsContainer: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         gap: 10
     }
 })

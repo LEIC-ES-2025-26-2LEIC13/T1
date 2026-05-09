@@ -1,19 +1,20 @@
-import { addDoc, deleteDoc, collection, doc, onSnapshot, Timestamp } from "firebase/firestore";
-import { db } from '../firebase/firebaseConfig';
-import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
+import { addDoc, deleteDoc,onSnapshot, Timestamp } from "firebase/firestore";
+import { pathHelper } from "./pathHelper";
 
-function normalizeTaskData({ name, description, label }) {
+function normalizeTaskData({ name, description, label, assignedMembers }) {
     return {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
         label: label?.trim() ?? '',
+        assignedMembers: Array.isArray(assignedMembers) 
+            ? assignedMembers.map(m => ({ id: m.id, email: m.email })) 
+            : [],
     }
 }
 
 export const taskService = {
     subscribeToColumnTasks: (projectId, columnId, onUpdate) => {
-        const columnTasksRef = collection(db, COLLECTIONS.PROJECTS, projectId, 
-            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS)
+        const columnTasksRef = pathHelper.columnTasks(projectId, columnId);
         
         return onSnapshot(columnTasksRef, (snapshot) => {
             const tasksToDisplay = snapshot.docs.map((doc) => ({
@@ -32,8 +33,7 @@ export const taskService = {
 
         const normalizedTaskData = normalizeTaskData(taskData);
 
-        const taskRef = collection(db, COLLECTIONS.PROJECTS, projectId, 
-            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS);
+        const taskRef = pathHelper.columnTasks(projectId, columnId);
 
         await addDoc(taskRef, {
             ...normalizedTaskData,
@@ -42,8 +42,8 @@ export const taskService = {
     },
 
     deleteTask: async (projectId, columnId, taskId) => {
-        const taskDocRef = doc(db, COLLECTIONS.PROJECTS, projectId, 
-            SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS, taskId);
+        const taskDocRef = pathHelper.task(projectId, columnId, taskId);
+            
         await deleteDoc(taskDocRef);
     }
 }

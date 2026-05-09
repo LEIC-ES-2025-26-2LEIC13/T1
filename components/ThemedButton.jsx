@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native'
 import { Colors } from '../constants/Colors'
 import AnimatedPressable from './AnimatedPressable'
 
-const ThemedButton = ({ style, disabled=false,...props }) => {
+const ThemedButton = ({ style, disabled=false, ...props }) => {
     
     return (
         <AnimatedPressable

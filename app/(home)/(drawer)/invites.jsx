@@ -6,7 +6,6 @@ import ThemedInvite from '../../../components/ThemedInvite';
 import EmptyState from '../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
 import { useInvite } from '../../../hooks/useInvite';
-import Pill from '../../../components/Pill';
 import Toast from 'react-native-toast-message';
 
 const Invites = () => {

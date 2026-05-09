@@ -86,7 +86,9 @@ For that same reason, a new api service was created: `columnsService`, that is r
 
 ### NOT YET IMPLEMENTED (but will be done in this sprint)
 
-To avoid hardcoding database paths throughout the codebase, a helper function was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes.
+# Implement database path helper
+
+To avoid hardcoding database paths throughout the codebase, `pathHelper.js` was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes. Logic is now consistent and self contained inside the helper, improving code readability and maintainability.
 
 ## Acceptance tests
 

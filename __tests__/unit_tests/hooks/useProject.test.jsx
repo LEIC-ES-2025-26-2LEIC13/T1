@@ -1,44 +1,30 @@
-import { renderHook } from '@testing-library/react-native';
-import { useProject } from '../../../hooks/useProject';
-import { ProjectProvider } from '../../../contexts/projectContext';
+import { jest, describe, it, expect } from '@jest/globals'
+import React from 'react'
+import { renderHook } from '@testing-library/react-native'
+import { useProject } from '../../../hooks/useProject'
+import { ProjectContext } from '../../../contexts/projectContext'
 
-// Jest is mocking the database interactions and the db itself
-jest.mock('firebase/firestore', () => ({
-    // All functions used from the database are mocked
-    addDoc: jest.fn(),
-    collection: jest.fn(),
-    deleteDoc: jest.fn(),
-    doc: jest.fn(),
-    onSnapshot: jest.fn((collectionRef, callback) => {
-        callback({ docs: [] });
-        return jest.fn();
-    }),
-    updateDoc: jest.fn(),
-}));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
-    db: {},
-}));
+jest.mock('../../../contexts/projectContext', () => ({
+    ProjectContext: require('react').createContext(null)
+}))
 
-describe("useProject", () => {
-    test("Get context values", () => {
-        const wrapper = ({ children }) => (
-            <ProjectProvider>
-                {children}
-            </ProjectProvider>
-        );
-        const { result } = renderHook(() => useProject(), { wrapper });
-
-        // Creates an array of projects
-        expect(Array.isArray(result.current.projects)).toBe(true)
-        expect(typeof result.current.createProject).toBe('function')
-        expect(typeof result.current.deleteProject).toBe('function')
-        expect(typeof result.current.updateProject).toBe('function')
+describe('useProject', () => {
+    it('should throw an error if used outside of provider', () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        expect(() => renderHook(() => useProject())).toThrow('useProject must be used within a ProjectProvider')
+        consoleSpy.mockRestore()
     })
 
-    test("Hook used outside ProjectProvider", () => {
-        expect(() => {
-            renderHook(() => useProject())
-        }).toThrow("useProject must be used within a ProjectProvider")
+    it('should return the context value when used within provider', () => {
+        const mockContextValue = { testValue: 'mocked' }
+        const wrapper = ({ children }) => (
+            <ProjectContext.Provider value={mockContextValue}>
+                {children}
+            </ProjectContext.Provider>
+        )
+
+        const { result } = renderHook(() => useProject(), { wrapper })
+        expect(result.current).toEqual(mockContextValue)
     })
 })

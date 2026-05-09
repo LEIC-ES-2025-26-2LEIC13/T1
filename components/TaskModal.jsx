@@ -48,9 +48,13 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
                     readOnly
                 />
 
-                <FormField // Will probably be a dropdown list of members
+                <FormField
                     labelName="ASSIGNED TO"
-                    value={task?.assignedTo || "No one"}
+                    value={
+                        task?.assignedMembers && task.assignedMembers.length > 0
+                            ? task.assignedMembers.map(m => m.email).join(', ')
+                            : "No one"
+                    }
                     readOnly
                 />
 
