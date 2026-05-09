@@ -13,7 +13,7 @@ export default function CreateProjectModal({
 }) {
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="New Project"

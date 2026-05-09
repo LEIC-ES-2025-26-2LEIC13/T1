@@ -15,7 +15,7 @@ export default function InviteProjectModal({
 }) {
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Invite Member"

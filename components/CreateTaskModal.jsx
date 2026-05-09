@@ -42,7 +42,7 @@ export default function CreateTaskModal({
     )
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Create Task"

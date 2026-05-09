@@ -1,5 +1,5 @@
 import React from 'react';
-import { useColorScheme, StyleSheet, Pressable} from "react-native";
+import { useColorScheme, StyleSheet } from "react-native";
 import ThemedText from "./ThemedText";
 import ThemedView from "./ThemedView";
 import { Colors, LabelColors } from "../constants/Colors";

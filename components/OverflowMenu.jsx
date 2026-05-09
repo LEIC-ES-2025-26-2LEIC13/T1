@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import ThemedIcon from './ThemedIcon';
 import ThemedText from './ThemedText';
@@ -7,7 +7,6 @@ import { Colors } from '../constants/Colors';
 import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
 import Divider from './Divider';
 import Spacer from './Spacer';
-import Animated from 'react-native-reanimated';
 import AnimatedPressable from './AnimatedPressable';
 
 export default function OverflowMenu({ testID, actions = [], customColor }) {

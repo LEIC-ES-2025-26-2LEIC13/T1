@@ -1,9 +1,7 @@
 import {useNavigation} from "expo-router";
-import {Pressable} from "react-native";
 import {DrawerActions} from "@react-navigation/routers";
 import {Colors} from "../constants/Colors";
 import ThemedIcon from "./ThemedIcon";
-import Animated from "react-native-reanimated";
 import AnimatedPressable from "./AnimatedPressable";
 
 

@@ -20,7 +20,7 @@ const ThemedAlert = ({ visible, alert, onConfirm, onCancel }) => {
     const iconName = validTypes.includes(alert.type) ? alert.type : ALERT_TYPES.ERROR
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={() => { if (onCancel) onCancel(); else onConfirm(); }}>
             <View style={styles.alertContainer}>
         
                 <View style={styles.alertHeader}>

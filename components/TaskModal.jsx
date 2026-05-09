@@ -16,7 +16,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
     const labelColor = LabelColors[task?.label] || LabelColors.default;
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Task Details"

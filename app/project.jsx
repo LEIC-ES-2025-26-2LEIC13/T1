@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import InviteProjectModal from '../components/InviteProjectModal';

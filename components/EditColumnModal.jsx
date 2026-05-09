@@ -16,7 +16,7 @@ export default function EditColumnModal({ visible, onClose, onEdit, columnData})
     }, [visible]);
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Edit Column Name"

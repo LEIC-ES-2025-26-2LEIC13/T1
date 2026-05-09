@@ -13,7 +13,7 @@ export default function CreateColumnModal({
 }) {
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="New Column"

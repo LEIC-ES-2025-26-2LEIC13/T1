@@ -116,7 +116,7 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
 
 
     return (
-        <AppModal visible={visible}>
+        <AppModal visible={visible} onClose={onClose}>
 
             <ModalHeader
                 heading="Project Members"
