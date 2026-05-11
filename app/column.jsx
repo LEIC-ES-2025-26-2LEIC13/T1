@@ -17,12 +17,15 @@ import Divider from "../components/Divider";
 import Spacer from "../components/Spacer";
 import ThemedIcon from "../components/ThemedIcon";
 import { projectService } from "../api/projectService";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Column({ projectId, projectName, columnData }) {
 
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+
+    const { user } = useAuth()
 
     const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
@@ -230,6 +233,7 @@ export default function Column({ projectId, projectName, columnData }) {
                         columnName={column.name}
                         onClose={closeTaskDetails}
                         deleteTask={handleDeleteTask}
+                        userEmail={user.email}
                     />
 
                     <ThemedAlert
@@ -242,7 +246,6 @@ export default function Column({ projectId, projectName, columnData }) {
         </View>
     )
 }
-
 
 const styles = StyleSheet.create({
     container: {

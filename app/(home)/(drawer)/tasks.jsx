@@ -113,6 +113,7 @@ const Tasks = () => {
                 columnName={selectedTask?.columnName}
                 onClose={closeTaskDetails}
                 deleteTask={handleDeleteTask}
+                userEmail={user.email}
             />
 
             <ThemedAlert

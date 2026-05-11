@@ -9,7 +9,7 @@ import { LABELS } from '../constants/Labels';
 import ModalActions from './modal/ModalActions';
 import { LabelColors } from '../constants/Colors';
 
-export default function TaskModal({ visible, task, projectName, columnName, onClose, deleteTask }) {
+export default function TaskModal({ visible, task, projectName, columnName, onClose, deleteTask, userEmail }) {
 
     // The corresponding icon for the task label
     const labelIcon = LABELS.find(label => label.name === task?.label)?.icon
@@ -52,7 +52,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
                     labelName="ASSIGNED TO"
                     value={
                         task?.assignedMembers && task.assignedMembers.length > 0
-                            ? task.assignedMembers.map(member => member.email).join(', ')
+                            ? task.assignedMembers.map(member => member.email === userEmail ? "Me" : member.email).join(', ')
                             : "No one"
                     }
                     readOnly
