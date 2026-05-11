@@ -15,6 +15,9 @@ export const pathHelper = {
 
     userProject: (userId, projectId) => doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId),
 
+    userTask: (userId, taskId) => doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_TASKS, taskId),
+
+    userTasks: (userId) => collection(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_TASKS),
 
     // Project Related
 
@@ -34,7 +37,7 @@ export const pathHelper = {
         collection(db, COLLECTIONS.PROJECTS, projectId, 
             SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS),
 
-    task: (projectId, columnId, taskId) =>
+    columnTask: (projectId, columnId, taskId) =>
         doc(db, COLLECTIONS.PROJECTS, projectId, 
             SUBCOLLECTIONS.PROJECT_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TASKS, taskId),
 }

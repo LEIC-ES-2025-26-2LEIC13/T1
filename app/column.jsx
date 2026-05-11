@@ -39,7 +39,7 @@ export default function Column({ projectId, projectName, columnData }) {
         name: '',
         description: '',
         label: '',
-        assignedMembers: [],
+        assignedMembers: []
     })
 
     // Alert
@@ -113,7 +113,7 @@ export default function Column({ projectId, projectName, columnData }) {
 
     const handleCreateTask = async (taskData) => {
         try {
-            await taskService.createTask(projectId, column.id, taskData)
+            await taskService.createTask(projectId, projectName, column.id, column.name, taskData)
             closeTaskCreationModal()
         }
         catch (error) {
@@ -121,9 +121,9 @@ export default function Column({ projectId, projectName, columnData }) {
         }
     }
 
-    const handleDeleteTask = async (taskId) => {
+    const handleDeleteTask = async (task) => {
         try {
-            await taskService.deleteTask(projectId, column.id, taskId)
+            await taskService.deleteTask(projectId, column.id, task.id, task.assignedMembers)
             closeTaskDetails()
         }
         catch (error) {

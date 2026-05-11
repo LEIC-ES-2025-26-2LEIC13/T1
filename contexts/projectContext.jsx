@@ -18,10 +18,10 @@ export const ProjectProvider = ({ children }) => {
         const unsub = projectService.subscribeToUserProjects(user.uid, (projectsToDisplay) => {
             setProjects(projectsToDisplay);
             setIsLoadingProjects(false);
-        });
+        })
 
-      return () => unsub();
-    }, [user?.uid]);
+      return () => unsub()
+    }, [user?.uid])
 
 
     async function createProject(projectData) {

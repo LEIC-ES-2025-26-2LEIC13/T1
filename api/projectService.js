@@ -1,6 +1,6 @@
-import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch, where } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-import { batchDelete } from './batchDeleteHelper';
+import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
 import { columnService } from "./columnService";
 import { pathHelper } from "./pathHelper";
@@ -74,6 +74,7 @@ export const projectService = {
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
     },
 
+    // BUG: this function does not cascade the updates to the userProjects subcollection documents, nor to the userTasks documents (projectName field)
     updateProject: async (projectId, updates) => {
         const { title, description } = normalizeProjectUpdates(updates)
         if (!title && !description) {
@@ -88,32 +89,32 @@ export const projectService = {
     },
 
     deleteProject: async (projectId) => {
-        // Array to hold the references of every document we need to delete
-        const refsToDelete = []
+        // Array to hold the operations of every document we need to delete
+        const operations = []
 
-        // Add all data from columns and tasks within the project (need to destructure the data as allColumnsRefsToDelete returns an array, to ensure proper deletion)
-        refsToDelete.push(...await columnService.allColumnsRefsToDelete(projectId))
+        // Add all data from columns and tasks within the project
+        operations.push(...await columnService.allColumnsOps(projectId))
 
         // Find all projectUsers inside the project to be deleted
         const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnapshot = await getDocs(projectUsersRef)
 
-        // for each projectUsers doc
+        // for each projectUsers doc    
         projectUsersSnapshot.forEach((docSnap) => {
             // Queue the subcollection document itself for deletion
-            refsToDelete.push(docSnap.ref)
+            operations.push({ type: OPERATION_TYPES.DELETE, ref: docSnap.ref })
             // Remove that project from all users that reference it
             const userId = docSnap.id;
             const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId)
-            refsToDelete.push(userProjectRef)
+            operations.push({ type: OPERATION_TYPES.DELETE, ref: userProjectRef })
         });
 
         // Add the deletion of the project doc itself
         const mainProjectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
-        refsToDelete.push(mainProjectRef);
+        operations.push({ type: OPERATION_TYPES.DELETE, ref: mainProjectRef });
 
-        // Execute the batch deletion of all the collected references
-        await batchDelete(db, refsToDelete);
+        // Execute the batch ops of all the collected operations
+        await batchOps(db, operations);
     },
 
     getProjectUsers: async (projectId) => {
@@ -128,15 +129,36 @@ export const projectService = {
     },
 
     kickMember: async (projectId, userId) => {
-        const userProjectRef = pathHelper.userProject(userId, projectId)
-        const projectUserRef = pathHelper.projectUser(projectId, userId)
+        const operations = []
 
-        // Using batch to perform the deletions atomically
-        const batch = writeBatch(db)
-        batch.delete(userProjectRef)
-        batch.delete(projectUserRef)
+        // Remove the user from the project and the project from the user
+        operations.push({ type: OPERATION_TYPES.DELETE, ref: pathHelper.userProject(userId, projectId) })
+        operations.push({ type: OPERATION_TYPES.DELETE, ref: pathHelper.projectUser(projectId, userId) })
+        
+        // Remove the kicked member from the tasks he was assigned to in this specific project
+        const userProjectTasksQuery = query(
+            pathHelper.userTasks(userId),
+            where('projectId', '==', projectId)
+        )
+        const userTasksSnap = await getDocs(userProjectTasksQuery)
 
-        await batch.commit()
+        userTasksSnap.forEach((taskDoc) => {
+            operations.push({ type: OPERATION_TYPES.DELETE, ref: taskDoc.ref }) // delete the task from the userTasks collection
+
+             // Get the column task reference to update the assignedMembers field
+            const columnTaskRef = pathHelper.columnTask(projectId, taskDoc.data().columnId, taskDoc.id)
+
+            // update the assignedMembers field of the column task, removing the kicked member
+            operations.push({
+                type: OPERATION_TYPES.UPDATE,
+                ref: columnTaskRef,
+                data: {
+                    assignedMembers: taskDoc.data().assignedMembers?.filter(member => member.id !== userId) || []
+                }
+            })
+        })
+
+        await batchOps(db, operations)
     },
 
     projectHasNoMembers: async (projectId) => {

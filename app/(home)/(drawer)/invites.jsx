@@ -1,7 +1,7 @@
 import { FlatList, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
 import { useFocusEffect } from 'expo-router';
-import ThemedView from '../../../components/ThemedView';
+import SafeAreaPage from '../../../components/SafeAreaPage';
 import ThemedInvite from '../../../components/ThemedInvite';
 import EmptyState from '../../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../../components/ThemedAlert';
@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
 
+    // Alert
     const [alertVisible, setAlertVisible] = useState(false);
     const [alert, setAlert] = useState({ type: '', title: '', message: '' });
 
@@ -53,7 +54,7 @@ const Invites = () => {
     )
 
     return (
-        <ThemedView style={styles.container}>
+        <SafeAreaPage style={styles.container}>
 
             <FlatList
                 data={invites}
@@ -87,7 +88,7 @@ const Invites = () => {
                 alert={alert}
                 onConfirm={() => setAlertVisible(false)} 
             />
-        </ThemedView>
+        </SafeAreaPage>
     );
 };
 

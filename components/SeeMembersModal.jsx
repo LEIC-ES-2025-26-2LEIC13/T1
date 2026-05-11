@@ -8,6 +8,7 @@ import ThemedIcon from "./ThemedIcon";
 import ThemedText from "./ThemedText";
 import Spacer from "./Spacer";
 import { Colors } from "../constants/Colors";
+import ThemedAlert, { ALERT_TYPES } from "./ThemedAlert";
 
 
 function putCurrUserFirst(userEmail, members) {
@@ -32,6 +33,15 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
     const [members, setMembers] = useState([]);
     const { user } = useAuth()
 
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
+
     const updateMembers = useCallback(async () => {
         if (visible) {
             try {
@@ -39,7 +49,7 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
                 const membersWithCurUserFirst = putCurrUserFirst(user.email, projectMembers)
                 setMembers(membersWithCurUserFirst)
             } catch (error) {
-                console.error(error.message)
+                showAlert(ALERT_TYPES.ERROR, "Failed to Load Members", error.message)
             }
         }
     }, [visible, getProjectUsers, user.email]);
@@ -116,18 +126,27 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
 
 
     return (
-        <AppModal visible={visible} onClose={onClose}>
+        <>
+            <AppModal visible={visible} onClose={onClose}>
 
-            <ModalHeader
-                heading="Project Members"
-                iconName="account-multiple"
-                onClose={onClose}
+                <ModalHeader
+                    heading="Project Members"
+                    iconName="account-multiple"
+                    onClose={onClose}
+                />
+
+                <Spacer height={10} />
+                <MemberList members={members}/>
+                
+            </AppModal>
+
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
             />
-
-            <Spacer height={10} />
-            <MemberList members={members}/>
-            
-        </AppModal>
+        </>
     );
 
 }
