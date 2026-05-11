@@ -1,5 +1,5 @@
 // themed components
-import ThemedView from '../../../components/ThemedView'
+import SafeAreaPage from '../../../components/SafeAreaPage'
 import { FlatList, StyleSheet } from "react-native";
 import { taskService } from '../../../api/taskService';
 import { useEffect, useState } from 'react';
@@ -62,7 +62,7 @@ const Tasks = () => {
     let previousProjectName = null
 
     return(
-        <ThemedView style={styles.container}>
+        <SafeAreaPage style={styles.container}>
             
             <FlatList
                 data={userTasks}
@@ -97,7 +97,7 @@ const Tasks = () => {
                                 </>
                             )}
 
-                            <ThemedTask
+                            <ThemedTask onBackground
                                 task={item}
                                 onPress={() => openTaskDetails(item)}
                             />
@@ -121,7 +121,7 @@ const Tasks = () => {
                 onConfirm={() => setAlertVisible(false)}
             />
             
-        </ThemedView>
+        </SafeAreaPage>
     )
 }
 
@@ -143,7 +143,7 @@ const styles =  StyleSheet.create({
     },
 
     label: {
-        fontSize: 11,
+        fontSize: 14,
         fontWeight: '600',
         letterSpacing: 0.8,
         textTransform: 'uppercase',

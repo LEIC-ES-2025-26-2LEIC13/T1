@@ -15,7 +15,7 @@ import SeeMembersModal from '../components/SeeMembersModal';
 import CreateColumnModal from '../components/CreateColumnModal';
 import ThemedIcon from '../components/ThemedIcon';
 import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
-import ThemedView from '../components/ThemedView';
+import SafeAreaPage from '../components/SafeAreaPage';
 import Columns from '../components/Columns';
 import AnimatedPressable from '../components/AnimatedPressable';
 
@@ -282,7 +282,7 @@ export default function ProjectScreen() {
 
 
 
-			<ThemedView style={styles.container}>
+			<SafeAreaPage style={styles.container}>
 				
 				<Columns
 					columns={columns}
@@ -326,7 +326,7 @@ export default function ProjectScreen() {
 					}} 
            	 	/>
 				
-			</ThemedView>
+			</SafeAreaPage>
 		</>
 	)
 }

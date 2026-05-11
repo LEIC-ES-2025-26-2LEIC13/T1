@@ -8,14 +8,14 @@ import { LABELS } from '../constants/Labels';
 import AnimatedPressable from './AnimatedPressable';
 
 
-export default function ThemedTask({ task, onPress }) {
+export default function ThemedTask({ task, onPress, onBackground }) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
     const labelBgColor = LabelColors[task.label] || LabelColors.default;
 
     const card = (
-        <ThemedView style={[ styles.card, { borderColor: theme.borders } ]}
+        <ThemedView style={[ styles.card, { borderColor: theme.borders }, onBackground && { backgroundColor: theme.navBackground } ]}
 >
             
             <ThemedText title bold>{task.name}</ThemedText>

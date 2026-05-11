@@ -1,13 +1,13 @@
 // themed components
-import ThemedView from '../../../components/ThemedView'
+import SafeAreaPage from '../../../components/SafeAreaPage'
 import ThemedText from '../../../components/ThemedText'
 import {StyleSheet} from "react-native";
 
 const Calendar = () => {
     return(
-        <ThemedView style={styles.container}>
+        <SafeAreaPage style={styles.container}>
             <ThemedText title={true}>Calendar</ThemedText>
-        </ThemedView>
+        </SafeAreaPage>
     )
 }
 
