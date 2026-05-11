@@ -13,6 +13,7 @@ import { useAuth } from '../hooks/useAuth';
 import { LABELS } from '../constants/Labels';
 import { LabelColors, Colors } from '../constants/Colors';
 import AnimatedPressable from './AnimatedPressable';
+import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
 
 
 export default function CreateTaskModal({
@@ -28,6 +29,15 @@ export default function CreateTaskModal({
     const { user } = useAuth()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
 
     const isPreset = LABELS.some(label => label.name === task.label)
 
@@ -67,8 +77,8 @@ export default function CreateTaskModal({
             // exclude current user from assignables if you want, or keep logic simple
             const others = users.filter(m => m.email !== user.email);
             setProjectMembers(others);
-        } catch (e) {
-            console.error(e);
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, "Failed to Load Members", error.message)
         }
     };
 
@@ -91,14 +101,10 @@ export default function CreateTaskModal({
     }
 
     const handleCreateWrapper = () => {
-        if (!task.name || !task.name.trim()) {
-            alert('Task name is required');
-            return;
-        }
         onCreate(task);
     };
 
-    const notSelectedMembesModal = (
+    const selectedMembersModal = (
         <>
             <ModalHeader
                 heading="Assign Members"
@@ -146,7 +152,7 @@ export default function CreateTaskModal({
         </>
     )
 
-    const selectedMembersModal = (
+    const notSelectedMembersModal = (
          <>
             <ModalHeader
                 heading="Create Task"
@@ -155,7 +161,7 @@ export default function CreateTaskModal({
             />
 
             <View style={{ maxHeight: 500 }}>
-                <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+                <ScrollView showsVerticalScrollIndicator={false}>
                     <ModalBody>
 
                         <PillsContainer style={{ marginBottom: 15 }}>
@@ -230,9 +236,17 @@ export default function CreateTaskModal({
     )
 
     return (
-        <AppModal visible={visible} onClose={onClose}>
-            {isSelectingMembers ? notSelectedMembesModal : selectedMembersModal}
-        </AppModal>
+        <>
+            <AppModal visible={visible} onClose={isSelectingMembers ? () => setIsSelectingMembers(false) : onClose}>
+                {isSelectingMembers ? selectedMembersModal : notSelectedMembersModal}
+            </AppModal>
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)} 
+            />
+        </>
     );
 }
 

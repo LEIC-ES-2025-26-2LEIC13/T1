@@ -100,12 +100,11 @@ export function AuthProvider({ children }) {
             authService.logout()
             return true
         } catch (error) {
-            console.error("Logout error:", error.message)
-            throw error
+            showAlert(ALERT_TYPES.ERROR, "Logout Error", error.message)
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }, [showAlert])
 
     const value = useMemo(() => ({
         user,

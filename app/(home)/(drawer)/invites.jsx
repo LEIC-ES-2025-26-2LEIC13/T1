@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 const Invites = () => {
     const { invites, acceptInvite, ignoreInvite, setHasNewInvites } = useInvite();
 
+    // Alert
     const [alertVisible, setAlertVisible] = useState(false);
     const [alert, setAlert] = useState({ type: '', title: '', message: '' });
 
