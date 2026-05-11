@@ -15,6 +15,7 @@ export const pathHelper = {
 
     userProject: (userId, projectId) => doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId),
 
+    userTasks: (userId) => collection(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_TASKS),
 
     // Project Related
 

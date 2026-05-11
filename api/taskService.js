@@ -1,14 +1,13 @@
-import { addDoc, deleteDoc,onSnapshot, Timestamp } from "firebase/firestore";
+import { addDoc, deleteDoc,doc,onSnapshot, Timestamp, writeBatch } from "firebase/firestore";
 import { pathHelper } from "./pathHelper";
+import { db } from "../firebase/firebaseConfig";
 
 function normalizeTaskData({ name, description, label, assignedMembers }) {
     return {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
         label: label?.trim() ?? '',
-        assignedMembers: Array.isArray(assignedMembers) 
-            ? assignedMembers.map(m => ({ id: m.id, email: m.email })) 
-            : [],
+        assignedMembers: Array.isArray(assignedMembers) ? assignedMembers.map(m => m.email) : [],
     }
 }
 
@@ -26,19 +25,43 @@ export const taskService = {
         });
     },
 
-    createTask: async (projectId, columnId, taskData) => {
+    createTask: async (projectId, projectName, columnId, columnName, taskData) => {
         if (!projectId) {
             throw new Error('Project ID is required to create a task');
         }
 
-        const normalizedTaskData = normalizeTaskData(taskData);
+        const batch = writeBatch(db) // creates a write batch
+        const normalizedTaskData = normalizeTaskData(taskData)
+        const creationTimestamp = Timestamp.now()
 
-        const taskRef = pathHelper.columnTasks(projectId, columnId);
+        // Generates a new random id for a document that doesn't exist yet, returning only a DocumentReference
+        const columnTaskRef = doc(pathHelper.columnTasks(projectId, columnId))
 
-        await addDoc(taskRef, {
+        // Get the ID, because same tasks (in different collections) will have the same ID
+        const sharedId = columnTaskRef.id
+
+        const assignedMembersIds = taskData.assignedMembers?.map(member => member.id) || []
+
+        for (const memberId of assignedMembersIds) {
+            // Returns a DocumentReference with the specified ID (ID is not randomly generated, but the specified one, reusing it)
+            const userTasksRef = doc(pathHelper.userTasks(memberId), sharedId)
+            
+            batch.set(userTasksRef, {
+                name: normalizedTaskData.name,
+                description: normalizedTaskData.description,
+                label: normalizedTaskData.label,
+                projectName: projectName,
+                columnName: columnName,
+                createdAt: creationTimestamp
+            })
+        }
+
+        batch.set(columnTaskRef, {
             ...normalizedTaskData,
-            createdAt: Timestamp.now(),
-        });
+            createdAt: creationTimestamp
+        })
+
+        await batch.commit()
     },
 
     deleteTask: async (projectId, columnId, taskId) => {

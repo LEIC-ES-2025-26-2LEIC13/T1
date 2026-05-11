@@ -39,7 +39,7 @@ export default function Column({ projectId, projectName, columnData }) {
         name: '',
         description: '',
         label: '',
-        assignedMembers: [],
+        assignedMembers: []
     })
 
     // Alert
@@ -113,7 +113,7 @@ export default function Column({ projectId, projectName, columnData }) {
 
     const handleCreateTask = async (taskData) => {
         try {
-            await taskService.createTask(projectId, column.id, taskData)
+            await taskService.createTask(projectId, projectName, column.id, column.name, taskData)
             closeTaskCreationModal()
         }
         catch (error) {

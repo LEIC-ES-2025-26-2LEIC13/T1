@@ -29,40 +29,54 @@ Since the database now includes projectColumns as a subcollection that contains 
 
 ```
 /
-├─ users                (collection)
-│  └─ {userId}          (user document)
+├─ users                      (collection)
+│  └─ {userId}                (user document)
 │     ├─ email
-│     ├─ userProjects       (subcolletion)
-│     │  └─ {projectId} (subcolletion document)
+│     ├─ userProjects         (subcolletion)
+│     │  └─ {projectId}       (subcolletion document)
 │     │     ├─ title
 │     │     └─ description
-│     └─ userInvites        (subcollection)
-│        └─ {inviteId}  (subcolletion document)
-│           ├─ createdAt
-│           ├─ projectId
+│     │
+│     ├─ userInvites
+│     │  └─ {inviteId}
+│     │     ├─ createdAt
+│     │     ├─ projectId
+│     │     ├─ projectName
+│     │     ├─ senderId
+│     │     └─ senderEmail
+│     │
+│     └─ userTasks
+│        └─ {taskId}
+│           ├─ name
+│           ├─ description
+│           ├─ label
 │           ├─ projectName
-│           ├─ senderId
-│           └─ senderEmail
+│           ├─ columnName
+│           └─ createdAt
 │
-└─ projects             (collection)
-   └─ {projectId}       (project document)
+└─ projects
+   └─ {projectId}
       ├─ title
       ├─ description
       ├─ createdBy
-      ├─ projectUsers        (subcollection)
-      │  └─ {userId}         (subcollection document)
-      │     └─ email
       ├─ columnCount
       │
+      ├─ projectUsers
+      │  └─ {userId}
+      │     └─ email
+      │
       └─ projectColumns
-          └─ {columnId}   (subcollection document)
+          └─ {columnId}
               ├─ name
               ├─ order
+              │
               └─ columnTasks
-                  └─ {taskId}   (subcollection document)
+                  └─ {taskId}
                       ├─ name
                       ├─ description
-                      └─ label
+                      ├─ label
+                      ├─ assignedMembers
+                      └─ createdAt
 ```
 
 ## New api services
