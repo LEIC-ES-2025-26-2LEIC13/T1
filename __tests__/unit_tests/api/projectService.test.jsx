@@ -3,7 +3,6 @@ import { projectService } from "../../../api/projectService"
 import { updateDoc, getDocs, writeBatch, onSnapshot } from "firebase/firestore"
 import { batchDelete } from "../../../api/batchDeleteHelper"
 import { columnService } from "../../../api/columnService"
-import { pathHelper } from "../../../api/pathHelper"
 
 jest.mock("firebase/firestore", () => ({
     collection: jest.fn(),

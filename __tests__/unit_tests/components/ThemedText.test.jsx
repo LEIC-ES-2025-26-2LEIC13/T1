@@ -1,3 +1,4 @@
+import { jest, describe, expect, test } from '@jest/globals'
 import { render, screen } from '@testing-library/react-native'
 import { useColorScheme } from 'react-native'
 import { Colors } from '../../../constants/Colors'
@@ -36,7 +37,7 @@ describe("ThemedText", () => {
         )
     })
 
-    test("Applies light theme to title", () => {
+    test("Applies light theme to title text", () => {
         useColorScheme.mockReturnValue("light")
         render(<ThemedText title={true} testID="themed-text" />)
 
@@ -48,7 +49,7 @@ describe("ThemedText", () => {
         )
     })
 
-    test("Applies dark theme to title", () => {
+    test("Applies dark theme to title text", () => {
         useColorScheme.mockReturnValue("dark")
         render(<ThemedText title={true} testID="themed-text" />)
 
