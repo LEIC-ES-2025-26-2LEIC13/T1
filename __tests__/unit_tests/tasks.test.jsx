@@ -103,7 +103,7 @@ describe('Tasks — unit', () => {
         useAuth.mockReturnValue({ user: MOCK_USER });
     });
 
-    // Rendering ──────────────────────────────────────────────────────────
+    // Rendering
 
     it('renders without crashing', () => {
         setupSubscription([]);
@@ -111,7 +111,7 @@ describe('Tasks — unit', () => {
         expect(screen.toJSON()).not.toBeNull();
     });
 
-    // Empty state ────────────────────────────────────────────────────────
+    // Empty state
 
     it('shows EmptyState when there are no tasks', () => {
         setupSubscription([]);
@@ -125,7 +125,7 @@ describe('Tasks — unit', () => {
         expect(screen.queryByTestId('empty-state')).toBeNull();
     });
 
-    // Task list ──────────────────────────────────────────────────────────
+    // Task list
 
     it('renders a ThemedTask for each task', () => {
         setupSubscription(makeTasks());
@@ -133,7 +133,7 @@ describe('Tasks — unit', () => {
         makeTasks().forEach((t) => expect(screen.getByTestId(`task-${t.id}`)).toBeTruthy());
     });
 
-    // Project labels ─────────────────────────────────────────────────────
+    // Project labels
 
     it('renders one label per unique projectName', () => {
         setupSubscription(makeTasks());
@@ -148,7 +148,7 @@ describe('Tasks — unit', () => {
         expect(screen.getAllByText('Alpha')).toHaveLength(1); // t1 + t2 are both Alpha
     });
 
-    // Subscription lifecycle ─────────────────────────────────────────────
+    // Subscription lifecycle
 
     it('subscribes with the current user uid', () => {
         setupSubscription([]);
@@ -170,7 +170,7 @@ describe('Tasks — unit', () => {
         expect(taskService.subscribeToUserTasks).not.toHaveBeenCalled();
     });
 
-    // Modal ──────────────────────────────────────────────────────────────
+    // Modal
 
     it('TaskModal is hidden initially', () => {
         setupSubscription(makeTasks());
@@ -193,7 +193,7 @@ describe('Tasks — unit', () => {
         await waitFor(() => expect(screen.queryByTestId('task-modal')).toBeNull());
     });
 
-    // Alert ──────────────────────────────────────────────────────────────
+    // Alert
 
     it('ThemedAlert is hidden initially', () => {
         setupSubscription([]);
