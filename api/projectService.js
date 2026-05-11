@@ -44,6 +44,10 @@ export const projectService = {
     createProject: async (userId, userEmail, projectData) => {
         const normalizedProjectData = normalizeProjectData(projectData)
 
+        if (!normalizedProjectData.title) {
+            throw new Error("Please enter a project title")
+        }
+
         const batch = writeBatch(db); // creates a write batch
 
         const projectRef = doc(collection(db, COLLECTIONS.PROJECTS)); // Generates a new random id for a document that doesnt exist yet
