@@ -121,9 +121,9 @@ export default function Column({ projectId, projectName, columnData }) {
         }
     }
 
-    const handleDeleteTask = async (taskId) => {
+    const handleDeleteTask = async (task) => {
         try {
-            await taskService.deleteTask(projectId, column.id, taskId)
+            await taskService.deleteTask(projectId, column.id, task.id, task.assignedMembers)
             closeTaskDetails()
         }
         catch (error) {

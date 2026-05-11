@@ -50,7 +50,9 @@ Since the database now includes projectColumns as a subcollection that contains 
 │           ├─ name
 │           ├─ description
 │           ├─ label
+|           ├─ projectId
 │           ├─ projectName
+|           ├─ columnId
 │           ├─ columnName
 │           └─ createdAt
 │

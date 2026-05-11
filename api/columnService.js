@@ -1,7 +1,9 @@
-import { addDoc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction, updateDoc } from "firebase/firestore";
+import { doc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction, updateDoc } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
-import { batchDelete } from "./batchDeleteHelper";
+import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 import { pathHelper } from "./pathHelper";
+import { taskService } from "./taskService";
+import { SUBCOLLECTIONS } from "../constants/Collections";
 
 function normalizeColumnData({name}) {
     return {
@@ -41,42 +43,62 @@ export const columnService = {
         // Normalize column name
         const normalizedColumnData = normalizeColumnData(columnData)
         const projectRef = pathHelper.project(projectId)
+        
         // Will need a run transaction because the column count that is written in the end requires the previous existing value in the database
-        let newColumnOrder;
         await runTransaction(db, async (transaction) => {
             const projectSnap = await transaction.get(projectRef)
-            newColumnOrder = projectSnap.data().columnCount + 1 // Increase order of newly created column (considering the preexisting value)
+            const newColumnOrder = projectSnap.data().columnCount + 1 // Increase order of newly created column (considering the preexisting value)
 
             // Update the value of column count
             transaction.update(projectRef, { columnCount: newColumnOrder })
-        })
-        // After the transaction is successfully completed, we can add the new column to the projectColumns subcollection
-        const projectColumnsRef = pathHelper.projectColumns(projectId)
-        await addDoc(projectColumnsRef, {
-            ...normalizedColumnData,
-            order: newColumnOrder, // Order of the column is set considering the previous value of column count in the database (updated in the transaction)
-            createdAt: Timestamp.now(),
+
+            // Generates a new random id for a document that doesn't exist yet
+            const newColumnRef = doc(pathHelper.projectColumns(projectId))
+            
+            // Set the new column document atomically within the transaction
+            transaction.set(newColumnRef, {
+                ...normalizedColumnData,
+                order: newColumnOrder,
+                createdAt: Timestamp.now(),
+            })
         })
     },
 
     deleteColumn: async (projectId, columnId) => {
         // Delete column and tasks within that column
-        const refsToDelete = []
+        const operations = []
+        
         // Get all existing tasks
-        const tasksRef = pathHelper.columnTasks(projectId, columnId)
-        const tasksSnapshot = await getDocs(tasksRef)
-        tasksSnapshot.forEach((doc) => {
-            refsToDelete.push(doc.ref) // Add reference of each task to the list of references to delete
+        const columnTasksRef = pathHelper.columnTasks(projectId, columnId)
+        const columnTasksSnapshot = await getDocs(columnTasksRef)
+        
+        columnTasksSnapshot.forEach((taskDoc) => {
+            const taskData = taskDoc.data()
+            const assignedMembers = taskData.assignedMembers || []
+            
+            // Reuse getTaskOps to collect all ops (column + user-level tasks)
+            const taskOps = taskService.getTaskRefsToDelete(
+                projectId,
+                columnId,
+                taskDoc.id,
+                assignedMembers
+            )
+            operations.push(...taskOps)
         })
+
         // Delete the column itself
         const columnRef = pathHelper.projectColumn(projectId, columnId)
-        refsToDelete.push(columnRef)
-        await batchDelete(db, refsToDelete) 
+        operations.push({
+            type: OPERATION_TYPES.DELETE,
+            ref: columnRef
+        })
+        
+        // Execute single batch delete for all operations
+        await batchOps(db, operations)
     },
 
-    // Instead of calling deleteColumn for each column, we can get all references to be deleted and then provide them to the refsToDelete inside projectService
-    allColumnsRefsToDelete: async(projectId) => {
-        const refsToDelete = []
+    allColumnsRefsToDelete: async (projectId) => {
+        const operations = []
         
         const projectColumnsRef = pathHelper.projectColumns(projectId)
         const projectColumnsSnapshot = await getDocs(projectColumnsRef)
@@ -84,14 +106,26 @@ export const columnService = {
         // Must use forEach instead of map because getDocs is async 
         for (const columnDoc of projectColumnsSnapshot.docs) {
             const columnRef = columnDoc.ref
-            refsToDelete.push(columnRef)
+            operations.push({ type: OPERATION_TYPES.DELETE, ref: columnRef })
 
-            const tasksRef = pathHelper.columnTasks(projectId, columnDoc.id)
-            const tasksSnapshot = await getDocs(tasksRef)
-            tasksSnapshot.forEach((taskDoc) => refsToDelete.push(taskDoc.ref))
+            // Include all tasks of the column
+            const columnTasksSnap = await getDocs(columnRef, SUBCOLLECTIONS.COLUMN_TASKS) 
+
+            for (const columnTaskDoc of columnTasksSnap.docs) {
+                operations.push(...taskService.getTaskRefsToDelete(
+                    projectId,
+                    columnDoc.id,
+                    columnTaskDoc.id,
+                    columnTaskDoc.data().assignedMembers || []
+                ))
+            }
+
+            const columnTasksRef = pathHelper.columnTasks(projectId, columnDoc.id)
+            const columnTasksSnapshot = await getDocs(columnTasksRef)
+            columnTasksSnapshot.forEach((taskDoc) => operations.push({ type: OPERATION_TYPES.DELETE, ref: taskDoc.ref }))
         }
 
-        return refsToDelete;
+        return operations;
     },
 
     updateColumn: async (projectId, columnId, updates) => {

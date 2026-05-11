@@ -8,7 +8,7 @@ import { LABELS } from '../constants/Labels';
 import AnimatedPressable from './AnimatedPressable';
 
 
-export default function ThemedTask({ task, onPress}) {
+export default function ThemedTask({ task, onPress }) {
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 

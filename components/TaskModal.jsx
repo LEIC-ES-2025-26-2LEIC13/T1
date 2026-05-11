@@ -52,7 +52,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
                     labelName="ASSIGNED TO"
                     value={
                         task?.assignedMembers && task.assignedMembers.length > 0
-                            ? task.assignedMembers.map(m => m.email).join(', ')
+                            ? task.assignedMembers.map(member => member.email).join(', ')
                             : "No one"
                     }
                     readOnly
@@ -64,7 +64,7 @@ export default function TaskModal({ visible, task, projectName, columnName, onCl
                 onCancel={onClose}
                 primaryActionName="Finish Task"
                 primaryActionIconName="check"
-                onPrimaryActionPress={() => deleteTask(task.id)}
+                onPrimaryActionPress={() => deleteTask(task)}
             />
         </AppModal>
     );
