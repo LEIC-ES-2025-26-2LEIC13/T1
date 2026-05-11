@@ -1,5 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react-native";
-import React from "react";
+import { jest, describe, expect, test } from '@jest/globals'
 
 // Mock Firebase modules before importing anything that uses them
 jest.mock("firebase/firestore", () => ({
