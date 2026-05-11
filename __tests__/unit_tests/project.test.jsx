@@ -7,18 +7,17 @@ import { useColumn } from '../../hooks/useColumn';
 import { useInvite } from '../../hooks/useInvite';
 import { projectService } from '../../api/projectService';
 import { userService } from '../../api/userService';
-import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
-// ─── Fix ESM errors ────────────────────────────────────────────────────────────
+// Fix ESM errors
 jest.mock('firebase/auth', () => ({}));
 jest.mock('firebase/firestore', () => ({}));
 jest.mock('../../firebase/firebaseConfig', () => ({}));
 
-// ─── Mock Toast ────────────────────────────────────────────────────────────────
+// Mock Toast
 jest.mock('react-native-toast-message', () => ({ show: jest.fn() }));
 
-// ─── Mock expo-router ─────────────────────────────────────────────────────────
+// Mock expo-router
 const mockBack = jest.fn();
 const mockReplace = jest.fn();
 const mockCanGoBack = jest.fn(() => true);
@@ -47,13 +46,13 @@ jest.mock('expo-router', () => {
     };
 });
 
-// ─── Mock hooks ────────────────────────────────────────────────────────────────
+// Mock hooks
 jest.mock('../../hooks/useAuth', () => ({ useAuth: jest.fn() }));
 jest.mock('../../hooks/useProject', () => ({ useProject: jest.fn() }));
 jest.mock('../../hooks/useColumn', () => ({ useColumn: jest.fn() }));
 jest.mock('../../hooks/useInvite', () => ({ useInvite: jest.fn() }));
 
-// ─── Mock services ─────────────────────────────────────────────────────────────
+// Mock services
 jest.mock('../../api/projectService', () => ({
     projectService: {
         projectHasNoMembers: jest.fn(),
@@ -68,12 +67,8 @@ jest.mock('../../api/userService', () => ({
     },
 }));
 
-// ─── Mock child components ─────────────────────────────────────────────────────
+// Mock child components
 
-/**
- * SeeMembersModal: exposes two pressables so tests can simulate
- * kicking another member or leaving the project.
- */
 jest.mock('../../components/SeeMembersModal', () => {
     const { Pressable } = require('react-native');
     return function MockSeeMembersModal({ onKickMember }) {
@@ -86,9 +81,6 @@ jest.mock('../../components/SeeMembersModal', () => {
     };
 });
 
-/**
- * InviteProjectModal: exposes a pressable to trigger the invite action.
- */
 jest.mock('../../components/InviteProjectModal', () => {
     const { Pressable } = require('react-native');
     return function MockInviteProjectModal({ onInvite }) {
@@ -96,9 +88,6 @@ jest.mock('../../components/InviteProjectModal', () => {
     };
 });
 
-/**
- * CreateColumnModal: exposes a pressable to trigger column creation.
- */
 jest.mock('../../components/CreateColumnModal', () => {
     const { Pressable } = require('react-native');
     return function MockCreateColumnModal({ onCreate, columnData }) {
@@ -106,12 +95,6 @@ jest.mock('../../components/CreateColumnModal', () => {
     };
 });
 
-/**
- * ThemedAlert: exports ALERT_TYPES so project.jsx can import it, and
- * auto-confirms alerts via a macrotask (setTimeout 0) so any async work
- * inside onConfirm (e.g. projectHasNoMembers) has time to resolve before
- * waitFor assertions run.
- */
 jest.mock('../../components/ThemedAlert', () => {
     const { useEffect } = require('react');
 
@@ -169,11 +152,11 @@ jest.mock('../../components/OverflowMenu', () => {
     };
 });
 
-// ─── Shared fixtures ───────────────────────────────────────────────────────────
+// Shared fixtures
 const CURRENT_USER = { uid: 'user-123', email: 'me@example.com' };
 const MOCK_PROJECTS = [{ id: 'test-project-123', title: 'Test Project' }];
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// Helpers
 function setupMocks({
                         projects = MOCK_PROJECTS,
                         kickMember = jest.fn(),
@@ -187,9 +170,7 @@ function setupMocks({
     useInvite.mockReturnValue({ sendInvite });
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  handleKickMember
-// ══════════════════════════════════════════════════════════════════════════════
 describe('handleKickMember', () => {
     let mockKickMember;
 
@@ -259,9 +240,7 @@ describe('handleKickMember', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  handleProjectDelete
-// ══════════════════════════════════════════════════════════════════════════════
 describe('handleProjectDelete', () => {
     let mockDeleteProject;
 
@@ -314,9 +293,7 @@ describe('handleProjectDelete', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  handleSendInvite
-// ══════════════════════════════════════════════════════════════════════════════
 describe('handleSendInvite', () => {
     let mockSendInvite;
 
@@ -426,9 +403,7 @@ describe('handleSendInvite', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  handleCreateColumn
-// ══════════════════════════════════════════════════════════════════════════════
 describe('handleCreateColumn', () => {
     let mockCreateColumn;
 
@@ -472,9 +447,7 @@ describe('handleCreateColumn', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  Access Lost – project disappears from the list
-// ══════════════════════════════════════════════════════════════════════════════
 describe('Access Lost detection', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -516,9 +489,7 @@ describe('Access Lost detection', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  handleGoBack
-// ══════════════════════════════════════════════════════════════════════════════
 describe('handleGoBack', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -553,9 +524,7 @@ describe('handleGoBack', () => {
     });
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
 //  useEffect – setActiveProjectId lifecycle
-// ══════════════════════════════════════════════════════════════════════════════
 describe('useEffect – setActiveProjectId', () => {
     it('sets the active project ID on mount', () => {
         const mockSetActiveProjectId = jest.fn();
