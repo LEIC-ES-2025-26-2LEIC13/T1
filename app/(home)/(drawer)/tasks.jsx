@@ -113,6 +113,7 @@ const Tasks = () => {
                 columnName={selectedTask?.columnName}
                 onClose={closeTaskDetails}
                 deleteTask={handleDeleteTask}
+                userEmail={user.email}
             />
 
             <ThemedAlert
@@ -143,11 +144,11 @@ const styles =  StyleSheet.create({
     },
 
     label: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '600',
         letterSpacing: 0.8,
         textTransform: 'uppercase',
         marginBottom: 7,
         opacity: 0.7
     }
-});
+})
