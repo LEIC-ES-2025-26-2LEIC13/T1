@@ -13,9 +13,11 @@ tags:
         RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
 - copyTextFrom:
     id: project-title # copy project title
-- tapOn: "Accept"
+- tapOn:
+    id: "invite-card-accept"
 - assertVisible: "No pending invites"
 - tapOn:
     id: "drawer-hamburger-button"
-- tapOn: "\uf383, Home" # go to My Projects tab
+- tapOn:
+    id: "home-drawer-screen"
 - assertVisible: ${maestro.copiedText} # check if the project is in the user's projects

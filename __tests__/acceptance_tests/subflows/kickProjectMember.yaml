@@ -14,7 +14,8 @@ tags:
         RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
 - tapOn:
     id: "drawer-hamburger-button"
-- tapOn: "\uf3d1, Logout" # logout
+- tapOn:
+    id: "drawer-logout"
 
 - runFlow: # login back to the user that created the project
     file: login.yaml
@@ -27,7 +28,8 @@ tags:
     id: "see-members-icon"
 - tapOn:
     id: "overflow-menu-${RECEIVER_EMAIL}"
-- tapOn: "Kick member, \uf4ad" # kick member option
+- tapOn:
+    id: "kick-member-action"
 - assertVisible: "Kick member"
 - assertVisible: "Are you sure you want to kick ${RECEIVER_EMAIL} from this project?"
 - tapOn: "OK"

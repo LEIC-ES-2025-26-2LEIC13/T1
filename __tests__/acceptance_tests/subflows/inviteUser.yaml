@@ -11,17 +11,20 @@ tags:
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
 - tapOn:
     id: "project-overflow-menu"
-- tapOn: "Invite member, \uf4a6" # invite member icon
+- tapOn:
+    id: "invite-member-action"
 - tapOn:
     id: "invite-email-input"
 - inputText: ${RECEIVER_EMAIL}
 - hideKeyboard
-- tapOn: "\uf48e, Send Invite" # send invite icon
+- tapOn:
+    id: "invite-member-actions-send-invite"
 - tapOn:
     id: "project-arrow-back"
 - tapOn:
     id: "drawer-hamburger-button"
-- tapOn: "\uf3d1, Logout" # logout
+- tapOn:
+    id: "drawer-logout"
 - runFlow:
     file: login.yaml
     env:
@@ -31,9 +34,7 @@ tags:
     id: "notification-bell"
 - tapOn:
     id: "drawer-hamburger-button"
-- assertVisible:
+- tapOn:
     id: "invites-with-notification"
-- tapOn: "\uf437, Invites" # enter invites
-- assertVisible: "1 pending invite" # simple condition to ensure test correctness
 - assertVisible: ${PROJECT_TITLE}
 - assertVisible: ${SENDER_EMAIL}

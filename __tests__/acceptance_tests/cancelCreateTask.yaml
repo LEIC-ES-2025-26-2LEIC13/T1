@@ -1,8 +1,22 @@
 appId: com.anonymous.LEICo
 tags:
   - task
+  
 ---
-- runFlow: openProject.yaml
+- launchApp:
+    clearState: true
+
+
+- runFlow:
+    file: subflows/createColumn.yaml
+    env:
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}
+      PROJECT_TITLE: ${PROJECT_TITLE}
+      PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+      COLUMN_NAME: ${COLUMN_NAME}
+        
+
 - tapOn: "+, Create Task"
 - tapOn: "Enter task name"
 - inputText: "Task1"

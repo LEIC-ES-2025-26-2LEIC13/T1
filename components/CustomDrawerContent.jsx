@@ -25,7 +25,7 @@ const CustomDrawerContent = (props) =>{
                 label="Logout"
                 onPress={logout}
                 labelStyle={{ color: Colors.warning }}
-                icon = {() => <ThemedIcon name="logout" color={Colors.warning}/>}
+                icon = {() => <ThemedIcon testID="drawer-logout" name="logout" color={Colors.warning}/>}
             />
         
         </DrawerContentScrollView>

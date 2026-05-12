@@ -75,6 +75,7 @@ const Columns = ({ columns, projectId, currentProjectName, openCreateColumnModal
 
             {columns.length === 0 && (
                 <ThemedButton
+                    testID="open-create-column-modal-button"
                     style={{ margin: 20 }}
                     onPress={openCreateColumnModal}>
                     <ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} /> 

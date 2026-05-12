@@ -44,6 +44,7 @@ export default function InviteProjectModal({
             </ModalBody>
 
             <ModalActions
+                testID="invite-member-actions"
                 onCancel={onClose}
                 primaryActionName="Send Invite"
                 primaryActionIconName="send"

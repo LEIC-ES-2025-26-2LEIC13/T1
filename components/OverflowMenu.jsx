@@ -50,6 +50,7 @@ export default function OverflowMenu({ testID, actions = [], customColor }) {
                 }]}}>
                 {filteredActions.map((action, index) => (
                     <MenuOption
+                    testID={action.testID}
                     key={action.id}
                     onSelect={() => handleSelect(action)}
                     >

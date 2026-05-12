@@ -103,6 +103,7 @@ export default function SeeMembersModal({visible, getProjectUsers, onClose, onKi
                                         onPress: () => kickAndUpdate(item.id, item.email),
                                     }, 
                                     {
+                                        testID: 'kick-member-action',
                                         id: 'kick-member',
                                         title: 'Kick member',
                                         icon: 'account-remove',
