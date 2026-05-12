@@ -3,7 +3,6 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import ThemedTask from "../../../components/ThemedTask";
 
-// keep these REAL (important!)
 jest.mock("../../../components/ThemedView", () => require("react-native").View);
 jest.mock("../../../components/ThemedText", () => require("react-native").Text);
 jest.mock("../../../components/Pill", () => {
