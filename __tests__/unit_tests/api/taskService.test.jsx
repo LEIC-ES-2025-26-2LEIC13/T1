@@ -1,167 +1,305 @@
 import { jest, describe, it, expect, afterEach } from "@jest/globals";
 import { taskService } from "../../../api/taskService";
-import { addDoc, deleteDoc, onSnapshot } from "firebase/firestore";
+import { onSnapshot, writeBatch } from "firebase/firestore";
 import { pathHelper } from "../../../api/pathHelper";
+import { batchOps } from "../../../api/batchOpsHelper";
 
 jest.mock("firebase/firestore", () => ({
-    addDoc: jest.fn(),
-    deleteDoc: jest.fn(),
+    doc: jest.fn(() => ({ id: "mockTaskId" })),
     onSnapshot: jest.fn(),
-    Timestamp: { now: jest.fn(() => "now") },
+    writeBatch: jest.fn(),
+    Timestamp: { now: jest.fn(() => "mockTimestamp") },
+}));
+
+jest.mock("../../../api/batchOpsHelper", () => ({
+    batchOps: jest.fn(),
+    OPERATION_TYPES: { DELETE: "DELETE", UPDATE: "UPDATE" },
 }));
 
 jest.mock("../../../api/pathHelper", () => ({
     pathHelper: {
         columnTasks: jest.fn(),
-        task: jest.fn(),
+        columnTask: jest.fn(),
+        userTasks: jest.fn(),
+        userTask: jest.fn(),
     },
 }));
 
+jest.mock("../../../firebase/firebaseConfig", () => ({ db: {} }));
+
+// helpers 
+
+const TASK_DATA = {
+    name: "Test Task",
+    description: "Desc",
+    label: "urgent",
+    assignedMembers: [{ id: "u1", email: "u1@test.com" }],
+};
+
+// createTask full signature: (projectId, projectName, columnId, columnName, taskData)
+const createTask = (taskData = TASK_DATA) =>
+    taskService.createTask("p1", "Project A", "c1", "Column A", taskData);
+
+// tests 
+
 describe("taskService", () => {
+    let mockBatch;
+
+    beforeEach(() => {
+        mockBatch = { set: jest.fn(), commit: jest.fn() };
+        writeBatch.mockReturnValue(mockBatch);
+        pathHelper.columnTasks.mockReturnValue("columnTasksRef");
+        pathHelper.userTasks.mockReturnValue("userTasksRef");
+        pathHelper.columnTask.mockReturnValue("columnTaskRef");
+        pathHelper.userTask.mockReturnValue("userTaskRef");
+    });
+
     afterEach(() => {
         jest.clearAllMocks();
     });
 
+    // subscribeToColumnTasks
+
+    describe("subscribeToColumnTasks", () => {
+        it("should call onUpdate with mapped docs", () => {
+            const mockOnUpdate = jest.fn();
+            onSnapshot.mockImplementation((ref, cb) => {
+                cb({ docs: [{ id: "t1", data: () => ({ name: "Task 1" }) }] });
+                return jest.fn();
+            });
+
+            taskService.subscribeToColumnTasks("p1", "c1", mockOnUpdate);
+
+            expect(pathHelper.columnTasks).toHaveBeenCalledWith("p1", "c1");
+            expect(mockOnUpdate).toHaveBeenCalledWith([{ id: "t1", name: "Task 1" }]);
+        });
+
+        it("should call onUpdate with an empty array when there are no tasks", () => {
+            const mockOnUpdate = jest.fn();
+            onSnapshot.mockImplementation((ref, cb) => {
+                cb({ docs: [] });
+                return jest.fn();
+            });
+
+            taskService.subscribeToColumnTasks("p1", "c1", mockOnUpdate);
+
+            expect(mockOnUpdate).toHaveBeenCalledWith([]);
+        });
+
+        it("should return the unsubscribe function", () => {
+            const unsub = jest.fn();
+            onSnapshot.mockReturnValue(unsub);
+
+            const result = taskService.subscribeToColumnTasks("p1", "c1", jest.fn());
+
+            expect(result).toBe(unsub);
+        });
+    });
+
+    // subscribeToUserTasks
+    // was completely untested
+
+    describe("subscribeToUserTasks", () => {
+        it("should call onUpdate with tasks sorted by projectName then label", () => {
+            const mockOnUpdate = jest.fn();
+            onSnapshot.mockImplementation((ref, cb) => {
+                cb({
+                    docs: [
+                        { id: "t1", data: () => ({ projectName: "B", label: "low" }) },
+                        { id: "t2", data: () => ({ projectName: "A", label: "urgent" }) },
+                        { id: "t3", data: () => ({ projectName: "A", label: "low" }) },
+                    ]
+                });
+                return jest.fn();
+            });
+
+            taskService.subscribeToUserTasks("u1", mockOnUpdate);
+
+            expect(pathHelper.userTasks).toHaveBeenCalledWith("u1");
+            expect(mockOnUpdate).toHaveBeenCalledWith([
+                { id: "t3", projectName: "A", label: "low" },    // A < B, low < urgent
+                { id: "t2", projectName: "A", label: "urgent" },
+                { id: "t1", projectName: "B", label: "low" },
+            ]);
+        });
+
+        it("should sort by label when projectName is the same", () => {
+            const mockOnUpdate = jest.fn();
+            onSnapshot.mockImplementation((ref, cb) => {
+                cb({
+                    docs: [
+                        { id: "t1", data: () => ({ projectName: "A", label: "urgent" }) },
+                        { id: "t2", data: () => ({ projectName: "A", label: "low" }) },
+                    ]
+                });
+                return jest.fn();
+            });
+
+            taskService.subscribeToUserTasks("u1", mockOnUpdate);
+
+            expect(mockOnUpdate).toHaveBeenCalledWith([
+                { id: "t2", projectName: "A", label: "low" },
+                { id: "t1", projectName: "A", label: "urgent" },
+            ]);
+        });
+
+        it("should call onUpdate with empty array when there are no tasks", () => {
+            const mockOnUpdate = jest.fn();
+            onSnapshot.mockImplementation((ref, cb) => {
+                cb({ docs: [] });
+                return jest.fn();
+            });
+
+            taskService.subscribeToUserTasks("u1", mockOnUpdate);
+
+            expect(mockOnUpdate).toHaveBeenCalledWith([]);
+        });
+    });
+
+    // createTask
+
     describe("createTask", () => {
-        it("should create a task with all fields", async () => {
-            pathHelper.columnTasks.mockReturnValue("tasksRef");
-            const taskData = {
-                name: "Test Task",
-                description: "Desc",
-                label: "urgent",
-                assignedMembers: [{ id: "u1", email: "user@example.com" }],
-            };
+        it("should throw if projectId is missing", async () => {
+            await expect(
+                taskService.createTask(null, "Project A", "c1", "Column A", TASK_DATA)
+            ).rejects.toThrow("Project ID is required to create a task");
+        });
 
-            await taskService.createTask("p1", "c1", taskData);
+        it("should commit the batch", async () => {
+            await createTask();
+            expect(mockBatch.commit).toHaveBeenCalled();
+        });
 
-            expect(addDoc).toHaveBeenCalledWith(
-                "tasksRef",
+        it("should set the column task with normalized data and timestamp", async () => {
+            await createTask();
+
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.anything(),
                 expect.objectContaining({
                     name: "Test Task",
                     description: "Desc",
                     label: "urgent",
-                }),
+                    createdAt: "mockTimestamp",
+                })
             );
         });
 
-        it("should normalize and trim fields on create", async () => {
-            pathHelper.columnTasks.mockReturnValue("tasksRef");
+        it("should trim whitespace from name, description and label", async () => {
+            await createTask({ name: "  Task  ", description: "  Desc  ", label: "  urgent  ", assignedMembers: [] });
 
-            await taskService.createTask("p1", "c1", {
-                name: "  Task  ",
-                description: undefined,
-                label: null,
-                assignedMembers: undefined,
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ name: "Task", description: "Desc", label: "urgent" })
+            );
+        });
+
+        it("should normalize null/undefined fields to empty strings and []", async () => {
+            await createTask({ name: undefined, description: null, label: undefined, assignedMembers: undefined });
+
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.objectContaining({ name: "", description: "", label: "", assignedMembers: [] })
+            );
+        });
+
+        it("should set a userTask for each assigned member with project and column metadata", async () => {
+            await createTask({
+                ...TASK_DATA,
+                assignedMembers: [{ id: "u1" }, { id: "u2" }],
             });
 
-            expect(addDoc).toHaveBeenCalledWith(
-                "tasksRef",
+            // 2 userTask sets + 1 columnTask set = 3 total
+            expect(mockBatch.set).toHaveBeenCalledTimes(3);
+            expect(pathHelper.userTasks).toHaveBeenCalledWith("u1");
+            expect(pathHelper.userTasks).toHaveBeenCalledWith("u2");
+
+            // userTask docs include project and column context
+            expect(mockBatch.set).toHaveBeenCalledWith(
+                expect.anything(),
                 expect.objectContaining({
-                    name: "Task",
-                    description: "",
-                    label: "",
-                    assignedMembers: [],
-                }),
+                    projectId: "p1",
+                    projectName: "Project A",
+                    columnId: "c1",
+                    columnName: "Column A",
+                })
             );
         });
 
-        it("should throw error if project ID is missing", async () => {
-            await expect(
-                taskService.createTask(null, "c1", {}),
-            ).rejects.toThrow("Project ID is required to create a task");
-        });
+        it("should not set any userTask when assignedMembers is empty", async () => {
+            // ← tests assignedMembersIds || [] fallback → loop never runs
+            await createTask({ name: "Task", assignedMembers: undefined });
 
-        it("should format assigned members correctly", async () => {
-            pathHelper.columnTasks.mockReturnValue("tasksRef");
-
-            await taskService.createTask("p1", "c1", {
-                name: "Task",
-                assignedMembers: [
-                    { id: "u1", email: "user1@example.com", extra: "ignored" },
-                    { id: "u2", email: "user2@example.com" },
-                ],
-            });
-
-            expect(addDoc).toHaveBeenCalledWith(
-                "tasksRef",
-                expect.objectContaining({
-                    assignedMembers: [
-                        { id: "u1", email: "user1@example.com" },
-                        { id: "u2", email: "user2@example.com" },
-                    ],
-                }),
-            );
+            // only the columnTask set
+            expect(mockBatch.set).toHaveBeenCalledTimes(1);
+            expect(pathHelper.userTasks).not.toHaveBeenCalled();
         });
     });
 
-    describe("deleteTask", () => {
-        it("should delete a task successfully", async () => {
-            pathHelper.task.mockReturnValue("taskRef");
+    // getTaskRefsToDelete
+    // was completely untested
 
-            await taskService.deleteTask("p1", "c1", "t1");
+    describe("getTaskRefsToDelete", () => {
+        it("should always include the columnTask ref", () => {
+            const ops = taskService.getTaskRefsToDelete("p1", "c1", "t1", []);
 
-            expect(pathHelper.task).toHaveBeenCalledWith("p1", "c1", "t1");
-            expect(deleteDoc).toHaveBeenCalledWith("taskRef");
+            expect(pathHelper.columnTask).toHaveBeenCalledWith("p1", "c1", "t1");
+            expect(ops).toContainEqual({ type: "DELETE", ref: "columnTaskRef" });
         });
 
-        it("should handle Firebase delete errors", async () => {
-            pathHelper.task.mockReturnValue("taskRef");
-            deleteDoc.mockRejectedValue(new Error("Firebase error"));
-
-            await expect(
-                taskService.deleteTask("p1", "c1", "t1"),
-            ).rejects.toThrow("Firebase error");
-        });
-    });
-
-    describe("subscribeToColumnTasks", () => {
-        it("should subscribe to tasks and handle updates", () => {
-            pathHelper.columnTasks.mockReturnValue("tasksRef");
-            const mockOnUpdate = jest.fn();
-            let callbackFunction;
-
-            onSnapshot.mockImplementation((ref, callback) => {
-                callbackFunction = callback;
-                return jest.fn();
-            });
-
-            const unsub = taskService.subscribeToColumnTasks(
-                "p1",
-                "c1",
-                mockOnUpdate,
-            );
-
-            // First update
-            callbackFunction({
-                docs: [{ id: "t1", data: () => ({ name: "Task 1" }) }],
-            });
-            expect(mockOnUpdate).toHaveBeenCalledWith([
-                { id: "t1", name: "Task 1" },
+        it("should include a userTask ref for each assigned member", () => {
+            const ops = taskService.getTaskRefsToDelete("p1", "c1", "t1", [
+                { id: "u1" },
+                { id: "u2" },
             ]);
 
-            // Empty update
-            callbackFunction({ docs: [] });
-            expect(mockOnUpdate).toHaveBeenCalledWith([]);
-
-            // Unsubscribe
-            expect(unsub).toEqual(expect.any(Function));
+            expect(pathHelper.userTask).toHaveBeenCalledWith("u1", "t1");
+            expect(pathHelper.userTask).toHaveBeenCalledWith("u2", "t1");
+            expect(ops).toHaveLength(3); // 1 columnTask + 2 userTasks
         });
 
-        it("should use correct path reference", () => {
-            pathHelper.columnTasks.mockReturnValue("tasksRef");
+        it("should skip userTask refs when assignedMembers is empty", () => {
+            // ← tests the if (assignedMembers.length > 0) guard
+            const ops = taskService.getTaskRefsToDelete("p1", "c1", "t1", []);
 
-            onSnapshot.mockImplementation((ref, callback) => {
-                callback({ docs: [] });
-                return jest.fn();
-            });
+            expect(pathHelper.userTask).not.toHaveBeenCalled();
+            expect(ops).toHaveLength(1); // only columnTask
+        });
+    });
 
-            taskService.subscribeToColumnTasks("p1", "c1", jest.fn());
+    // deleteTask 
 
-            expect(pathHelper.columnTasks).toHaveBeenCalledWith("p1", "c1");
-            expect(onSnapshot).toHaveBeenCalledWith(
-                "tasksRef",
-                expect.any(Function),
+    describe("deleteTask", () => {
+        it("should call batchOps with the columnTask ref when no members are assigned", async () => {
+            // ← was using deleteDoc — source uses batchOps
+            await taskService.deleteTask("p1", "c1", "t1", []);
+
+            expect(batchOps).toHaveBeenCalledWith(
+                expect.anything(),
+                [{ type: "DELETE", ref: "columnTaskRef" }]
             );
+        });
+
+        it("should call batchOps with columnTask and all userTask refs", async () => {
+            await taskService.deleteTask("p1", "c1", "t1", [{ id: "u1" }, { id: "u2" }]);
+
+            expect(batchOps).toHaveBeenCalledWith(
+                expect.anything(),
+                expect.arrayContaining([
+                    { type: "DELETE", ref: "columnTaskRef" },
+                    { type: "DELETE", ref: "userTaskRef" },
+                ])
+            );
+            // columnTask + 2 userTasks
+            const [, ops] = batchOps.mock.calls[0];
+            expect(ops).toHaveLength(3);
+        });
+
+        it("should propagate batchOps errors", async () => {
+            batchOps.mockRejectedValue(new Error("Firestore error"));
+
+            await expect(
+                taskService.deleteTask("p1", "c1", "t1", [])
+            ).rejects.toThrow("Firestore error");
         });
     });
 });
