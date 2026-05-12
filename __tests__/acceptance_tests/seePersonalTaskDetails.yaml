@@ -1,0 +1,16 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/viewPersonalTaskList.yaml
+    env:
+        EMAIL: "johndoe@gmail.com"
+        PASSWORD: "123456"
+        PROJECT_TITLE: "Test-View-Personal-Task-List"
+        PROJECT_DESCRIPTION: "Description"
+        COLUMN_NAME: "Column Name"
+

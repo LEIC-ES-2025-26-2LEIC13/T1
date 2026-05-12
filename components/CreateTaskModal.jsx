@@ -144,6 +144,7 @@ export default function CreateTaskModal({
             </ModalBody>
             
             <ModalActions
+                testID="assign-members-modal-actions"
                 onCancel={() => setIsSelectingMembers(false)}
                 primaryActionName="Done"
                 primaryActionIconName="check"
@@ -225,6 +226,7 @@ export default function CreateTaskModal({
             </View>
 
             <ModalActions
+                testID="create-task-modal-actions"
                 onCancel={onClose}
                 primaryActionName="Create"
                 primaryActionIconName="plus"

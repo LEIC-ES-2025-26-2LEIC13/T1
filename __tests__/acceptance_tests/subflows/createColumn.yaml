@@ -6,7 +6,7 @@ tags:
     clearState: true
 
 - runFlow:
-    file: createProject.yaml
+    file: openProject.yaml
     env:
         EMAIL: ${EMAIL}
         PASSWORD: ${PASSWORD}

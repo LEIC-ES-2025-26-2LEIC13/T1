@@ -1,11 +1,15 @@
 appId: com.anonymous.LEICo
 tags:
   - task
-  
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Cance-Create-Task"
+    PROJECT_DESCRIPTION: "Description"
+    COLUMN_NAME: "Column Name"
 ---
 - launchApp:
     clearState: true
-
 
 - runFlow:
     file: subflows/createColumn.yaml
@@ -16,8 +20,8 @@ tags:
       PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
       COLUMN_NAME: ${COLUMN_NAME}
         
-
-- tapOn: "+, Create Task"
+- tapOn:
+    id: "open-create-task-modal-button"
 - tapOn: "Enter task name"
 - inputText: "Task1"
 - tapOn: "Enter task description"
