@@ -53,6 +53,8 @@ It is organised by the following activities:
       - [AI usage documentation](#ai-usage-documentation)
       - [Setup environment documentation](#setup-environment-documentation)
       - [Sprint 2 Release](#sprint-2-release)
+      - [Final backlog](#final-backlog)
+      - [Sprint 2 Review](#sprint-2-review)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -503,6 +505,18 @@ _Sprint 2 Backlog (5/5)_
 #### Sprint 2 Release
 
 Release of Sprint 2 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v.2.0.0).
+
+#### Final backlog
+
+- The following image depicts the scrum boardat the end of Sprint 2.
+
+![Sprint2FinalBacklog](docs/imgs/Sprint2FinalBacklog.jpeg)
+
+- All the PBIs that were in the Sprint Backlog column at the beginning of the sprint were successfully completed during the sprint.
+
+#### Sprint 2 Review
+
+- Sprint 2 review [here](docs/sprint2review.md).
 
 ### Sprint 3
 

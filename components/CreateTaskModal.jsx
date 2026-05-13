@@ -100,8 +100,8 @@ export default function CreateTaskModal({
         onChange('assignedMembers', newAssigned);
     }
 
-    const handleCreateWrapper = () => {
-        onCreate(task);
+    const handleCreateWrapper = async () => {
+        await onCreate(task);
     };
 
     const selectedMembersModal = (
