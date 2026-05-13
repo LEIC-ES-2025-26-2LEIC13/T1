@@ -51,6 +51,7 @@ It is organised by the following activities:
       - [Initial backlog](#initial-backlog)
       - [Logs and documentation](#logs-and-documentation)
       - [AI usage documentation](#ai-usage-documentation)
+      - [Setup environment documentation](#setup-environment-documentation)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -359,7 +360,7 @@ Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 
 * Responsible use of AI: available [here](docs/MisterAIUsage.md).
   - Used AI tools to improve UI of the app in the development of [this](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2/views/1?pane=issue&itemId=178740336&issue=LEIC-ES-2025-26-2LEIC13%7CT1%7C104) issue.
-* Tools and database setup: available [here](docs/firebaseSetup.md)
+* Tools and database setup: available [here](docs/setupEnvironment.md)
 * Change log: available [here](docs/changeLogSprint1.md)
 
 #### Database Modelling and Integration
@@ -488,10 +489,15 @@ _Sprint 2 Backlog (5/5)_
 #### Logs and documentation
 
 - Documentation of bugs, defects, fixes, and improvements [here](docs/sprint2documentation.md).
+- Summarized change log of Sprint 2 [here](docs/changeLogSprint2.md).
 
 #### AI usage documentation
 
 - AI usage during this sprint documented [here](docs/sprint2AIUsage.md).
+
+#### Setup environment documentation
+
+- Continuous documentation for setting up the development environment [here](docs/setupEnvironment.md).
 
 ### Sprint 3
 
