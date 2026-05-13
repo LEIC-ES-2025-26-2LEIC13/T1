@@ -1,4 +1,4 @@
-import { doc, onSnapshot, Timestamp, writeBatch } from "firebase/firestore";
+import { doc, getCountFromServer, onSnapshot, Timestamp, writeBatch, orderBy, query } from "firebase/firestore";
 import { pathHelper } from "./pathHelper";
 import { db } from "../firebase/firebaseConfig";
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
@@ -15,16 +15,16 @@ function normalizeTaskData({ name, description, label, assignedMembers }) {
 export const taskService = {
     subscribeToColumnTasks: (projectId, columnId, onUpdate) => {
         const columnTasksRef = pathHelper.columnTasks(projectId, columnId);
-        
-        return onSnapshot(columnTasksRef, (snapshot) => {
-            const tasksToDisplay = snapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            }))
 
-            onUpdate(tasksToDisplay)
-        })
-    },
+        const queryRef = query(columnTasksRef, orderBy('order', 'asc'));
+
+        return onSnapshot(queryRef, (snapshot) => {
+            const tasksToDisplay = snapshot.docs
+                .map((doc) => ({ id: doc.id, ...doc.data() }))
+
+            onUpdate(tasksToDisplay);
+        });
+    },  
 
     subscribeToUserTasks: (userId, onUpdate) => {
         const userTasksRef = pathHelper.userTasks(userId);
@@ -53,6 +53,10 @@ export const taskService = {
         const normalizedTaskData = normalizeTaskData(taskData)
         const creationTimestamp = Timestamp.now()
 
+        const existingTasks = await getCountFromServer(pathHelper.columnTasks(projectId, columnId))
+
+        const taskOrder = existingTasks.data().count
+
         // Generates a new random id for a document that doesn't exist yet, returning only a DocumentReference
         const columnTaskRef = doc(pathHelper.columnTasks(projectId, columnId))
 
@@ -79,6 +83,7 @@ export const taskService = {
 
         batch.set(columnTaskRef, {
             ...normalizedTaskData,
+            order: taskOrder,
             createdAt: creationTimestamp
         })
 
@@ -112,5 +117,60 @@ export const taskService = {
 
         // Execute batch delete for all operations
         await batchOps(db, operations)
-    }
+    },
+
+    reorderColumnTasks: async (projectId, columnId, reorderedTasks, from, to) => {
+        const [start, end] = from < to ? [from, to] : [to, from]; // only considers the affected range (to reduce the number of updates needed)
+        const affected = reorderedTasks.slice(start, end + 1); // finds the new order of the affected tasks
+        // the index starts on start, the ordering is updated from that point onwards, by simply summing with the index, as start represents the lowest
+        // index of the affected range, the index of the lowest task (considering the original order)
+        const operations = affected.map((task, index) => ({
+            type: OPERATION_TYPES.UPDATE,
+            ref: pathHelper.columnTask(projectId, columnId, task.id),
+            data: { order: start + index }
+        }));
+
+        await batchOps(db, operations);
+    },
+
+    moveTaskToColumn: async (projectId, task, fromColumnId, toColumn) => {
+        const existingTasks = await getCountFromServer(pathHelper.columnTasks(projectId, toColumn.id))
+        const newOrder = existingTasks.data().count
+
+        const operations = []
+
+        // 1. Delete from old column
+        operations.push({
+            type: OPERATION_TYPES.DELETE,
+            ref: pathHelper.columnTask(projectId, fromColumnId, task.id)
+        })
+
+        // 2. Create in new column, reusing same task ID
+        operations.push({
+            type: OPERATION_TYPES.SET,
+            ref: pathHelper.columnTask(projectId, toColumn.id, task.id),
+            data: {
+                name: task.name,
+                description: task.description,
+                label: task.label,
+                assignedMembers: task.assignedMembers,
+                order: newOrder,
+                createdAt: task.createdAt
+            }
+        })
+
+        // 3. Update userTask copies to reflect new column
+        for (const { id: memberId } of (task.assignedMembers ?? [])) {
+            operations.push({
+                type: OPERATION_TYPES.UPDATE,
+                ref: pathHelper.userTask(memberId, task.id),
+                data: {
+                    columnId: toColumn.id,
+                    columnName: toColumn.name
+                }
+            })
+        }
+
+        await batchOps(db, operations)  
+    },
 }
