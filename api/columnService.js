@@ -159,5 +159,4 @@ export const columnService = {
     }
 }
 
-//TODO: Rever funções implementadas e criar UI para as mesmas. Testar interação e verificar no emulador
-// Testar se um utilizador não autenticado consegue ainda aceder a partes internas do projeto
+// Reorderable columns could be implmented, similarly to tasks

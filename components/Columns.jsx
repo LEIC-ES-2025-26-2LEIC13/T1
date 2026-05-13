@@ -67,6 +67,7 @@ const Columns = ({ columns, projectId, currentProjectName, openCreateColumnModal
                                 projectId={projectId}
                                 projectName={currentProjectName}
                                 columnData={item}
+                                columns={columns}
                             />
                         </View>
                     );
