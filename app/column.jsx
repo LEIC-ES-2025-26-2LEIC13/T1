@@ -205,8 +205,9 @@ export default function Column({ projectId, projectName, columnData, columns }) 
                     />
                     </GestureHandlerRootView>
 
-                    <ThemedButton onPress={openTaskCreationModal}>
-                        <ThemedIcon name="plus" onPrimary />
+                    
+                    <ThemedButton testID="open-create-task-modal-button" onPress={openTaskCreationModal}>
+                        <ThemedIcon name="plus" onPrimary/>
                         <ThemedText bold onPrimary>Create Task</ThemedText>
                     </ThemedButton>
 

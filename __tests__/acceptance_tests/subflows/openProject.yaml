@@ -10,7 +10,7 @@ tags:
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
         
-- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open \u2192"
+- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open, \udb80\udfcc"
 - assertVisible: "${PROJECT_TITLE}"
 - assertVisible:
     id: "project-arrow-back"

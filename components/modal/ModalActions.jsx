@@ -6,7 +6,7 @@ import ThemedIcon from '../ThemedIcon'
 import { Colors } from '../../constants/Colors'
 
 // For two actions: "Cancel" and "Accept/Create/..."
-const ModalActions = ({onCancel, primaryActionName, primaryActionIconName, onPrimaryActionPress, primaryActionDisabled, secondaryActionName, customStyle}) => {
+const ModalActions = ({testID, onCancel, primaryActionName, primaryActionIconName, onPrimaryActionPress, primaryActionDisabled, secondaryActionName, customStyle}) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -14,11 +14,12 @@ const ModalActions = ({onCancel, primaryActionName, primaryActionIconName, onPri
 
     return (
         <View style={[styles.actions, customStyle]}>
-            <ThemedButton style={[styles.actionButton, { backgroundColor: theme.borders }]} onPress={onCancel}>
+            <ThemedButton testID={`${testID}-cancel`} style={[styles.actionButton, { backgroundColor: theme.borders }]} onPress={onCancel}>
                 <ThemedText bold>{secondaryActionName ?? "Cancel"}</ThemedText>
             </ThemedButton>
 
             <ThemedButton 
+                testID={`${testID}-${primaryActionName.toLowerCase().replace(/\s/g, '-')}`}
                 style={[styles.actionButton, !primaryActionDisabled && styles.primaryActionButton]}
                 onPress={async () => {
                     setIsSubmitting(true) 

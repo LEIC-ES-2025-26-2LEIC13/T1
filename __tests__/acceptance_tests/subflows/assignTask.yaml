@@ -1,0 +1,50 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+---
+# same as createTask, but assigns member in the end
+- runFlow:
+    file: acceptInvite.yaml
+    env:
+        SENDER_EMAIL: ${SENDER_EMAIL}
+        SENDER_PASSWORD: ${SENDER_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        RECEIVER_EMAIL: ${RECEIVER_EMAIL}
+        RECEIVER_PASSWORD: ${RECEIVER_PASSWORD}
+
+- runFlow:
+    file: createColumn.yaml
+    env:
+      EMAIL: ${ASSIGNER_EMAIL}
+      PASSWORD: ${ASSIGNER_PASSWORD}
+      PROJECT_TITLE: ${PROJECT_TITLE}
+      PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+      COLUMN_NAME: ${COLUMN_NAME}
+        
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- hideKeyboard
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "open-assign-members-button"
+- tapOn:
+    id: "open-assign-members-button"
+- tapOn: ${}
+
+- tapOn: 
+    id: "create-task-modal-actions-create"
+- assertVisible: ${TASK_NAME}
+- assertVisible: ${TASK_DESCRIPTION}
+
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "drawer-logout"

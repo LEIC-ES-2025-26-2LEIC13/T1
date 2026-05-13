@@ -1,0 +1,40 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+
+env:
+    ASSIGNER_EMAIL: "johndoe@gmail.com"
+    ASSIGNER_PASSWORD: "123456"
+    ASSIGNEE_EMAIL: "pedro19@gmail.com"
+    ASSIGNEE_PASSWORD: "123456"
+    PROJECT_TITLE: "Test-See-Personal-Task-Details"
+    PROJECT_DESCRIPTION: "Description"
+    COLUMN_NAME: "Column-Name"
+    TASK_NAME: "Task-Name"
+    TASK_DESCRIPTION: "Task-Description"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/viewPersonalTaskList.yaml
+    env:
+        ASSIGNER_EMAIL: ${ASSIGNER_EMAIL}
+        ASSIGNER_PASSWORD: ${ASSIGNER_PASSWORD}
+        ASSIGNEE_EMAIL: ${ASSIGNEE_EMAIL}
+        ASSIGNEE_PASSWORD: ${ASSIGNEE_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        COLUMN_NAME: ${COLUMN_NAME}
+        TASK_NAME: ${TASK_NAME}
+        TASK_DESCRIPTION: ${TASK_DESCRIPTION}
+
+- tapOn: "Task-Name, Task-Description"
+
+- tapOn: "${TASK_NAME}, ${TASK_DESCRIPTION}"
+- assertVisible: "TASK NAME"
+- assertVisible: ${TASK_NAME}
+- assertVisible: "DESCRIPTION"
+- assertVisible: ${TASK_DESCRIPTION}
+- assertVisible: "ASSIGNED TO"
+- assertVisible: "Me"

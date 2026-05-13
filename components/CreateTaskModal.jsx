@@ -144,6 +144,7 @@ export default function CreateTaskModal({
             </ModalBody>
             
             <ModalActions
+                testID="assign-members-modal-actions"
                 onCancel={() => setIsSelectingMembers(false)}
                 primaryActionName="Done"
                 primaryActionIconName="check"
@@ -199,6 +200,7 @@ export default function CreateTaskModal({
                         </ThemedText>
 
                         <AnimatedPressable 
+                            testID="open-assign-members-button"
                             onPress={handleOpenAssign}
                             style={[styles.addButton, { borderColor: theme.borders }]}
                         >
@@ -225,6 +227,7 @@ export default function CreateTaskModal({
             </View>
 
             <ModalActions
+                testID="create-task-modal-actions"
                 onCancel={onClose}
                 primaryActionName="Create"
                 primaryActionIconName="plus"

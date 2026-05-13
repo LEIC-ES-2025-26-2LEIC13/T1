@@ -20,6 +20,7 @@ const ThemedInvite = ({ projectName, sender, onAccept, onIgnore }) => {
             </View>
 
             <ModalActions
+                testID="invite-card"
                 onCancel={onIgnore}
                 primaryActionName="Accept"
                 primaryActionIconName="check"

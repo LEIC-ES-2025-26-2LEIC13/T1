@@ -1,0 +1,24 @@
+appId: com.anonymous.LEICo
+tags:
+    - project
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: openProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        COLUMN_NAME: ${COLUMN_NAME}
+        
+- tapOn:
+    id: "open-create-column-modal-button"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN_NAME}
+- tapOn:
+    id: "create-column-modal-actions-create"
+- assertVisible: ${COLUMN_NAME}
+- assertVisible: "No tasks yet"

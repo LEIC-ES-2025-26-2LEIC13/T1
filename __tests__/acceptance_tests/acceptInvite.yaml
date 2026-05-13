@@ -21,5 +21,6 @@ tags:
 - assertVisible: "No pending invites"
 - tapOn:
     id: "drawer-hamburger-button"
-- tapOn: "\uf383, Home" # go to My Projects tab
+- tapOn:
+    id: "home-drawer-screen"
 - assertVisible: ${maestro.copiedText} # check if the project is in the user's projects

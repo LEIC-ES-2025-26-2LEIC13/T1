@@ -1,0 +1,26 @@
+
+appId: com.anonymous.LEICo
+tags:
+  - task
+
+---
+- runFlow:
+    file: createColumn.yaml
+    env:
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}
+      PROJECT_TITLE: ${PROJECT_TITLE}
+      PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+      COLUMN_NAME: ${COLUMN_NAME}
+        
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+- tapOn: 
+    id: "create-task-modal-actions-create"
+- assertVisible: ${TASK_NAME}
+- assertVisible: ${TASK_DESCRIPTION}

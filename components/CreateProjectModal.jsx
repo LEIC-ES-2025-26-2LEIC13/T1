@@ -42,6 +42,7 @@ export default function CreateProjectModal({
 
 
             <ModalActions
+                testID="create-project-modal-actions"
                 onCancel={onClose}
                 primaryActionName="Create"
                 primaryActionIconName="plus"

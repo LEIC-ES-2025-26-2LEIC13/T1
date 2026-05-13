@@ -30,7 +30,7 @@ It is organised by the following activities:
   - [Project management](#project-management)
     - [Sprint 0](#sprint-0)
       - [Log and documentation](#log-and-documentation)
-      - [Release](#release)
+      - [Sprint 0 Release](#sprint-0-release)
     - [Sprint 1](#sprint-1)
       - [Database Modelling and Integration](#database-modelling-and-integration)
       - [Defect Log, Tracking and Verification](#defect-log-tracking-and-verification)
@@ -41,13 +41,14 @@ It is organised by the following activities:
         - [UI improvements](#ui-improvements)
         - [Defects / Further Improvements](#defects--further-improvements)
       - [Sprint Review](#sprint-review)
-        - [Did well:](#did-well)
-        - [Do differently:](#do-differently)
-        - [Puzzles:](#puzzles)
+        - [Did well](#did-well)
+        - [Do differently](#do-differently)
+        - [Puzzles](#puzzles)
         - [Final Thoughts](#final-thoughts)
       - [Teamwork Assessment](#teamwork-assessment)
-      - [Release](#release-1)
+      - [Sprint 1 Release](#sprint-1-release)
     - [Sprint 2](#sprint-2)
+      - [Initial backlog](#initial-backlog)
       - [Logs and documentation](#logs-and-documentation)
       - [AI usage documentation](#ai-usage-documentation)
     - [Sprint 3](#sprint-3)
@@ -67,6 +68,7 @@ Thank you!
 
 
 ---
+
 ## Business Modelling
 
 Business modeling in software development involves defining the product's vision, understanding market needs, aligning features with user expectations, and setting the groundwork for strategic planning and execution.
@@ -130,6 +132,7 @@ Optionally, indicate an initial/tentative list of assumptions that you are doing
 ## Requirements
 
 ### Requirement validation
+
 To validate the requirements and idealized features, a survey using the platform Tally was conducted among L.EIC students to understand their needs and preferences regarding the problem that the app aims to solve.
 The full report can be found here: [Survey Report](docs/surveyReport.md).
 
@@ -175,10 +178,10 @@ Example:
 -->
 ![Domain Model](diagrams/DomainModel.drawio.svg)
 
-
 ## Architecture and Design
 
 ### Overall architecture
+
 The system follows a layered architecture, chosen to keep the code modular and easy to evolve while supporting real-time collaborative features.
 
 - Presentation layer: React Native screens and reusable UI components (Login/Register, My Projects, Task Modal, Invites, Calendars, Profile).
@@ -187,6 +190,7 @@ The system follows a layered architecture, chosen to keep the code modular and e
 - External services layer: cloud authentication, cloud database and push notifications used for login, data persistence and synchronization and real-time notifications, respectively.
 
 ### Architectural Patterns
+
 As described above, the high-level architecture is organized in layers with clear separation and modularity.
 
 <!--
@@ -213,6 +217,7 @@ Example of _UML package diagram_ showing a _logical view_ of the Eletronic Ticke
 Logical modules are organized as follows.
 
 #### In-app modules
+
 - UI module: comprised by screens and UI components to easily interact with Authentication, My Projects, current Project Board, Task Detail/Creation Modal, My Tasks, Global Calendar, Project Calendar, Invites, Profile.
 
 - Application module (use cases): used to fetch, manipulate and coordinate data in-between layers, implementing the core functionality of the app, such as:
@@ -228,12 +233,12 @@ Logical modules are organized as follows.
   - Access a local database to store user settings and offline data, if no connection is available.
 
 #### External components
+
 - Cloud auth service: identity management and secure session handling.
 - Cloud database service: stores all data in a real-time cloud database, enabling multi-user synchronization and persistence.
 - Push notification service: used to send real-time notifications to users about project updates, task assignments, and deadlines.
 
 ![Logical Architecture Diagram](diagrams/LogicalArchitecture.drawio.svg)
-
 
 ### Physical architecture
 
@@ -242,7 +247,7 @@ The physical architecture includes three main deployment nodes:
 - Mobile device (Android/iOS)
   - Where the app will be installed and used by the students.
 
-- Cloud backend 
+- Cloud backend
   - Authentication service.
   - Real-time database service.
   - Push notification service.
@@ -254,8 +259,6 @@ The physical architecture includes three main deployment nodes:
 
 ![Physical Architecture Diagram](diagrams/DeploymentDiagram.drawio.svg)
 
-
-
 <!--
 The goal of this subsection is to document the high-level physical structure of the software system (machines, connections, software components installed, and their dependencies) using UML deployment diagrams (Deployment View) or component diagrams (Implementation View), separate or integrated, showing the physical structure of the system.
 
@@ -266,6 +269,7 @@ Example of _UML deployment diagram_ showing a _deployment view_ of the Eletronic
 ![DeploymentView](https://user-images.githubusercontent.com/9655877/160592491-20e85af9-0758-4e1e-a704-0db1be3ee65d.png)
 -->
 ### Mockups
+
 The mockup design was created using Figma. Mockup [here](https://www.figma.com/make/nR7b7PCmUlPGA51k237Na7/Collaborative-Project-Organizer-UI?p=f&preview-route=%2Fapp%2Fdashboard).
 
 ### Functional prototype
@@ -301,23 +305,23 @@ You can find below information and references related with the project managemen
 -->
 Backlog management: [Github Projects board](https://github.com/orgs/LEIC-ES-2025-26-2LEIC13/projects/2);
 
- 
 ### Sprint 0
 
 #### Log and documentation
 
-* To do unit and integration testing, we used Jest, which was installed in the project with the command:
+- To do unit and integration testing, we used Jest, which was installed in the project with the command:
 
 ```bash
 `npx expo install @testing-library/react-native --dev`
 ```
-* Installed Jest types with 
+
+- Installed Jest types with
 
 ```bash
 `npm install -D @types/jest`
 ```
 
-* Fixed some dependency issues with the commands:
+- Fixed some dependency issues with the commands:
 
 ```bash
 rm -rf node_modules
@@ -325,7 +329,7 @@ rm package-lock.json
 npm install
 ```
 
-* And added the above commands to a script in package.json, since it was a recurrent issue:
+- And added the above commands to a script in package.json, since it was a recurrent issue:
 
 ```json
 "scripts": {
@@ -335,20 +339,19 @@ npm install
 }
 ```
 
-* for the 
-* Added a linter (ESLint)to the project with the command (and following [this](https://docs.expo.dev/guides/using-eslint/) guidelines):
+- Added a linter (ESLint)to the project with the command (and following [this](https://docs.expo.dev/guides/using-eslint/) guidelines):
 
 ```bash
 npx expo lint
 ```
 
-* ...and the corresponding VSCode extension: ESLint
+- ...and the corresponding VSCode extension: ESLint
 
-* Added two GitHub Actions workflows: one for bundling, run the tests of the project and running the linter and another one for building the app and realease the .apk file:
-    - `bundle-quality-test.yml`: for pushes in PRs to the main branch and for pushses to the main branch.
-    - `android-ios-build-release.yml`: for pushes to tags beginning with "v".
+- Added two GitHub Actions workflows: one for bundling, run the tests of the project and running the linter and another one for building the app and realease the .apk file:
+  - `bundle-quality-test.yml`: for pushes in PRs to the main branch and for pushses to the main branch.
+  - `android-ios-build-release.yml`: for pushes to tags beginning with "v".
 
-#### Release
+#### Sprint 0 Release
 
 Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.0.0).
 
@@ -360,9 +363,11 @@ Release of Sprint 0 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 * Change log: available [here](docs/changeLogSprint1.md)
 
 #### Database Modelling and Integration
+
 To integrate our app with a database, in this case, we had to redesign the database model, from a more SQL centric approach to a NoSQL approach (Firestore is inherently NoSQL so the first idea didn't make any sense).
 The final model is the follwing:
-````
+
+```` text
 ├─ users                (collection)
 │  └─ {userId}          (user document)
 │     ├─ email
@@ -393,23 +398,27 @@ The final model is the follwing:
 #### Defect Log, Tracking and Verification
 
 ##### Scope
+
 - Files inside the contexts folder: `contexts/inviteContext.jsx` and `contexts/projectContext.jsx`.
 
 #### InviteContext and ProjectContext
 
 ##### Fixes / Improvements Implemented in Code
+
 - Realtime invite and project synchronization is implemented through `onSnapshot` (listeners).
 - Duplicate invite prevention is implemented via query filters (where) on `receiverId` and `projectId` before creating a new invite.
 - User-already-in-project validation is implemented before creating an invite (inviting a user that already is inside the project wouldn't make a lot of sense).
 
 ##### Verification Status
+
 Tests were created for a previous version of the code. Currently a refactor is needed.
 
 ##### UI improvements
+
 The UI was improved during this sprint: modals, screens, layout.
 
-
 ##### Defects / Further Improvements
+
 1. Create "Classes" to better structure data that is sent/recieved to/from Firestore;
 2. Create high level functions to abstract repeated behaviour when interacting with database;
 3. Improve icon positioning and layout (inside the emulator was good but when testing on a real device those problems were identified);
@@ -421,8 +430,10 @@ The UI was improved during this sprint: modals, screens, layout.
 9. Change the App Logo
 
 #### Sprint Review
-##### Did well:
-- Database Integration 
+
+##### Did well
+
+- Database Integration
 - Authentication
 - Invites to project
 - Join project via invite
@@ -430,39 +441,57 @@ The UI was improved during this sprint: modals, screens, layout.
 - Task labelling
 - Collective effort and resilience
 
-##### Do differently:
+##### Do differently
+
 - Investing more time in databse modelling from the beginning since many of the implemented features depend on that. Because of that we had to remodel and refactor a lot of code, which is not ideal.
 - Refactor code more often, instead of waiting for a big refactor at the end of the sprint, which is more work and more difficult to do.
 - Define a priority order for the features implemented. Because a lot of features in this Sprint were interdependent, it would be good to have a clear priority order to implement them, so we can focus on the most important ones first and avoid having a lot of unfinished features at the end of the sprint.
 - Divide work evenly thorought the sprint, instead of having a lot of work concentrated in the last days, which is more stressful and less efficient.
 
-##### Puzzles:
+##### Puzzles
+
 - How to remove numerous hooks that are currently in the code.
 - When to write tests during the development process.
 - Database related code refactor (atomicity, transactions, high level functions to simplify logic).
 
 ##### Final Thoughts
-* Due to team dynamics and changes we couldn't achieve the goals defined at the start of the sprint. 
-* Despite that the end result was pretty good. We learned a lot especially how to use NoSQL databases and how to maximize their efficiency and reduce the number of reads.
+
+- Due to team dynamics and changes we couldn't achieve the goals defined at the start of the sprint. 
+- Despite that the end result was pretty good. We learned a lot especially how to use NoSQL databases and how to maximize their efficiency and reduce the number of reads.
 
 #### Teamwork Assessment
 
-* The work was evenly distributed accross the team members.
-* Since the tasks were very interdependent, we communicated a lot with each other, so everyone was aboard with the ongoing development process.
+- The work was evenly distributed accross the team members.
+- Since the tasks were very interdependent, we communicated a lot with each other, so everyone was aboard with the ongoing development process.
 
-#### Release
+#### Sprint 1 Release
 
 Release of Sprint 1 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.1.0).
 
 ### Sprint 2
 
+#### Initial backlog
+
+- The following images depict the scrum board, namely the Sprint Backlog, at the beginning of Sprint 2.
+
+![Sprint2Backlog1](docs/imgs/Sprint2Backlog1.png)
+_Sprint 2 Backlog (1/5)_
+![Sprint2Backlog2](docs/imgs/Sprint2Backlog2.png)
+_Sprint 2 Backlog (2/5)_
+![Sprint2Backlog3](docs/imgs/Sprint2Backlog3.png)
+_Sprint 2 Backlog (3/5)_
+![Sprint2Backlog4](docs/imgs/Sprint2Backlog4.png)
+_Sprint 2 Backlog (4/5)_
+![Sprint2Backlog5](docs/imgs/Sprint2Backlog5.png)
+_Sprint 2 Backlog (5/5)_
+
 #### Logs and documentation
 
-* Documentation of bugs, defects, fixes, and improvements [here](docs/sprint2improvements.md).
+- Documentation of bugs, defects, fixes, and improvements [here](docs/sprint2documentation.md).
 
 #### AI usage documentation
 
-* AI usage during this sprint documented [here](docs/sprint2AIUsage.md).
+- AI usage during this sprint documented [here](docs/sprint2AIUsage.md).
 
 ### Sprint 3
 

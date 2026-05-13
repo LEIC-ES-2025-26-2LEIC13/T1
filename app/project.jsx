@@ -239,7 +239,7 @@ export default function ProjectScreen() {
 
 					headerLeft: () => (
 						<AnimatedPressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
-							<ThemedIcon name="arrow-left"/>
+							<ThemedIcon testID="project-arrow-back" name="arrow-left"/>
 						</AnimatedPressable>
 					),
 
@@ -255,7 +255,8 @@ export default function ProjectScreen() {
 							<OverflowMenu
 								testID="project-overflow-menu"
 								actions={[
-									{
+									{	
+										testID: "invite-member-action",
 										id: 'invite-member',
 										title: 'Invite member',
 										icon: 'account-plus',

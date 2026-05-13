@@ -34,6 +34,7 @@ export default function CreateColumnModal({
 
 
             <ModalActions
+                testID="create-column-modal-actions"
                 onCancel={onClose}
                 primaryActionName="Create"
                 primaryActionIconName="plus"

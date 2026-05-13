@@ -1,0 +1,24 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+---
+- launchApp:
+    clearState: true
+
+# Assuming the account johndoe@gmail.com has no tasks assigned
+- runFlow:
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "tasks-drawer-screen"
+- assertVisible: "No tasks assigned"
+- assertVisible: "When a task is assigned to you, it will appear here"

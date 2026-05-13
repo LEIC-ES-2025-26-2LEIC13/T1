@@ -1,14 +1,35 @@
 appId: com.anonymous.LEICo
 tags:
   - task
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Cance-Create-Task"
+    PROJECT_DESCRIPTION: "Description"
+    COLUMN_NAME: "Column-Name"
+    TASK_NAME: "Task-Name"
+    TASK_DESCRIPTION: "Task-Description"
 ---
-- runFlow: openProject.yaml
-- tapOn: "+, Create Task"
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/createColumn.yaml
+    env:
+      EMAIL: ${EMAIL}
+      PASSWORD: ${PASSWORD}
+      PROJECT_TITLE: ${PROJECT_TITLE}
+      PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+      COLUMN_NAME: ${COLUMN_NAME}
+        
+- tapOn:
+    id: "open-create-task-modal-button"
 - tapOn: "Enter task name"
 - inputText: "Task1"
-- tapOn: "Enter task description"
+- tapOn: "Enter task description (optional)"
 - inputText: "Task1 Description"
 - hideKeyboard
 - tapOn: "Cancel"
-- assertNotVisible: "Task1"
-- assertNotVisible: "Task1 Description"
+- assertNotVisible: 
+- assertNotVisible: ${TASK_NAME}
+- assertNotVisible: ${TASK_DESCRIPTION}

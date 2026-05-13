@@ -94,6 +94,7 @@ const Projects = () => {
                 
                 
                     <ThemedButton
+                        testID="open-create-project-modal-button"
                         style={{ marginBottom: 16 }}
                         disabled={isLoadingProjects}
                         onPress={openProjectModal}>
