@@ -1,25 +1,27 @@
 import { jest, describe, test, expect } from "@jest/globals";
-
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
 
 import LoadingScreen from "../../../components/LoadingScreen";
 
+// Mocks corrigidos e otimizados para Default Exports
 jest.mock("../../../components/ThemedView", () => {
-    return ({ children }) => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>,
     };
 });
 
 jest.mock("../../../components/ThemedText", () => {
-    return ({ children }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{children}</Text>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <Text>{children}</Text>,
     };
 });
 

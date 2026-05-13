@@ -1,10 +1,12 @@
 import { jest, describe, expect, test, beforeEach } from '@jest/globals'
+import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { useColorScheme } from 'react-native'
 import { Colors } from '../../../constants/Colors'
 import ThemedProject from '../../../components/ThemedProject'
 
 const mockPush = jest.fn()
+
 jest.mock('expo-router', () => ({
     useRouter: () => ({ push: mockPush })
 }))
@@ -16,15 +18,25 @@ jest.mock('react-native', () => {
 })
 
 jest.mock('../../../components/ThemedText', () => {
+    const React = require('react');
     const { Text } = require('react-native')
-    return ({ children }) => <Text>{children}</Text>
+    return {
+        __esModule: true,
+        default: ({ children }) => <Text>{children}</Text>
+    }
 })
 
-jest.mock('expo-linear-gradient', () => ({
-    LinearGradient: ({ children }) => children ?? null
-}))
+jest.mock('expo-linear-gradient', () => {
+    const React = require('react');
+    return {
+        LinearGradient: ({ children }) => children ?? null
+    }
+})
 
-jest.mock('../../../components/ThemedIcon', () => () => null)
+jest.mock('../../../components/ThemedIcon', () => ({
+    __esModule: true,
+    default: () => null
+}))
 
 describe("ThemedProject", () => {
 

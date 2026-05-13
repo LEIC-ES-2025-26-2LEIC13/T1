@@ -1,5 +1,4 @@
 import { jest, beforeEach, describe, test, expect } from "@jest/globals";
-
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
@@ -14,10 +13,7 @@ jest.mock("react-native-popup-menu", () => {
     return {
         Menu: ({ children }) => <View>{children}</View>,
 
-        MenuTrigger: ({
-                          children,
-                          testID,
-                      }) => (
+        MenuTrigger: ({ children, testID }) => (
             <Pressable testID={testID}>
                 {children}
             </Pressable>
@@ -27,10 +23,7 @@ jest.mock("react-native-popup-menu", () => {
             <View>{children}</View>
         ),
 
-        MenuOption: ({
-                         children,
-                         onSelect,
-                     }) => (
+        MenuOption: ({ children, onSelect }) => (
             <Pressable onPress={onSelect}>
                 {children}
             </Pressable>
@@ -38,44 +31,59 @@ jest.mock("react-native-popup-menu", () => {
     };
 });
 
+// Mocks otimizados com suporte para default exports
 jest.mock("../../../components/ThemedIcon", () => {
-    return ({ name }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{name}</Text>;
+    return {
+        __esModule: true,
+        default: ({ name }) => <Text>{name}</Text>,
     };
 });
 
 jest.mock("../../../components/ThemedText", () => {
-    return ({ children }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{children}</Text>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <Text>{children}</Text>,
     };
 });
 
 jest.mock("../../../components/Divider", () => {
-    return () => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return <View testID="divider" />;
+    return {
+        __esModule: true,
+        default: () => <View testID="divider" />,
     };
 });
 
 jest.mock("../../../components/Spacer", () => {
-    return () => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return <View testID="spacer" />;
+    return {
+        __esModule: true,
+        default: () => <View testID="spacer" />,
     };
 });
 
 jest.mock("../../../components/AnimatedPressable", () => {
-    return "AnimatedPressable";
+    const React = require("react");
+    const { Pressable } = require("react-native");
+
+    return {
+        __esModule: true,
+        default: ({ children, onPress, testID }) => (
+            <Pressable onPress={onPress} testID={testID}>
+                {children}
+            </Pressable>
+        ),
+    };
 });
 
 jest.mock("../../../components/ThemedAlert", () => {
@@ -86,12 +94,7 @@ jest.mock("../../../components/ThemedAlert", () => {
         INFO: "info",
     };
 
-    const MockAlert = ({
-                           visible,
-                           alert,
-                           onConfirm,
-                           onCancel,
-                       }) => {
+    const MockAlert = ({ visible, alert, onConfirm, onCancel }) => {
         if (!visible) return null;
 
         return (

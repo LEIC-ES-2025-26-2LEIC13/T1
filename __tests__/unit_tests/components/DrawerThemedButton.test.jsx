@@ -1,5 +1,4 @@
 import { jest, beforeEach, describe, test, expect } from "@jest/globals";
-
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
@@ -21,32 +20,36 @@ jest.mock("@react-navigation/routers", () => ({
     },
 }));
 
+// Mock corrigido para suportar default exports
 jest.mock("../../../components/ThemedIcon", () => {
-    return ({ name, testID }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({ name, testID }) => (
             <Text testID={testID || `icon-${name}`}>
                 {name}
             </Text>
-        );
+        ),
     };
 });
 
+// Mock corrigido para suportar default exports
 jest.mock("../../../components/AnimatedPressable", () => {
-    return ({ children, onPress, testID }) => {
-        const React = require("react");
-        const { Pressable } = require("react-native");
+    const React = require("react");
+    const { Pressable } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({ children, onPress, testID }) => (
             <Pressable
                 onPress={onPress}
                 testID={testID}
             >
                 {children}
             </Pressable>
-        );
+        ),
     };
 });
 
