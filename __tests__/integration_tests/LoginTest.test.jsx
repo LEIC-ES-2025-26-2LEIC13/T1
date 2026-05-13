@@ -1,82 +1,233 @@
-import React from 'react'
-import { Alert, Text } from 'react-native'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native'
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import Login from '../../app/(auth)/login'; // Adjust path if necessary
+import { useAuth } from '../../hooks/useAuth';
+import { useRouter } from 'expo-router';
 
-import Login from '../../app/(auth)/login'
-import { UserProvider } from '../../contexts/userContext'
-import { useAuth } from '../../hooks/useAuth'
+// --- Mocks ---
 
-// Component used to check the authentication
-const AuthStateProbe = () => {
-	const { user } = useAuth()
+// Mock hooks
+jest.mock('../../hooks/useAuth', () => ({
+    useAuth: jest.fn()
+}));
 
-    // Renders different text based on the authentication state of the user
-	return user ? (
-		<Text testID="authenticated-screen">Hello, {user}!</Text>
-	) : (
-		<Text testID="login-screen">Login to continue</Text>
-	)
-}
+jest.mock('expo-router', () => ({
+    useRouter: jest.fn()
+}));
 
-const renderLoginIntegration = () => {
-    // Wraps the login with a user provider (to allow context usage)
-    // Below that we see the probe
-	return render(
-		<UserProvider>
-			<Login />
-			<AuthStateProbe />
-		</UserProvider>
-	)
-}
+// Mock simple visual components
+jest.mock('../../components/ThemedGradient', () => {
+    const { View } = require('react-native');
+    return () => <View testID="themed-gradient" />;
+});
 
-describe('Login Integration', () => {
-	afterEach(() => {
-		jest.restoreAllMocks()
-	})
+jest.mock('../../components/auth/BrandingContainer', () => {
+    const { View } = require('react-native');
+    return () => <View testID="branding-container" />;
+});
 
-	test('valid credentials authenticate the user and show authenticated content', async () => {
-		renderLoginIntegration()
+jest.mock('../../components/auth/AuthBody', () => {
+    const { View } = require('react-native');
+    return ({ children }) => <View testID="auth-body">{children}</View>;
+});
 
-        // Initially expects to have the login screen 
-		expect(screen.getByTestId('login-screen')).toBeTruthy()
+jest.mock('../../components/Spacer', () => () => null);
 
-        // Inputs the correct credentials and submits the form
-		fireEvent.changeText(screen.getByTestId('login-username-input'), 'John Doe')
-		fireEvent.changeText(screen.getByTestId('login-password-input'), '1234')
-		fireEvent.press(screen.getByTestId('login-submit-button'))
+jest.mock('../../components/ThemedText', () => {
+    const { Text } = require('react-native');
+    return ({ children }) => <Text>{children}</Text>;
+});
 
-        // Since login is async, we have to wait for its output
-		await waitFor(() => {
-			expect(screen.getByTestId('authenticated-screen')).toBeTruthy()
-			expect(screen.queryByTestId('login-screen')).toBeNull()
-		})
+// Mock interactive components
+jest.mock('../../components/auth/AuthField', () => {
+    const { TextInput, View, Pressable } = require('react-native');
+    return ({ testID, value, onChangeText, onRightIconPress, secureTextEntry }) => (
+        <View>
+            <TextInput 
+                testID={testID} 
+                value={value} 
+                onChangeText={onChangeText} 
+                secureTextEntry={secureTextEntry} 
+            />
+            {onRightIconPress && (
+                <Pressable testID={`${testID}-icon`} onPress={onRightIconPress} />
+            )}
+        </View>
+    );
+});
 
-        // Checks if the current screen is the expected, with correct text
-		expect(screen.getByText('Hello, John Doe!')).toBeTruthy()
-	})
+jest.mock('../../components/ThemedButton', () => {
+    const { Pressable } = require('react-native');
+    return ({ testID, onPress, disabled, children }) => (
+        <Pressable 
+            testID={testID} 
+            onPress={onPress} 
+            disabled={disabled}
+            accessibilityState={{ disabled: !!disabled }} // <-- Add this line
+        >
+            {children}
+        </Pressable>
+    );
+});
+jest.mock('../../components/auth/AuthFooter', () => {
+    const { Pressable } = require('react-native');
+    return ({ onPress }) => (
+        <Pressable testID="auth-footer" onPress={onPress} />
+    );
+});
 
-	test('invalid credentials keep user unauthenticated', async () => {
-        // Mocks the alert function
-		const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => {})
+jest.mock('../../components/ThemedAlert', () => {
+    const { Pressable, View, Text } = require('react-native');
+    const ALERT_TYPES = { ERROR: 'error', SUCCESS: 'success' };
+    
+    function MockThemedAlert({ visible, alert, onConfirm }) {
+        if (!visible) return null;
+        return (
+            <View testID="themed-alert">
+                <Text>{alert.title}</Text>
+                <Text>{alert.message}</Text>
+                <Pressable testID="alert-confirm" onPress={onConfirm} />
+            </View>
+        );
+    }
+    return { __esModule: true, default: MockThemedAlert, ALERT_TYPES };
+});
 
-        // Login rendering
-		renderLoginIntegration()
+// --- Test Suite ---
 
-        // Executes events needed to login
-		fireEvent.changeText(screen.getByTestId('login-username-input'), 'John Doe')
-		fireEvent.changeText(screen.getByTestId('login-password-input'), 'wrong')
-		fireEvent.press(screen.getByTestId('login-submit-button'))
+describe('Login Screen', () => {
+    const mockLogin = jest.fn();
+    const mockPush = jest.fn();
 
-        // Checks current screen
-		await waitFor(() => {
-			expect(screen.getByTestId('login-screen')).toBeTruthy()
-			expect(screen.queryByTestId('authenticated-screen')).toBeNull()
-		})
+    beforeEach(() => {
+        jest.clearAllMocks();
 
-        // Checks if the instance called alert with the expected parameters
-		expect(alertSpy).toHaveBeenCalledWith(
-			'Invalid credentials',
-			'Please insert correct credentials.'
-		)
-	})
-})
+        useAuth.mockReturnValue({
+            login: mockLogin,
+            isLoading: false
+        });
+
+        useRouter.mockReturnValue({
+            push: mockPush
+        });
+    });
+
+    it('renders all main components correctly', () => {
+        render(<Login />);
+        expect(screen.getByTestId('themed-gradient')).toBeTruthy();
+        expect(screen.getByTestId('branding-container')).toBeTruthy();
+        expect(screen.getByTestId('auth-body')).toBeTruthy();
+        expect(screen.getByTestId('login-email-input')).toBeTruthy();
+        expect(screen.getByTestId('login-password-input')).toBeTruthy();
+        expect(screen.getByTestId('login-submit-button')).toBeTruthy();
+        expect(screen.getByTestId('auth-footer')).toBeTruthy();
+    });
+
+    it('updates email and password state on user input', () => {
+        render(<Login />);
+        
+        const emailInput = screen.getByTestId('login-email-input');
+        const passwordInput = screen.getByTestId('login-password-input');
+
+        fireEvent.changeText(emailInput, 'test@example.com');
+        fireEvent.changeText(passwordInput, 'password123');
+
+        expect(emailInput.props.value).toBe('test@example.com');
+        expect(passwordInput.props.value).toBe('password123');
+    });
+
+    it('toggles password visibility when the right icon is pressed', () => {
+        render(<Login />);
+        
+        const passwordInput = screen.getByTestId('login-password-input');
+        const toggleIcon = screen.getByTestId('login-password-input-icon');
+
+        // Initially secure
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+
+        // Press toggle
+        fireEvent.press(toggleIcon);
+
+        // Should no longer be secure
+        expect(passwordInput.props.secureTextEntry).toBe(false);
+
+        // Press toggle again
+        fireEvent.press(toggleIcon);
+
+        // Should be secure again
+        expect(passwordInput.props.secureTextEntry).toBe(true);
+    });
+
+    it('shows an error alert when trying to submit with missing fields', async () => {
+        render(<Login />);
+        
+        const submitButton = screen.getByTestId('login-submit-button');
+
+        // Submit without typing anything
+        fireEvent.press(submitButton);
+
+        // login function should not have been called
+        expect(mockLogin).not.toHaveBeenCalled();
+
+        // Alert should be visible
+        await waitFor(() => {
+            expect(screen.getByTestId('themed-alert')).toBeTruthy();
+            expect(screen.getByText('Missing fields')).toBeTruthy();
+            expect(screen.getByText('Please enter both email and password.')).toBeTruthy();
+        });
+    });
+
+    it('dismisses the alert when confirm button is pressed', async () => {
+        render(<Login />);
+        
+        // Trigger alert
+        fireEvent.press(screen.getByTestId('login-submit-button'));
+        
+        await waitFor(() => {
+            expect(screen.getByTestId('themed-alert')).toBeTruthy();
+        });
+
+        // Dismiss alert
+        fireEvent.press(screen.getByTestId('alert-confirm'));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('themed-alert')).toBeNull();
+        });
+    });
+
+    it('calls login function successfully with valid inputs', async () => {
+        render(<Login />);
+        
+        fireEvent.changeText(screen.getByTestId('login-email-input'), 'user@example.com');
+        fireEvent.changeText(screen.getByTestId('login-password-input'), 'SecurePass1!');
+        
+        fireEvent.press(screen.getByTestId('login-submit-button'));
+
+        await waitFor(() => {
+            expect(mockLogin).toHaveBeenCalledWith('user@example.com', 'SecurePass1!');
+        });
+    });
+
+    it('navigates to register screen when footer link is pressed', () => {
+        render(<Login />);
+        
+        const footer = screen.getByTestId('auth-footer');
+        fireEvent.press(footer);
+
+        expect(mockPush).toHaveBeenCalledWith('/(auth)/register');
+    });
+
+    it('disables the submit button when isLoading is true', () => {
+        // Override mock for this specific test
+        useAuth.mockReturnValue({
+            login: mockLogin,
+            isLoading: true
+        });
+
+        render(<Login />);
+        
+        const submitButton = screen.getByTestId('login-submit-button');
+        expect(submitButton.props.accessibilityState.disabled).toBe(true);
+    });
+});
