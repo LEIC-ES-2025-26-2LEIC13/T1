@@ -147,4 +147,5 @@ To avoid hardcoding database paths throughout the codebase, `pathHelper.js` was 
 * Icons used in the project are now from the `@expo/vector-icons/MaterialCommunityIcons` library. Icon collection [here](https://icons.expo.fyi/Index) with the filter set to "MaterialCommunityIcons".
 
 ## Movable tasks between same column and between different columns
+
 * Tasks can now be moved between the same column, using reordered-list (npm package), and between different columns, using the new `moveTask` function in `columnsService.js` that allows moving a task from one column to another, updating the database accordingly. This feature enhances the flexibility of task management within projects, allowing users to easily reorganize their tasks as needed.
