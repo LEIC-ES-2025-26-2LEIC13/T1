@@ -26,7 +26,8 @@ export default function TaskModal({
     projectId,
     columns,        
     columnId,       
-    onTaskMoved, 
+    onTaskMoved,
+    userEmail
 }) {
     
 
@@ -112,9 +113,9 @@ export default function TaskModal({
                 <FormField
                     labelName="ASSIGNED TO"
                     value={
-                        task?.assignedMembers?.length > 0
-                            ? task.assignedMembers.map(m => m.email).join(', ')
-                            : 'No one'
+                        task?.assignedMembers && task.assignedMembers.length > 0
+                            ? task.assignedMembers.map(member => member.email === userEmail ? "Me" : member.email).join(', ')
+                            : "No one"
                     }
                     readOnly
                 />
