@@ -70,9 +70,7 @@ export const taskService = {
             const userTasksRef = doc(pathHelper.userTasks(memberId), sharedId)
             
             batch.set(userTasksRef, {
-                name: normalizedTaskData.name,
-                description: normalizedTaskData.description,
-                label: normalizedTaskData.label,
+                ...normalizedTaskData,
                 projectId: projectId,
                 projectName: projectName,
                 columnId: columnId,
