@@ -18,33 +18,35 @@ jest.mock("../../../hooks/useAuth", () => ({
     }),
 }));
 
-// ICON MOCK (so we can test it properly)
+// Mocks de UI otimizados com suporte correto a Default Exports
 jest.mock("../../../components/ThemedIcon", () => {
-    return ({ name }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
-        return <Text testID={`icon-${name}`}>{name}</Text>;
+    const React = require("react");
+    const { Text } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ name }) => <Text testID={`icon-${name}`}>{name}</Text>,
     };
 });
 
-// simple UI mocks
 jest.mock("../../../components/Divider", () => {
-    return () => {
-        const React = require("react");
-        const { View } = require("react-native");
-        return <View testID="divider" />;
+    const React = require("react");
+    const { View } = require("react-native");
+    return {
+        __esModule: true,
+        default: () => <View testID="divider" />,
     };
 });
 
 jest.mock("../../../components/Spacer", () => {
-    return () => {
-        const React = require("react");
-        const { View } = require("react-native");
-        return <View testID="spacer" />;
+    const React = require("react");
+    const { View } = require("react-native");
+    return {
+        __esModule: true,
+        default: () => <View testID="spacer" />,
     };
 });
 
-// minimal navigation mock
+// Mock da navegação corrigido para passar as propriedades corretas do ícone
 jest.mock("@react-navigation/drawer", () => {
     const React = require("react");
     const { View, Text, Pressable } = require("react-native");
@@ -61,7 +63,8 @@ jest.mock("@react-navigation/drawer", () => {
         DrawerItem: ({ label, onPress, icon }) => (
             <Pressable onPress={onPress} testID={`drawer-${label}`}>
                 <Text>{label}</Text>
-                {icon && icon()}
+                {/* O React Navigation envia sempre um objeto com color, size e focused para o icon */}
+                {icon && icon({ focused: false, color: "black", size: 24 })}
             </Pressable>
         ),
     };
@@ -72,7 +75,6 @@ beforeEach(() => {
 });
 
 describe("CustomDrawerContent", () => {
-
     test("renders drawer structure", () => {
         render(<CustomDrawerContent />);
 
@@ -106,5 +108,4 @@ describe("CustomDrawerContent", () => {
 
         expect(screen.getByText("Logout")).toBeTruthy();
     });
-
 });

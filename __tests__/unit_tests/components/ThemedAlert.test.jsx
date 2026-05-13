@@ -6,31 +6,51 @@ import ThemedAlert, { ALERT_TYPES } from "../../../components/ThemedAlert";
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
 jest.mock("../../../components/AppModal", () => {
+    const React = require("react");
     const { View } = require("react-native");
-    return ({ visible, children, onClose }) =>
-        visible ? <View testID="app-modal" onTouchEnd={onClose}>{children}</View> : null;
+    return {
+        __esModule: true,
+        default: ({ visible, children, onClose }) =>
+            visible ? <View testID="app-modal" onTouchEnd={onClose}>{children}</View> : null
+    };
 });
 
 jest.mock("../../../components/ThemedIcon", () => {
+    const React = require("react");
     const { View } = require("react-native");
-    return ({ name, testID }) => <View testID={testID ?? `icon-${name}`} />;
+    return {
+        __esModule: true,
+        default: ({ name, testID }) => <View testID={testID ?? `icon-${name}`} />
+    };
 });
 
 jest.mock("../../../components/ThemedText", () => {
+    const React = require("react");
     const { Text } = require("react-native");
-    return ({ children, ...props }) => <Text {...props}>{children}</Text>;
+    return {
+        __esModule: true,
+        default: ({ children, ...props }) => <Text {...props}>{children}</Text>
+    };
 });
 
 jest.mock("../../../components/ThemedButton", () => {
+    const React = require("react");
     const { TouchableOpacity } = require("react-native");
-    return ({ children, onPress, testID, ...props }) => (
-        <TouchableOpacity testID={testID ?? "themed-button"} onPress={onPress} {...props}>
-            {children}
-        </TouchableOpacity>
-    );
+    return {
+        __esModule: true,
+        default: ({ children, onPress, testID, ...props }) => (
+            <TouchableOpacity testID={testID ?? "themed-button"} onPress={onPress} {...props}>
+                {children}
+            </TouchableOpacity>
+        )
+    };
 });
 
-jest.mock("../../../components/Spacer", () => "Spacer");
+jest.mock("../../../components/Spacer", () => ({
+    __esModule: true,
+    default: () => null // Devolver null é mais seguro no React Native que uma String solta
+}));
+
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -46,6 +66,7 @@ const defaultProps = {
     onConfirm: jest.fn(),
     onCancel: jest.fn(),
 };
+
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 

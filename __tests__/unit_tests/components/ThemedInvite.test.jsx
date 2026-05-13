@@ -1,24 +1,44 @@
 import { describe, expect, test, jest, beforeEach } from '@jest/globals'
 import React from "react";
-import {fireEvent, render} from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import * as ReactNative from "react-native";
 import ThemedInvite from "../../../components/ThemedInvite";
-import {Colors} from "../../../constants/Colors";
+import { Colors } from "../../../constants/Colors";
 
-jest.mock("../../../components/ThemedText", () => "ThemedText");
-jest.mock("../../../components/modal/ModalActions", () => {
-    const { TouchableOpacity, Text } = require("react-native");
-    return ({ onCancel, onPrimaryActionPress, primaryActionName, secondaryActionName }) => (
-        <>
-            <TouchableOpacity testID="primary-action" onPress={onPrimaryActionPress}>
-                <Text>{primaryActionName}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity testID="secondary-action" onPress={onCancel}>
-                <Text>{secondaryActionName}</Text>
-            </TouchableOpacity>
-        </>
-    );
+
+// ── Mocks ──────────────────────────────────────────────────────────────────
+
+jest.mock("../../../components/ThemedText", () => {
+    const React = require("react");
+    const { Text } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ children, testID, ...props }) => (
+            <Text testID={testID} {...props}>{children}</Text>
+        )
+    };
 });
+
+jest.mock("../../../components/modal/ModalActions", () => {
+    const React = require("react");
+    const { TouchableOpacity, Text, View } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ onCancel, onPrimaryActionPress, primaryActionName, secondaryActionName }) => (
+            <View>
+                <TouchableOpacity testID="primary-action" onPress={onPrimaryActionPress}>
+                    <Text>{primaryActionName}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity testID="secondary-action" onPress={onCancel}>
+                    <Text>{secondaryActionName}</Text>
+                </TouchableOpacity>
+            </View>
+        )
+    };
+});
+
+
+// ── Spies e Helpers ────────────────────────────────────────────────────────
 
 const mockUseColorScheme = jest.spyOn(ReactNative, "useColorScheme");
 
@@ -28,6 +48,9 @@ const defaultProps = {
     onAccept: jest.fn(),
     onIgnore: jest.fn(),
 };
+
+
+// ── Testes ─────────────────────────────────────────────────────────────────
 
 describe("ThemedInvite", () => {
     beforeEach(() => {

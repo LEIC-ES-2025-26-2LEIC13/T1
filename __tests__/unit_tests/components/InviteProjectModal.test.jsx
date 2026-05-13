@@ -1,5 +1,4 @@
 import { jest, beforeEach, describe, test, expect } from "@jest/globals";
-
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
@@ -9,79 +8,78 @@ const mockOnClose = jest.fn();
 const mockOnInvite = jest.fn();
 const mockOnChangeText = jest.fn();
 
+// Mocks corrigidos e otimizados para Default Exports
 jest.mock("../../../components/AppModal", () => {
-    return ({ children, visible }) => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return visible ? <View>{children}</View> : null;
+    return {
+        __esModule: true,
+        default: ({ children, visible }) => (visible ? <View>{children}</View> : null),
     };
 });
 
 jest.mock("../../../components/modal/ModalHeader", () => {
-    return ({ heading }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{heading}</Text>;
+    return {
+        __esModule: true,
+        default: ({ heading }) => <Text>{heading}</Text>,
     };
 });
 
 jest.mock("../../../components/modal/ModalBody", () => {
-    return ({ children }) => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>,
     };
 });
 
 jest.mock("../../../components/Pill", () => {
-    return ({ projectName }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{projectName}</Text>;
+    return {
+        __esModule: true,
+        default: ({ projectName }) => <Text>{projectName}</Text>,
     };
 });
 
 jest.mock("../../../components/FormField", () => {
-    return ({
-                placeholder,
-                value,
-                onChangeText,
-                testID,
-            }) => {
-        const React = require("react");
-        const { TextInput } = require("react-native");
+    const React = require("react");
+    const { TextInput } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({ placeholder, value, onChangeText, testID }) => (
             <TextInput
                 testID={testID}
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
             />
-        );
+        ),
     };
 });
 
 jest.mock("../../../components/modal/ModalActions", () => {
-    return ({
-                onCancel,
-                onPrimaryActionPress,
-                primaryActionName,
-                primaryActionDisabled,
-            }) => {
-        const React = require("react");
-        const { View, Pressable, Text } = require("react-native");
+    const React = require("react");
+    const { View, Pressable, Text } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({
+            onCancel,
+            onPrimaryActionPress,
+            primaryActionName,
+            primaryActionDisabled,
+        }) => (
             <View>
-                <Pressable
-                    testID="cancel-button"
-                    onPress={onCancel}
-                >
+                <Pressable testID="cancel-button" onPress={onCancel}>
                     <Text>Cancel</Text>
                 </Pressable>
 
@@ -95,7 +93,7 @@ jest.mock("../../../components/modal/ModalActions", () => {
                     <Text>{primaryActionName}</Text>
                 </Pressable>
             </View>
-        );
+        ),
     };
 });
 
@@ -119,25 +117,17 @@ beforeEach(() => {
 });
 
 describe("InviteProjectModal", () => {
-
     test("renders modal when visible", () => {
         renderModal();
 
-        expect(
-            screen.getByText("Invite Member")
-        ).toBeTruthy();
-
-        expect(
-            screen.getByPlaceholderText("Enter user email")
-        ).toBeTruthy();
+        expect(screen.getByText("Invite Member")).toBeTruthy();
+        expect(screen.getByPlaceholderText("Enter user email")).toBeTruthy();
     });
 
     test("does not render when visible is false", () => {
         renderModal({ visible: false });
 
-        expect(
-            screen.queryByText("Invite Member")
-        ).toBeFalsy();
+        expect(screen.queryByText("Invite Member")).toBeFalsy();
     });
 
     test("renders project pill", () => {
@@ -145,9 +135,7 @@ describe("InviteProjectModal", () => {
             projectName: "My Project",
         });
 
-        expect(
-            screen.getByText("My Project")
-        ).toBeTruthy();
+        expect(screen.getByText("My Project")).toBeTruthy();
     });
 
     test("renders email input value", () => {
@@ -155,25 +143,16 @@ describe("InviteProjectModal", () => {
             value: "test@example.com",
         });
 
-        expect(
-            screen.getByDisplayValue("test@example.com")
-        ).toBeTruthy();
+        expect(screen.getByDisplayValue("test@example.com")).toBeTruthy();
     });
 
     test("calls onChangeText when typing email", () => {
         renderModal();
 
-        const input = screen.getByTestId(
-            "invite-email-input"
-        );
+        const input = screen.getByTestId("invite-email-input");
+        fireEvent.changeText(input, "user@example.com");
 
-        fireEvent.changeText(
-            input,
-            "user@example.com"
-        );
-
-        expect(mockOnChangeText)
-            .toHaveBeenCalledWith("user@example.com");
+        expect(mockOnChangeText).toHaveBeenCalledWith("user@example.com");
     });
 
     test("calls onInvite when Send Invite pressed", () => {
@@ -181,9 +160,7 @@ describe("InviteProjectModal", () => {
             value: "user@example.com",
         });
 
-        fireEvent.press(
-            screen.getByTestId("invite-button")
-        );
+        fireEvent.press(screen.getByTestId("invite-button"));
 
         expect(mockOnInvite).toHaveBeenCalled();
     });
@@ -191,9 +168,7 @@ describe("InviteProjectModal", () => {
     test("calls onClose when cancel pressed", () => {
         renderModal();
 
-        fireEvent.press(
-            screen.getByTestId("cancel-button")
-        );
+        fireEvent.press(screen.getByTestId("cancel-button"));
 
         expect(mockOnClose).toHaveBeenCalled();
     });
@@ -203,13 +178,9 @@ describe("InviteProjectModal", () => {
             value: "",
         });
 
-        const button = screen.getByTestId(
-            "invite-button"
-        );
+        const button = screen.getByTestId("invite-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(true);
+        expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     test("invite button disabled when email whitespace only", () => {
@@ -217,13 +188,9 @@ describe("InviteProjectModal", () => {
             value: "   ",
         });
 
-        const button = screen.getByTestId(
-            "invite-button"
-        );
+        const button = screen.getByTestId("invite-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(true);
+        expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     test("invite button enabled when email valid", () => {
@@ -231,21 +198,15 @@ describe("InviteProjectModal", () => {
             value: "valid@email.com",
         });
 
-        const button = screen.getByTestId(
-            "invite-button"
-        );
+        const button = screen.getByTestId("invite-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(false);
+        expect(button.props.accessibilityState.disabled).toBe(false);
     });
 
     test("renders Send Invite button", () => {
         renderModal();
 
-        expect(
-            screen.getByText("Send Invite")
-        ).toBeTruthy();
+        expect(screen.getByText("Send Invite")).toBeTruthy();
     });
 
     test("handles different project names", () => {
@@ -253,9 +214,6 @@ describe("InviteProjectModal", () => {
             projectName: "Backend API",
         });
 
-        expect(
-            screen.getByText("Backend API")
-        ).toBeTruthy();
+        expect(screen.getByText("Backend API")).toBeTruthy();
     });
-
 });
