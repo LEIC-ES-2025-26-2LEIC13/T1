@@ -1,4 +1,6 @@
-# Firebase Setup
+# Setup Environment Documentation
+
+## Firebase Setup
 
 Simple guide for setting up Firebase in this project.
 
@@ -7,7 +9,7 @@ This project uses only two Firebase modules:
 - Firebase Authentication (Email/Password)
 - Cloud Firestore
 
-## Development Environment
+### Development Environment
 
 - Node.js LTS
 - npm
@@ -15,7 +17,7 @@ This project uses only two Firebase modules:
 - Android Studio emulator or physical device
 - Firebase Console account
 
-## Install Firebase
+### Install Firebase
 
 Command used:
 
@@ -23,17 +25,17 @@ Command used:
 npx expo install firebase
 ```
 
-## Firebase Console Steps
+### Firebase Console Steps
 
 1. Create a Firebase project.
 2. Add Android and iOS apps.
 3. Download and place files in the project:
-	 - firebase/google-services.json
-	 - firebase/GoogleService-Info.plist
+   - firebase/google-services.json
+   - firebase/GoogleService-Info.plist
 4. Enable Authentication with Email/Password.
 5. Enable Firestore Database.
 
-## Project Configuration
+### Project Configuration
 
 - Firebase initialization is in firebase/firebaseConfig.js.
 - Auth uses AsyncStorage persistence.
@@ -41,7 +43,7 @@ npx expo install firebase
 - app.json points to native Firebase files for Android and iOS.
 - No other Firebase modules are used in this project.
 
-## Run and Verify
+### Run and Verify
 
 ```bash
 npm install
@@ -54,7 +56,7 @@ Check:
 - Login/register work.
 - Firestore read/write works.
 
-## Coding Standards
+### Coding Standards
 
 - Keep Firebase setup in one file only (firebase/firebaseConfig.js).
 - Do not initialize Firebase inside screens/components.
@@ -66,10 +68,30 @@ npm run lint
 npm test
 ```
 
-## References
+### References
 
 - Firebase Docs (main): https://firebase.google.com/docs
 - Add Firebase to JavaScript app: https://firebase.google.com/docs/web/setup
 - Firebase Auth (Web/JS): https://firebase.google.com/docs/auth/web/start
 - Cloud Firestore (Web/JS): https://firebase.google.com/docs/firestore/quickstart
 - Expo guide for Firebase: https://docs.expo.dev/guides/using-firebase/
+
+## Running development server
+
+- To run the development server for Android, use the following command:
+
+```bash
+npx expo run:android
+```
+
+- Then, it is possible to run the app in an Android emulator or physical device, via USB or Wi-Fi debugging.
+
+## Running acceptance tests
+
+- Acceptance tests for this project were written using the Maestro testing framework.
+- To install Maestro, follow the instructions in the official QuickStart guide [here](https://docs.maestro.dev/get-started/quickstart).
+- To run the acceptance tests:
+  1. Launch the MaestroStudio application (also followint the instructions in the QuickStart guide)
+  2. Open the `__tests__/acceptance_tests/` directory.
+  3. Select device as emulator or physical device.
+  4. Run the desired test file, select it and clicking the "Run test" button in MaestroStudio.
