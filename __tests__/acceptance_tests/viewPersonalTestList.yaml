@@ -17,12 +17,10 @@ env:
     clearState: true
 
 - runFlow:
-    file: subflows/assignTask.yaml
+    file: subflows/acceptInvite.yaml
     env:
-        ASSIGNER_EMAIL: ${ASSIGNER_EMAIL}
-        ASSIGNER_PASSWORD: ${ASSIGNER_PASSWORD}
-        ASSIGNEE_EMAIL: ${ASSIGNEE_EMAIL}
-        ASSIGNEE_PASSWORD: ${ASSIGNEE_PASSWORD}
+        SENDER_EMAIL: ${ASSIGNEE_EMAIL}
+        SENDER_PASSWORD: ${ASSIGNEE_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
         RECEIVER_EMAIL: ${ASSIGNER_EMAIL}
@@ -49,12 +47,39 @@ env:
 - tapOn: "Enter task description (optional)"
 - inputText: ${TASK_DESCRIPTION}
 - hideKeyboard
-
-- tapOn: 
+- scrollUntilVisible:
+    element:
+      id: "open-assign-members-button"
+- tapOn:
+    id: "open-assign-members-button"
+- tapOn: ${ASSIGNEE_EMAIL}
+- tapOn:
+    id: "assign-members-modal-actions-done"
+- tapOn:
     id: "create-task-modal-actions-create"
 - assertVisible: ${TASK_NAME}
 - assertVisible: ${TASK_DESCRIPTION}
 
-- scrollUntilVisible:
-    element: "\udb80\udc14, Add Members"
-- tapOn: ${ASSIGNEE_EMAIL}
+# Logout
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "drawer-logout"
+
+# Login with the assignee account
+- runFlow:
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${ASSIGNEE_EMAIL}
+        PASSWORD: ${ASSIGNEE_PASSWORD}
+
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "tasks-drawer-screen"
+
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${TASK_NAME}
+- assertVisible: ${TASK_DESCRIPTION}

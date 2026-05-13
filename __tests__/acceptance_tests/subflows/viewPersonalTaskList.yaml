@@ -1,0 +1,72 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+
+---
+- runFlow:
+    file: acceptInvite.yaml
+    env:
+        SENDER_EMAIL: ${ASSIGNEE_EMAIL}
+        SENDER_PASSWORD: ${ASSIGNEE_PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        RECEIVER_EMAIL: ${ASSIGNER_EMAIL}
+        RECEIVER_PASSWORD: ${ASSIGNER_PASSWORD}
+
+# Open project
+- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open, \udb80\udfcc"
+
+# Create column
+- tapOn:
+    id: "open-create-column-modal-button"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN_NAME}
+- tapOn:
+    id: "create-column-modal-actions-create"
+- assertVisible: ${COLUMN_NAME}
+- assertVisible: "No tasks yet"
+
+# Create task assigning it to assignee member
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "open-assign-members-button"
+- tapOn:
+    id: "open-assign-members-button"
+- tapOn: ${ASSIGNEE_EMAIL}
+- tapOn:
+    id: "assign-members-modal-actions-done"
+- tapOn:
+    id: "create-task-modal-actions-create"
+- assertVisible: ${TASK_NAME}
+- assertVisible: ${TASK_DESCRIPTION}
+
+# Logout
+- tapOn:
+    id: "project-arrow-back"
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "drawer-logout"
+
+# Login with the assignee account
+- runFlow:
+    file: login.yaml
+    env:
+        EMAIL: ${ASSIGNEE_EMAIL}
+        PASSWORD: ${ASSIGNEE_PASSWORD}
+
+- tapOn:
+    id: "drawer-hamburger-button"
+- tapOn:
+    id: "tasks-drawer-screen"
+
+- assertVisible: ${PROJECT_TITLE}
+- assertVisible: ${TASK_NAME}
+- assertVisible: ${TASK_DESCRIPTION}

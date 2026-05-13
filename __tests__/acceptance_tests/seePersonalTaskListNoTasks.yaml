@@ -17,10 +17,8 @@ env:
         PASSWORD: ${PASSWORD}
 
 - tapOn:
-    id: "project-arrow-back"
-- tapOn:
     id: "drawer-hamburger-button"
-- assertVisible:
+- tapOn:
     id: "tasks-drawer-screen"
 - assertVisible: "No tasks assigned"
 - assertVisible: "When a task is assigned to you, it will appear here"

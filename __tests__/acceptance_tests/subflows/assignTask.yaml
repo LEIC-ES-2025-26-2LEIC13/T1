@@ -48,7 +48,3 @@ tags:
     id: "drawer-hamburger-button"
 - tapOn:
     id: "drawer-logout"
-
-- runFlow: ""
-
-
