@@ -44,6 +44,10 @@ export const projectService = {
     createProject: async (userId, userEmail, projectData) => {
         const normalizedProjectData = normalizeProjectData(projectData)
 
+        if (!normalizedProjectData.title) {
+            throw new Error("Please enter a project title")
+        }
+
         const batch = writeBatch(db); // creates a write batch
 
         const projectRef = doc(collection(db, COLLECTIONS.PROJECTS)); // Generates a new random id for a document that doesnt exist yet
@@ -93,7 +97,7 @@ export const projectService = {
         const operations = []
 
         // Add all data from columns and tasks within the project
-        operations.push(...await columnService.allColumnsOps(projectId))
+        operations.push(...await columnService.allColumnsRefsToDelete(projectId))
 
         // Find all projectUsers inside the project to be deleted
         const projectUsersRef = pathHelper.projectUsers(projectId)

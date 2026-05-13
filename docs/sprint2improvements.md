@@ -27,7 +27,7 @@ As atomicity was desired for the application (collaborative), batch operations w
 
 Since the database now includes projectColumns as a subcollection that contains columns of a project and those columns now have a subcollection of tasks, the database structure has been updated to reflect this change:
 
-```
+``` text
 /
 ├─ users                      (collection)
 │  └─ {userId}                (user document)
@@ -50,6 +50,7 @@ Since the database now includes projectColumns as a subcollection that contains 
 │           ├─ name
 │           ├─ description
 │           ├─ label
+|           ├─ assignedMembers
 |           ├─ projectId
 │           ├─ projectName
 |           ├─ columnId
@@ -99,12 +100,15 @@ For that same reason, a new api service was created: `columnsService`, that is r
   * Inside `project.jsx` an horizontal FlatList was introduced to allow column swiping, facilitating the navigation inside each project (much appreciated for mobile users). Also new modals and components were created to allow users to create, edit and delete columns.
 
 ## Hooks
+
 * Simplified hook usage for database documents by introducing object hooks. Instead of maintaining multiple hooks for individual fields (e.g. `task.name`, `task.description`), there is now` a single hook that returns the entire object, making it easier to manage and consume data across components.
 
 ## Intro Page
+
 * A new intro page was added that welcomes users to the app with a short tagline. The page is displayed only on the user's first visit and will not appear again once they are logged in.
 
 ## Tasks
+
 * Tasks and their associated data (name, description, label, and assignees) are now stored as documents inside task columns, resulting in a more consistent data structure. Allowing for better organization and easier retrieval of task-related data,
 
 * **Labels**: Tasks can now have a label to help users categorise and identify their work at a glance. When creating a task, users can choose from a predefined list of labels (e.g. "Work", "Urgent", "Idea") or create their own custom label.
@@ -113,11 +117,9 @@ For that same reason, a new api service was created: `columnsService`, that is r
 
 * **Task Details Modal**: A new modal displays the full details of a task, including its name, description, label, and assignees. It also includes a "Finish Task" button that removes the task from the database and its column, giving users a clear way to complete and close out their work.
 
+* **User Tasks**: The user can see all the tasks assigned to them in the "My Tasks" tab, allowing them to easily keep track of their responsibilities across different projects.
+
 ## Implement database path helper
-
-### NOT YET IMPLEMENTED (but will be done in this sprint)
-
-# Implement database path helper
 
 To avoid hardcoding database paths throughout the codebase, `pathHelper.js` was implemented to generate the correct paths for different operations. This not only reduces the chances of errors due to typos but also centralizes the logic for path generation, making it easier to maintain and update in the future if the database structure changes. Logic is now consistent and self contained inside the helper, improving code readability and maintainability.
 

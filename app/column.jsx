@@ -29,6 +29,12 @@ export default function Column({ projectId, projectName, columnData, columns }) 
     const { deleteColumn, updateColumn } = useColumn();
     const { user } = useAuth();
 
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
+
+    const { user } = useAuth()
+
+    const { deleteColumn, updateColumn } = useColumn()
     const [column, setColumn] = useState({
         id: columnData.id,
         name: columnData.name,
@@ -229,6 +235,7 @@ export default function Column({ projectId, projectName, columnData, columns }) 
                         columns={columns}             
                         columnId={column.id}
                         onTaskMoved={closeTaskDetails} 
+                        userEmail={user.email}
                     />
 
                     <ThemedAlert

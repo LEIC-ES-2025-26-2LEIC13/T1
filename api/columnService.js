@@ -1,9 +1,8 @@
-import { doc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction, updateDoc } from "firebase/firestore";
+import { doc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 import { pathHelper } from "./pathHelper";
 import { taskService } from "./taskService";
-import { SUBCOLLECTIONS } from "../constants/Collections";
 
 function normalizeColumnData({name}) {
     return {
@@ -109,20 +108,16 @@ export const columnService = {
             operations.push({ type: OPERATION_TYPES.DELETE, ref: columnRef })
 
             // Include all tasks of the column
-            const columnTasksSnap = await getDocs(columnRef, SUBCOLLECTIONS.COLUMN_TASKS) 
-
-            for (const columnTaskDoc of columnTasksSnap.docs) {
+            const columnTasksRef = pathHelper.columnTasks(projectId, columnDoc.id)
+            const columnTasksSnapshot = await getDocs(columnTasksRef)
+            columnTasksSnapshot.forEach((columnTaskDoc) => {
                 operations.push(...taskService.getTaskRefsToDelete(
                     projectId,
                     columnDoc.id,
                     columnTaskDoc.id,
                     columnTaskDoc.data().assignedMembers || []
                 ))
-            }
-
-            const columnTasksRef = pathHelper.columnTasks(projectId, columnDoc.id)
-            const columnTasksSnapshot = await getDocs(columnTasksRef)
-            columnTasksSnapshot.forEach((taskDoc) => operations.push({ type: OPERATION_TYPES.DELETE, ref: taskDoc.ref }))
+            })
         }
 
         return operations;
@@ -134,11 +129,34 @@ export const columnService = {
             return // no updates
         }
 
-        const dataToUpdate = {}
-        if (name !== undefined) dataToUpdate.name = name
+        const operations = []
+        
+        // 1. Update the column itself
+        operations.push({
+            type: OPERATION_TYPES.UPDATE,
+            ref: pathHelper.projectColumn(projectId, columnId),
+            data: { name }
+        })
 
-        await updateDoc(pathHelper.projectColumn(projectId, columnId), dataToUpdate)
-    }, 
+        // 2. Cascade the new columnName to all tasks assigned to users in this column
+        const columnTasksRef = pathHelper.columnTasks(projectId, columnId)
+        const columnTasksSnapshot = await getDocs(columnTasksRef)
+
+        columnTasksSnapshot.forEach((taskDoc) => {
+            const taskData = taskDoc.data()
+            const assignedMembers = taskData.assignedMembers || []
+
+            assignedMembers.forEach((member) => {
+                operations.push({
+                    type: OPERATION_TYPES.UPDATE,
+                    ref: pathHelper.userTask(member.id, taskDoc.id),
+                    data: { columnName: name }
+                })
+            })
+        })
+
+        await batchOps(db, operations)
+    }
 }
 
 // Reorderable columns could be implmented, similarly to tasks

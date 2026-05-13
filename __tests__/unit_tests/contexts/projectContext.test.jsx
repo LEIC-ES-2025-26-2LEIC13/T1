@@ -1,16 +1,17 @@
 import { jest, describe, it, expect, beforeEach } from '@jest/globals'
 import React, { useContext } from 'react'
 import { renderHook, act } from '@testing-library/react-native'
-import { InviteContext, InviteProvider } from '../../../contexts/inviteContext'
-import { inviteService } from '../../../api/inviteService'
+import { ProjectContext, ProjectProvider } from '../../../contexts/projectContext'
+import { projectService } from '../../../api/projectService'
 import { useAuth } from '../../../hooks/useAuth'
 
-jest.mock('../../../api/inviteService', () => ({
-    inviteService: {
-        subscribeToUserInvites: jest.fn(),
-        sendInvite: jest.fn(),
-        acceptInvite: jest.fn(),
-        ignoreInvite: jest.fn()
+jest.mock('../../../api/projectService', () => ({
+    projectService: {
+        subscribeToUserProjects: jest.fn(),
+        createProject: jest.fn(),
+        updateProject: jest.fn(),
+        deleteProject: jest.fn(),
+        kickMember: jest.fn()
     }
 }))
 
@@ -18,36 +19,36 @@ jest.mock('../../../hooks/useAuth', () => ({
     useAuth: jest.fn()
 }))
 
-describe('InviteContext', () => {
+describe('ProjectContext', () => {
     let wrapper
 
     beforeEach(() => {
         jest.clearAllMocks()
-        wrapper = ({ children }) => <InviteProvider>{children}</InviteProvider>
+        wrapper = ({ children }) => <ProjectProvider>{children}</ProjectProvider>
     })
 
-    it('should clear invites if user is missing', () => {
+    it('should set projects to empty array if user is missing', () => {
         useAuth.mockReturnValue({ user: null })
-        const { result } = renderHook(() => useContext(InviteContext), { wrapper })
+        const { result } = renderHook(() => useContext(ProjectContext), { wrapper })
 
-        expect(result.current.invites).toEqual([])
-        expect(inviteService.subscribeToUserInvites).not.toHaveBeenCalled()
+        expect(result.current.projects).toEqual([])
+        expect(projectService.subscribeToUserProjects).not.toHaveBeenCalled()
     })
 
-    it('should fetch invites and set notification flag', () => {
+    it('should subscribe to projects and handle loading state', () => {
         useAuth.mockReturnValue({ user: { uid: 'u1' } })
         const mockUnsubscribe = jest.fn()
         
-        inviteService.subscribeToUserInvites.mockImplementation((uid, callback) => {
-            callback([{ id: 'i1' }]) 
+        projectService.subscribeToUserProjects.mockImplementation((uid, callback) => {
+            callback([{ id: 'p1' }])
             return mockUnsubscribe
         })
 
-        const { result, unmount } = renderHook(() => useContext(InviteContext), { wrapper })
+        const { result, unmount } = renderHook(() => useContext(ProjectContext), { wrapper })
 
-        expect(inviteService.subscribeToUserInvites).toHaveBeenCalledWith('u1', expect.any(Function))
-        expect(result.current.invites).toEqual([{ id: 'i1' }])
-        expect(result.current.hasNewInvites).toBe(true)
+        expect(projectService.subscribeToUserProjects).toHaveBeenCalledWith('u1', expect.any(Function))
+        expect(result.current.projects).toEqual([{ id: 'p1' }])
+        expect(result.current.isLoadingProjects).toBe(false)
 
         unmount()
         expect(mockUnsubscribe).toHaveBeenCalled()
@@ -58,24 +59,39 @@ describe('InviteContext', () => {
 
         beforeEach(() => {
             useAuth.mockReturnValue({ user: { uid: 'u1', email: 'test@test.com' } })
-            const { result } = renderHook(() => useContext(InviteContext), { wrapper })
+
+            projectService.subscribeToUserProjects.mockImplementation((uid, cb) => jest.fn())
+            const { result } = renderHook(() => useContext(ProjectContext), { wrapper })
             currentResult = result
         })
 
-        it('should call sendInvite API', () => {
-            const inviteData = { receiverId: 'r1', projectId: 'p1' }
-            act(() => currentResult.current.sendInvite(inviteData))
-            expect(inviteService.sendInvite).toHaveBeenCalledWith(inviteData)
+        it('should call createProject API', async () => {
+            const projectData = { title: 'New Project' }
+            await act(async () => {
+                await currentResult.current.createProject(projectData)
+            })
+            expect(projectService.createProject).toHaveBeenCalledWith('u1', 'test@test.com', projectData)
         })
 
-        it('should call acceptInvite API', () => {
-            act(() => currentResult.current.acceptInvite({ id: 'i1', projectId: 'p1' }))
-            expect(inviteService.acceptInvite).toHaveBeenCalledWith('u1', 'test@test.com', { id: 'i1', projectId: 'p1' })
+        it('should call updateProject API', async () => {
+            await act(async () => {
+                await currentResult.current.updateProject('p1', { title: 'Updated' })
+            })
+            expect(projectService.updateProject).toHaveBeenCalledWith('p1', { title: 'Updated' })
         })
 
-        it('should call ignoreInvite API', () => {
-            act(() => currentResult.current.ignoreInvite({ id: 'i1' }))
-            expect(inviteService.ignoreInvite).toHaveBeenCalledWith('u1', 'i1')
+        it('should call deleteProject API', async () => {
+            await act(async () => {
+                await currentResult.current.deleteProject('p1')
+            })
+            expect(projectService.deleteProject).toHaveBeenCalledWith('p1')
+        })
+
+        it('should call kickMember API', async () => {
+            await act(async () => {
+                await currentResult.current.kickMember('p1', 'm1')
+            })
+            expect(projectService.kickMember).toHaveBeenCalledWith('p1', 'm1')
         })
     })
 })

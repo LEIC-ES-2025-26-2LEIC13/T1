@@ -18,6 +18,26 @@ jest.mock('../../../api/authService', () => ({
     }
 }))
 
+jest.mock('../../../components/ThemedText', () => {
+    const { Text, StyleSheet } = jest.requireActual('react-native')
+    return ({ children }) => <Text>{children}</Text>
+})
+
+jest.mock('../../../components/ThemedAlert', () => {
+    const React = require('react')
+    const { Alert } = require('react-native')
+    return {
+        __esModule: true,
+        default: ({ visible, alert }) => {
+            if (visible && alert) {
+                Alert.alert(alert.title, alert.message)
+            }
+            return <></>
+        },
+        ALERT_TYPES: { ERROR: 'error', SUCCESS: 'success', WARNING: 'warning', INFO: 'info' }
+    }
+})
+
 describe('AuthContext', () => {
     let wrapper
 
