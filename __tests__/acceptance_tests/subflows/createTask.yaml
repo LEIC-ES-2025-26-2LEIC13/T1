@@ -4,9 +4,6 @@ tags:
   - task
 
 ---
-- launchApp:
-    clearState: true
-
 - runFlow:
     file: createColumn.yaml
     env:

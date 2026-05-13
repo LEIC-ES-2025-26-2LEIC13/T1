@@ -17,10 +17,12 @@ env:
     clearState: true
 
 - runFlow:
-    file: subflows/acceptInvite.yaml
+    file: subflows/assignTask.yaml
     env:
-        SENDER_EMAIL: ${ASSIGNEE_EMAIL}
-        SENDER_PASSWORD: ${ASSIGNEE_PASSWORD}
+        ASSIGNER_EMAIL: ${ASSIGNER_EMAIL}
+        ASSIGNER_PASSWORD: ${ASSIGNER_PASSWORD}
+        ASSIGNEE_EMAIL: ${ASSIGNEE_EMAIL}
+        ASSIGNEE_PASSWORD: ${ASSIGNEE_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
         RECEIVER_EMAIL: ${ASSIGNER_EMAIL}

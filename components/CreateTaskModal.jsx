@@ -200,6 +200,7 @@ export default function CreateTaskModal({
                         </ThemedText>
 
                         <AnimatedPressable 
+                            testID="open-assign-members-button"
                             onPress={handleOpenAssign}
                             style={[styles.addButton, { borderColor: theme.borders }]}
                         >

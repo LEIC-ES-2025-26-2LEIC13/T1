@@ -29,3 +29,4 @@ env:
     id: "create-column-modal-actions-create"
 - assertVisible: ${COLUMN_NAME}
 - assertVisible: "No tasks yet"
+- assertVisible: "Create the first task in this column using the button below"

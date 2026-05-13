@@ -6,7 +6,9 @@ env:
     PASSWORD: "123456"
     PROJECT_TITLE: "Test-Cance-Create-Task"
     PROJECT_DESCRIPTION: "Description"
-    COLUMN_NAME: "Column Name"
+    COLUMN_NAME: "Column-Name"
+    TASK_NAME: "Task-Name"
+    TASK_DESCRIPTION: "Task-Description"
 ---
 - launchApp:
     clearState: true
@@ -28,5 +30,6 @@ env:
 - inputText: "Task1 Description"
 - hideKeyboard
 - tapOn: "Cancel"
-- assertNotVisible: "Task1"
-- assertNotVisible: "Task1 Description"
+- assertNotVisible: 
+- assertNotVisible: ${TASK_NAME}
+- assertNotVisible: ${TASK_DESCRIPTION}
