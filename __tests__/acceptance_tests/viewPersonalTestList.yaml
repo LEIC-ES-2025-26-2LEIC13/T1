@@ -3,8 +3,10 @@ tags:
     - task
 
 env:
-    EMAIL: "johndoe@gmail.com"
-    PASSWORD: "123456"
+    ASSIGNER_EMAIL: "johndoe@gmail.com"
+    ASSIGNER_PASSWORD: "123456"
+    ASSIGNEE_EMAIL: "pedro19@gmail.com"
+    ASSIGNEE_PASSWORD: "123456"
     PROJECT_TITLE: "Test-View-Personal-Task-List"
     PROJECT_DESCRIPTION: "Description"
     COLUMN_NAME: "Column-Name"
@@ -15,21 +17,42 @@ env:
     clearState: true
 
 - runFlow:
-    file: subflows/createTask.yaml
+    file: subflows/acceptInvite.yaml
     env:
-        EMAIL: ${EMAIL}
-        PASSWORD: ${PASSWORD}
+        SENDER_EMAIL: ${ASSIGNEE_EMAIL}
+        SENDER_PASSWORD: ${ASSIGNEE_PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
-        COLUMN_NAME: ${COLUMN_NAME}
-        TASK_NAME: ${TASK_NAME}
-        TASK_DESCRIPTION: ${TASK_DESCRIPTION}
+        RECEIVER_EMAIL: ${ASSIGNER_EMAIL}
+        RECEIVER_PASSWORD: ${ASSIGNER_PASSWORD}
 
+# Open project
+- tapOn: "${PROJECT_TITLE}, ${PROJECT_DESCRIPTION}, Open, \udb80\udfcc"
+
+# Create column
 - tapOn:
-    id: "project-arrow-back"
+    id: "open-create-column-modal-button"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN_NAME}
 - tapOn:
-    id: "drawer-hamburger-button"
-- assertVisible:
-    id: "tasks-drawer-screen"
+    id: "create-column-modal-actions-create"
+- assertVisible: ${COLUMN_NAME}
+- assertVisible: "No tasks yet"
+
+# Create task assigning it to assignee member
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+
+- tapOn: 
+    id: "create-task-modal-actions-create"
 - assertVisible: ${TASK_NAME}
 - assertVisible: ${TASK_DESCRIPTION}
+
+- scrollUntilVisible:
+    element: "\udb80\udc14, Add Members"
+- tapOn: ${ASSIGNEE_EMAIL}

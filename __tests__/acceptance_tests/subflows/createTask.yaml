@@ -20,7 +20,7 @@ tags:
     id: "open-create-task-modal-button"
 - tapOn: "Enter task name"
 - inputText: ${TASK_NAME}
-- tapOn: "Enter task description"
+- tapOn: "Enter task description (optional)"
 - inputText: ${TASK_DESCRIPTION}
 - hideKeyboard
 - tapOn: 

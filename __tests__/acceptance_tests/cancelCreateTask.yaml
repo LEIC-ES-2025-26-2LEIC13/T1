@@ -24,7 +24,7 @@ env:
     id: "open-create-task-modal-button"
 - tapOn: "Enter task name"
 - inputText: "Task1"
-- tapOn: "Enter task description"
+- tapOn: "Enter task description (optional)"
 - inputText: "Task1 Description"
 - hideKeyboard
 - tapOn: "Cancel"
