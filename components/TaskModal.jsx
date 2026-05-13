@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, useColorScheme } from 'react-native'
+import { StyleSheet } from 'react-native'
 import AppModal from './AppModal'
 import ModalHeader from './modal/ModalHeader'
 import FormField from './FormField'
@@ -8,7 +8,7 @@ import PillsContainer from './PillsContainer'
 import Pill from './Pill'
 import {LABELS} from '../constants/Labels'
 import ModalActions from './modal/ModalActions'
-import {LabelColors, Colors } from '../constants/Colors'
+import {LabelColors } from '../constants/Colors'
 import AnimatedPressable from './AnimatedPressable'
 import ThemedText from './ThemedText'
 import ThemedIcon from './ThemedIcon'
@@ -29,8 +29,6 @@ export default function TaskModal({
     onTaskMoved, 
 }) {
     
-    const colorScheme = useColorScheme()
-    const theme = Colors[colorScheme] ?? Colors.light
 
     const labelIcon = LABELS.find(label => label.name === task?.label)?.icon
     const labelColor = LabelColors[task?.label] ?? LabelColors.default
@@ -40,7 +38,6 @@ export default function TaskModal({
     const nextColumn = currentIndex < (columns?.length - 1) ? columns[currentIndex + 1] : null
 
     const handleMove = async (targetColumn) => {
-        console.log(projectId, task, columnId, targetColumn)
         await taskService.moveTaskToColumn(projectId, task, columnId, targetColumn)
         onTaskMoved?.()  // close modal after move
     }

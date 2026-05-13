@@ -1,16 +1,14 @@
-import React, { memo } from 'react';
-import { useColorScheme, StyleSheet, Pressable, View } from "react-native";
+import React from 'react';
+import { useColorScheme, StyleSheet } from "react-native";
 import ThemedText from "./ThemedText";
 import ThemedView from "./ThemedView";
 import { Colors, LabelColors } from "../constants/Colors";
 import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
-import { useReorderableDrag}  from 'react-native-reorderable-list';
 import AnimatedPressable from './AnimatedPressable';
 
-export default function ThemedTask({ task, onPress, onBackground }) {
-    const drag = useReorderableDrag();
-
+export default function ThemedTask({ task, onPress, onBackground, onLongPress }) {
+    
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
 
@@ -19,7 +17,7 @@ export default function ThemedTask({ task, onPress, onBackground }) {
     return (
         <AnimatedPressable
             onPress={onPress}
-            onLongPress={drag}
+            onLongPress={onLongPress}
             delayLongPress={150}
             style= {{marginVertical: 6}}
         >

@@ -18,9 +18,8 @@ import Spacer from "../components/Spacer";
 import ThemedIcon from "../components/ThemedIcon";
 import { projectService } from "../api/projectService";
 import { useAuth } from "../hooks/useAuth";
-import ReorderableList, { reorderItems } from 'react-native-reorderable-list';
+import ReorderableList, { reorderItems, useReorderableDrag } from 'react-native-reorderable-list';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useRef } from "react";
 
 export default function Column({ projectId, projectName, columnData, columns }) {
     const colorScheme = useColorScheme();
@@ -130,11 +129,22 @@ export default function Column({ projectId, projectName, columnData, columns }) 
     }, [projectId, columnData.id]);
 
 
+    const DraggableTask = ({ item, onPress }) => {
+        const drag = useReorderableDrag();
+        return (
+            <ThemedTask
+                task={item}
+                onPress={onPress}
+                onBackground={false}
+                onLongPress={drag}
+            />
+        );
+    };
+
     const renderItem = useCallback(({ item }) => (
-        <ThemedTask
-            task={item}
+        <DraggableTask
+            item={item}
             onPress={() => openTaskDetails(item)}
-            onBackground={false}
         />
     ), []);
 
