@@ -17,7 +17,7 @@
 * View all the tasks assigned to a user in the "My Tasks" tab.
 * Move tasks between and within columns.
 
-## Project-level
+### Project-level
 
 * Deletion of projects (with all its columns and tasks).
 * Possibility to see the members of a project.

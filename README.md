@@ -52,6 +52,7 @@ It is organised by the following activities:
       - [Logs and documentation](#logs-and-documentation)
       - [AI usage documentation](#ai-usage-documentation)
       - [Setup environment documentation](#setup-environment-documentation)
+      - [Sprint 2 Release](#sprint-2-release)
     - [Sprint 3](#sprint-3)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
@@ -281,7 +282,7 @@ In this subsection please describe which feature, or part of it, you have implem
 
 At this phase, instead of a complete user story, you can simply implement a small part of a feature that demonstrates thay you can use the technology, for example, show a screen with the app credits (name and authors).
 -->
-Most recent release [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v1.1.0).
+Most recent release [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v.2.0.0).
 
 ## Project management
 <!--
@@ -498,6 +499,10 @@ _Sprint 2 Backlog (5/5)_
 #### Setup environment documentation
 
 - Continuous documentation for setting up the development environment [here](docs/setupEnvironment.md).
+
+#### Sprint 2 Release
+
+Release of Sprint 2 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v.2.0.0).
 
 ### Sprint 3
 
