@@ -5,25 +5,35 @@ import * as ReactNative from "react-native";
 import ThemedTextInput from "../../../components/ThemedTextInput";
 import { Colors } from "../../../constants/Colors";
 
-// Mocks
+// ── Mocks ──────────────────────────────────────────────────────────────────
 
 jest.mock("../../../components/ThemedIcon", () => {
+    const React = require("react");
     const { View } = require("react-native");
-    return ({ name, testID, ...props }) => <View testID={testID ?? `icon-${name}`} {...props} />;
+    return {
+        __esModule: true,
+        default: ({ name, testID, ...props }) => (
+            <View testID={testID ?? `icon-${name}`} {...props} />
+        )
+    };
 });
 
 jest.mock("../../../components/AnimatedPressable", () => {
+    const React = require("react");
     const { TouchableOpacity } = require("react-native");
-    return ({ children, onPress, testID }) => (
-        <TouchableOpacity testID={testID ?? "animated-pressable"} onPress={onPress}>
-            {children}
-        </TouchableOpacity>
-    );
+    return {
+        __esModule: true,
+        default: ({ children, onPress, testID }) => (
+            <TouchableOpacity testID={testID ?? "animated-pressable"} onPress={onPress}>
+                {children}
+            </TouchableOpacity>
+        )
+    };
 });
 
 const mockUseColorScheme = jest.spyOn(ReactNative, "useColorScheme");
 
-// Tests
+// ── Tests ──────────────────────────────────────────────────────────────────
 
 describe("ThemedTextInput", () => {
     beforeEach(() => {

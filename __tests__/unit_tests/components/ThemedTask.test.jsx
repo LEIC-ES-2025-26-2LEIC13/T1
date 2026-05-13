@@ -3,20 +3,46 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import ThemedTask from "../../../components/ThemedTask";
 
-jest.mock("../../../components/ThemedView", () => require("react-native").View);
-jest.mock("../../../components/ThemedText", () => require("react-native").Text);
-jest.mock("../../../components/Pill", () => {
-    const { Text } = require("react-native");
-    return ({ name }) => <Text>{name}</Text>;
-});
-jest.mock("../../../components/AnimatedPressable", () => {
-    const { Pressable } = require("react-native");
-    return ({ children, onPress }) => (
-        <Pressable onPress={onPress}>{children}</Pressable>
-    );
+// Mocks uniformizados com __esModule e require otimizado
+jest.mock("../../../components/ThemedView", () => {
+    const React = require("react");
+    const { View } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ children, ...props }) => <View {...props}>{children}</View>
+    };
 });
 
-// safe constants
+jest.mock("../../../components/ThemedText", () => {
+    const React = require("react");
+    const { Text } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ children, ...props }) => <Text {...props}>{children}</Text>
+    };
+});
+
+jest.mock("../../../components/Pill", () => {
+    const React = require("react");
+    const { Text } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ name }) => <Text>{name}</Text>
+    };
+});
+
+jest.mock("../../../components/AnimatedPressable", () => {
+    const React = require("react");
+    const { Pressable } = require("react-native");
+    return {
+        __esModule: true,
+        default: ({ children, onPress }) => (
+            <Pressable onPress={onPress}>{children}</Pressable>
+        )
+    };
+});
+
+// Constantes seguras
 jest.mock("../../../constants/Labels", () => ({
     LABELS: [],
 }));

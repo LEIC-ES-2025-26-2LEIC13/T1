@@ -5,7 +5,6 @@ import {
     test,
     expect,
 } from "@jest/globals";
-
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
@@ -14,64 +13,67 @@ import EditColumnModal from "../../../components/EditColumnModal";
 const mockOnClose = jest.fn();
 const mockOnEdit = jest.fn();
 
+// Mocks corrigidos para suportar Default Exports (__esModule: true) e evitar requires no render
 jest.mock("../../../components/AppModal", () => {
-    return ({ children, visible }) => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return visible ? <View>{children}</View> : null;
+    return {
+        __esModule: true,
+        default: ({ children, visible }) => (visible ? <View>{children}</View> : null),
     };
 });
 
 jest.mock("../../../components/modal/ModalHeader", () => {
-    return ({ heading }) => {
-        const React = require("react");
-        const { Text } = require("react-native");
+    const React = require("react");
+    const { Text } = require("react-native");
 
-        return <Text>{heading}</Text>;
+    return {
+        __esModule: true,
+        default: ({ heading }) => <Text>{heading}</Text>,
     };
 });
 
 jest.mock("../../../components/modal/ModalBody", () => {
-    return ({ children }) => {
-        const React = require("react");
-        const { View } = require("react-native");
+    const React = require("react");
+    const { View } = require("react-native");
 
-        return <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>,
     };
 });
 
 jest.mock("../../../components/FormField", () => {
-    return ({ placeholder, value, onChangeText }) => {
-        const React = require("react");
-        const { TextInput } = require("react-native");
+    const React = require("react");
+    const { TextInput } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({ placeholder, value, onChangeText }) => (
             <TextInput
                 placeholder={placeholder}
                 value={value}
                 onChangeText={onChangeText}
             />
-        );
+        ),
     };
 });
 
 jest.mock("../../../components/modal/ModalActions", () => {
-    return ({
-                onCancel,
-                onPrimaryActionPress,
-                primaryActionName,
-                primaryActionDisabled,
-            }) => {
-        const React = require("react");
-        const { View, Text, Pressable } = require("react-native");
+    const React = require("react");
+    const { View, Text, Pressable } = require("react-native");
 
-        return (
+    return {
+        __esModule: true,
+        default: ({
+            onCancel,
+            onPrimaryActionPress,
+            primaryActionName,
+            primaryActionDisabled,
+        }) => (
             <View>
-                <Pressable
-                    testID="cancel-button"
-                    onPress={onCancel}
-                >
+                <Pressable testID="cancel-button" onPress={onCancel}>
                     <Text>Cancel</Text>
                 </Pressable>
 
@@ -85,7 +87,7 @@ jest.mock("../../../components/modal/ModalActions", () => {
                     <Text>{primaryActionName}</Text>
                 </Pressable>
             </View>
-        );
+        ),
     };
 });
 
@@ -111,42 +113,29 @@ beforeEach(() => {
 });
 
 describe("EditColumnModal", () => {
-
     test("renders modal when visible", () => {
         renderModal();
 
-        expect(
-            screen.getByText("Edit Column Name")
-        ).toBeTruthy();
-
-        expect(
-            screen.getByPlaceholderText("Enter new column title")
-        ).toBeTruthy();
+        expect(screen.getByText("Edit Column Name")).toBeTruthy();
+        expect(screen.getByPlaceholderText("Enter new column title")).toBeTruthy();
     });
 
     test("does not render when visible is false", () => {
         renderModal({ visible: false });
 
-        expect(
-            screen.queryByText("Edit Column Name")
-        ).toBeFalsy();
+        expect(screen.queryByText("Edit Column Name")).toBeFalsy();
     });
 
     test("renders edit button", () => {
         renderModal();
 
-        expect(
-            screen.getByText("Edit")
-        ).toBeTruthy();
+        expect(screen.getByText("Edit")).toBeTruthy();
     });
 
     test("updates input value on text change", () => {
         renderModal();
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
-
+        const input = screen.getByPlaceholderText("Enter new column title");
         fireEvent.changeText(input, "Updated Column");
 
         expect(input.props.value).toBe("Updated Column");
@@ -155,15 +144,9 @@ describe("EditColumnModal", () => {
     test("calls onEdit with updated column data", () => {
         renderModal();
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
-
+        const input = screen.getByPlaceholderText("Enter new column title");
         fireEvent.changeText(input, "In Progress");
-
-        fireEvent.press(
-            screen.getByTestId("primary-button")
-        );
+        fireEvent.press(screen.getByTestId("primary-button"));
 
         expect(mockOnEdit).toHaveBeenCalledWith({
             id: "1",
@@ -174,9 +157,7 @@ describe("EditColumnModal", () => {
     test("calls onClose when cancel pressed", () => {
         renderModal();
 
-        fireEvent.press(
-            screen.getByTestId("cancel-button")
-        );
+        fireEvent.press(screen.getByTestId("cancel-button"));
 
         expect(mockOnClose).toHaveBeenCalled();
     });
@@ -186,41 +167,29 @@ describe("EditColumnModal", () => {
 
         const button = screen.getByTestId("primary-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(true);
+        expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     test("edit button disabled when input whitespace only", () => {
         renderModal();
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
-
+        const input = screen.getByPlaceholderText("Enter new column title");
         fireEvent.changeText(input, "   ");
 
         const button = screen.getByTestId("primary-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(true);
+        expect(button.props.accessibilityState.disabled).toBe(true);
     });
 
     test("edit button enabled when input valid", () => {
         renderModal();
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
-
+        const input = screen.getByPlaceholderText("Enter new column title");
         fireEvent.changeText(input, "Done");
 
         const button = screen.getByTestId("primary-button");
 
-        expect(
-            button.props.accessibilityState.disabled
-        ).toBe(false);
+        expect(button.props.accessibilityState.disabled).toBe(false);
     });
 
     test("resets input when modal becomes visible", () => {
@@ -242,9 +211,7 @@ describe("EditColumnModal", () => {
             />
         );
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
+        const input = screen.getByPlaceholderText("Enter new column title");
 
         expect(input.props.value).toBe("");
     });
@@ -257,20 +224,13 @@ describe("EditColumnModal", () => {
             },
         });
 
-        const input = screen.getByPlaceholderText(
-            "Enter new column title"
-        );
-
+        const input = screen.getByPlaceholderText("Enter new column title");
         fireEvent.changeText(input, "QA");
-
-        fireEvent.press(
-            screen.getByTestId("primary-button")
-        );
+        fireEvent.press(screen.getByTestId("primary-button"));
 
         expect(mockOnEdit).toHaveBeenCalledWith({
             id: "99",
             name: "QA",
         });
     });
-
 });

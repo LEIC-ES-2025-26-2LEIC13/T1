@@ -5,7 +5,6 @@ import {
     screen,
     fireEvent,
     waitFor,
-    act
 } from "@testing-library/react-native";
 
 import CreateTaskModal from "../../../components/CreateTaskModal";

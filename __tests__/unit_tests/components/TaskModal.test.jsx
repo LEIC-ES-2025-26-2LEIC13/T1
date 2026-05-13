@@ -9,7 +9,7 @@ import { taskService } from '../../../api/taskService';
 // Mock the API service
 jest.mock('../../../api/taskService', () => ({
     taskService: {
-        moveTaskToColumn: jest.fn(),
+        moveTaskToColumn: jest.fn().mockResolvedValue({}), // Mock as a resolved promise explicitly
     },
 }));
 
@@ -28,70 +28,107 @@ jest.mock('../../../constants/Colors', () => ({
     }
 }));
 
-// Mock Child Components to avoid deep rendering complexities
+// Mocks Otimizados (Evitando render requirements)
 jest.mock('../../../components/AppModal', () => {
     const { View } = require('react-native');
-    return ({ children, visible }) => visible ? <View testID="app-modal">{children}</View> : null;
+    return {
+        __esModule: true,
+        default: ({ children, visible }) => visible ? <View testID="app-modal">{children}</View> : null
+    };
 });
 
 jest.mock('../../../components/modal/ModalHeader', () => {
     const { Pressable } = require('react-native');
-    return ({ onClose }) => <Pressable testID="modal-header-close" onPress={onClose} />;
+    return {
+        __esModule: true,
+        default: ({ onClose }) => <Pressable testID="modal-header-close" onPress={onClose} />
+    };
 });
 
 jest.mock('../../../components/FormField', () => {
     const { View, Text } = require('react-native');
-    return ({ labelName, value }) => (
-        <View testID={`form-field-${labelName}`}>
-            <Text>{value}</Text>
-        </View>
-    );
+    return {
+        __esModule: true,
+        default: ({ labelName, value }) => (
+            <View testID={`form-field-${labelName}`}>
+                <Text>{value}</Text>
+            </View>
+        )
+    };
 });
 
 jest.mock('../../../components/modal/ModalBody', () => {
     const { View } = require('react-native');
-    return ({ children }) => <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>
+    };
 });
 
 jest.mock('../../../components/PillsContainer', () => {
     const { View } = require('react-native');
-    return ({ children }) => <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>
+    };
 });
 
 jest.mock('../../../components/Pill', () => {
     const { View } = require('react-native');
-    return ({ projectName, columnName, name }) => (
-        <View testID={`pill-${projectName || columnName || name}`} />
-    );
+    return {
+        __esModule: true,
+        default: ({ projectName, columnName, name }) => (
+            <View testID={`pill-${projectName || columnName || name}`} />
+        )
+    };
 });
 
 jest.mock('../../../components/modal/ModalActions', () => {
     const { Pressable, View } = require('react-native');
-    return ({ onPrimaryActionPress, onCancel }) => (
-        <View>
-            <Pressable testID="modal-actions-primary" onPress={onPrimaryActionPress} />
-            <Pressable testID="modal-actions-cancel" onPress={onCancel} />
-        </View>
-    );
+    return {
+        __esModule: true,
+        default: ({ onPrimaryActionPress, onCancel }) => (
+            <View>
+                <Pressable testID="modal-actions-primary" onPress={onPrimaryActionPress} />
+                <Pressable testID="modal-actions-cancel" onPress={onCancel} />
+            </View>
+        )
+    };
 });
 
 jest.mock('../../../components/AnimatedPressable', () => {
     const { Pressable } = require('react-native');
-    return ({ onPress, children }) => <Pressable onPress={onPress}>{children}</Pressable>;
+    return {
+        __esModule: true,
+        default: ({ onPress, children }) => <Pressable onPress={onPress}>{children}</Pressable>
+    };
 });
 
 jest.mock('../../../components/ThemedView', () => {
     const { View } = require('react-native');
-    return ({ children }) => <View>{children}</View>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <View>{children}</View>
+    };
 });
 
 jest.mock('../../../components/ThemedText', () => {
     const { Text } = require('react-native');
-    return ({ children }) => <Text>{children}</Text>;
+    return {
+        __esModule: true,
+        default: ({ children }) => <Text>{children}</Text>
+    };
 });
 
-jest.mock('../../../components/ThemedIcon', () => () => null);
-jest.mock('../../../components/Spacer', () => () => null);
+jest.mock('../../../components/ThemedIcon', () => ({
+    __esModule: true,
+    default: () => null
+}));
+
+jest.mock('../../../components/Spacer', () => ({
+    __esModule: true,
+    default: () => null
+}));
 
 
 // --- Test Suite ---
@@ -144,14 +181,11 @@ describe('TaskModal Component', () => {
         
         expect(screen.getByTestId('app-modal')).toBeTruthy();
         
-        // Assert FormField values render the text correctly
         expect(screen.getByText('Fix Bug')).toBeTruthy();
         expect(screen.getByText('This is a nasty bug')).toBeTruthy();
         
-        // Assert that the email formatting logic correctly replaces 'me@example.com' with 'Me'
         expect(screen.getByText('Me, other@example.com')).toBeTruthy();
 
-        // Assert Pills
         expect(screen.getByTestId('pill-Test Project')).toBeTruthy();
         expect(screen.getByTestId('pill-In Progress')).toBeTruthy();
         expect(screen.getByTestId('pill-Bug')).toBeTruthy();
@@ -175,40 +209,41 @@ describe('TaskModal Component', () => {
         it('renders without label pill if label is missing', () => {
             const props = { ...baseProps, task: { ...baseProps.task, label: null } };
             render(<TaskModal {...props} />);
-            // Should not crash, and pill shouldn't exist
             expect(screen.queryByTestId('pill-Bug')).toBeNull();
         });
 
         it('handles unknown label fallback color gracefully without crashing', () => {
             const props = { ...baseProps, task: { ...baseProps.task, label: 'Unknown' } };
             render(<TaskModal {...props} />);
-            expect(screen.getByTestId('pill-Unknown')).toBeTruthy(); // Uses default color internally
+            expect(screen.getByTestId('pill-Unknown')).toBeTruthy(); 
         });
     });
 
     describe('Column Navigation (Move Task)', () => {
         it('shows both previous and next buttons for a middle column', () => {
             render(<TaskModal {...baseProps} columnId="col-2" />);
-            expect(screen.getByText('To Do')).toBeTruthy(); // Previous
-            expect(screen.getByText('Done')).toBeTruthy();  // Next
+            expect(screen.getByText('To Do')).toBeTruthy(); 
+            expect(screen.getByText('Done')).toBeTruthy();  
         });
 
         it('shows only NEXT button when in the first column', () => {
             render(<TaskModal {...baseProps} columnId="col-1" />);
-            expect(screen.queryByText('To Do')).toBeNull(); // No previous
-            expect(screen.getByText('In Progress')).toBeTruthy(); // Next
+            expect(screen.queryByText('To Do')).toBeNull(); 
+            expect(screen.getByText('In Progress')).toBeTruthy(); 
         });
 
         it('shows only PREV button when in the last column', () => {
             render(<TaskModal {...baseProps} columnId="col-3" />);
-            expect(screen.getByText('In Progress')).toBeTruthy(); // Previous
-            expect(screen.queryByText('Done')).toBeNull(); // No next
+            expect(screen.getByText('In Progress')).toBeTruthy(); 
+            expect(screen.queryByText('Done')).toBeNull(); 
         });
 
         it('handles moving task to previous column', async () => {
             render(<TaskModal {...baseProps} columnId="col-2" />);
             const prevButton = screen.getByText('To Do');
             
+            // O waitFor encapsula os event loops, garantindo que o testing library
+            // monitoriza e agrupa todos os React State Updates dentro da promessa do componente
             fireEvent.press(prevButton);
 
             await waitFor(() => {
@@ -249,7 +284,6 @@ describe('TaskModal Component', () => {
             await waitFor(() => {
                 expect(taskService.moveTaskToColumn).toHaveBeenCalled();
             });
-            // Implicitly passing if no error is thrown
         });
     });
 
