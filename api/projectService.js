@@ -111,26 +111,6 @@ export const projectService = {
             })
         })
 
-        // 3. Update userTasks if projectName changed
-        if (title !== undefined) {
-            for (const userDoc of projectUsersSnapshot.docs) {
-                const userId = userDoc.id
-                const userProjectTasksQuery = query(
-                    pathHelper.userTasks(userId),
-                    where('projectId', '==', projectId)
-                )
-                const userTasksSnap = await getDocs(userProjectTasksQuery)
-
-                userTasksSnap.forEach((taskDoc) => {
-                    operations.push({
-                        type: OPERATION_TYPES.UPDATE,
-                        ref: taskDoc.ref,
-                        data: { projectName: title }
-                    })
-                })
-            }
-        }
-
         await batchOps(db, operations)
     },
 
