@@ -520,6 +520,21 @@ Release of Sprint 2 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/release
 
 ### Sprint 3
 
+#### Initial backlog
+
+- The following images depict the scrum board, namely the Sprint Backlog, at the beginning of Sprint 3.
+
+![Sprint3Backlog1](docs/imgs/Sprint3Backlog1.png)
+_Sprint 3 Backlog (1/5)_
+![Sprint3Backlog2](docs/imgs/Sprint3Backlog2.png)
+_Sprint 3 Backlog (2/5)_
+![Sprint3Backlog3](docs/imgs/Sprint3Backlog3.png)
+_Sprint 3 Backlog (3/5)_
+![Sprint3Backlog4](docs/imgs/Sprint3Backlog4.png)
+_Sprint 3 Backlog (4/5)_
+![Sprint3Backlog5](docs/imgs/Sprint3Backlog5.png)
+_Sprint 3 Backlog (5/5)_
+
 ### Sprint 4
 
 ### Final Release
