@@ -74,9 +74,7 @@ export default function CreateTaskModal({
         setIsSelectingMembers(true);
         try {
             const users = await getProjectUsers();
-            // exclude current user from assignables if you want, or keep logic simple
-            const others = users.filter(m => m.email !== user.email);
-            setProjectMembers(others);
+            setProjectMembers(users);
         } catch (error) {
             showAlert(ALERT_TYPES.ERROR, "Failed to Load Members", error.message)
         }
@@ -94,6 +92,10 @@ export default function CreateTaskModal({
         }
         onChange('assignedMembers', newAssigned);
     };
+
+    const unselectAllMembers = () => {
+        task.assignedMembers = [];
+    }
 
     const removeMember = (memberId) => {
         const newAssigned = (task.assignedMembers || []).filter(m => m.id !== memberId);
@@ -131,7 +133,7 @@ export default function CreateTaskModal({
                                 >
                                     <ThemedIcon name="account-circle" style={{ marginRight: 10 }} />
                                     <ThemedText bold style={{ flex: 1 }} numberOfLines={1}>
-                                        {item.email}
+                                        { item.email === user.email ? "Me" : item.email}
                                     </ThemedText>
                                     {isAssigned && (
                                         <ThemedIcon name="check-circle" style={{ marginLeft: 10 }} />
@@ -145,7 +147,12 @@ export default function CreateTaskModal({
             
             <ModalActions
                 testID="assign-members-modal-actions"
-                onCancel={() => setIsSelectingMembers(false)}
+                // I have to set selectin false and remove all select users
+                onCancel={() => {
+                    setIsSelectingMembers(false)
+                    unselectAllMembers();
+                }}
+                secondaryActionName="Go back"
                 primaryActionName="Done"
                 primaryActionIconName="check"
                 onPrimaryActionPress={() => setIsSelectingMembers(false)}
@@ -212,7 +219,7 @@ export default function CreateTaskModal({
                             <View style={{ marginBottom: 15 }}>
                                 {(task.assignedMembers || []).map(member => (
                                     <View key={member.id} style={[styles.assignedTag, { borderColor: theme.borders }]}>
-                                        <ThemedText style={{ flex: 1 }} numberOfLines={1}>{member.email}</ThemedText>
+                                        <ThemedText style={{ flex: 1 }} numberOfLines={1}>{ member.email === user.email ? "Me" : member.email }</ThemedText>
 
                                         <AnimatedPressable onPress={() => removeMember(member.id)} >
                                             <ThemedIcon name="close" size={16} />
