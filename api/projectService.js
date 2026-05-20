@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, updateDoc, getDocs, writeBatch, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, getDocs, writeBatch, where } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
@@ -78,7 +78,6 @@ export const projectService = {
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
     },
 
-    // BUG: this function does not cascade the updates to the userProjects subcollection documents, nor to the userTasks documents (projectName field)
     updateProject: async (projectId, updates) => {
         const { title, description } = normalizeProjectUpdates(updates)
         if (!title && !description) {
@@ -89,7 +88,50 @@ export const projectService = {
         if (title !== undefined) dataToUpdate.title = title
         if (description !== undefined) dataToUpdate.description = description
         
-        await updateDoc(doc(db, COLLECTIONS.PROJECTS, projectId), dataToUpdate)
+        const operations = []
+
+        // 1. Update the main project document
+        operations.push({
+            type: OPERATION_TYPES.UPDATE,
+            ref: doc(db, COLLECTIONS.PROJECTS, projectId),
+            data: dataToUpdate
+        })
+
+        // 2. Update all userProjects subcollection documents
+        const projectUsersRef = pathHelper.projectUsers(projectId)
+        const projectUsersSnapshot = await getDocs(projectUsersRef)
+
+        projectUsersSnapshot.forEach((docSnap) => {
+            const userId = docSnap.id
+            const userProjectRef = doc(db, COLLECTIONS.USERS, userId, SUBCOLLECTIONS.USER_PROJECTS, projectId)
+            operations.push({
+                type: OPERATION_TYPES.UPDATE,
+                ref: userProjectRef,
+                data: dataToUpdate
+            })
+        })
+
+        // 3. Update userTasks if projectName changed
+        if (title !== undefined) {
+            for (const userDoc of projectUsersSnapshot.docs) {
+                const userId = userDoc.id
+                const userProjectTasksQuery = query(
+                    pathHelper.userTasks(userId),
+                    where('projectId', '==', projectId)
+                )
+                const userTasksSnap = await getDocs(userProjectTasksQuery)
+
+                userTasksSnap.forEach((taskDoc) => {
+                    operations.push({
+                        type: OPERATION_TYPES.UPDATE,
+                        ref: taskDoc.ref,
+                        data: { projectName: title }
+                    })
+                })
+            }
+        }
+
+        await batchOps(db, operations)
     },
 
     deleteProject: async (projectId) => {
