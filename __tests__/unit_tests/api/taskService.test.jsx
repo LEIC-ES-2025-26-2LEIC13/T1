@@ -300,4 +300,168 @@ describe('taskService', () => {
             expect(operationsPassedToBatch).toHaveLength(2);
         });
     });
+
+    describe('updateTask', () => {
+        it('normalizes task data and generates UPDATE operations for column and assigned members', async () => {
+            const taskData = {
+                name: '  Updated Task  ',
+                description: '  New Description  ',
+                label: ' Bug ',
+                assignedMembers: [{ id: 'u1' }, { id: 'u2' }]
+            };
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            expect(batchOps).toHaveBeenCalledWith('mocked-db-instance', [
+                // 1. Update task in column
+                {
+                    type: 'update',
+                    ref: 'projects/p1/columns/c1/tasks/t1',
+                    data: {
+                        name: 'Updated Task',
+                        description: 'New Description',
+                        label: 'Bug',
+                        assignedMembers: [{ id: 'u1' }, { id: 'u2' }]
+                    }
+                },
+                // 2. Update task for each assigned member
+                {
+                    type: 'update',
+                    ref: 'users/u1/tasks/t1',
+                    data: {
+                        name: 'Updated Task',
+                        description: 'New Description',
+                        label: 'Bug',
+                        assignedMembers: [{ id: 'u1' }, { id: 'u2' }]
+                    }
+                },
+                {
+                    type: 'update',
+                    ref: 'users/u2/tasks/t1',
+                    data: {
+                        name: 'Updated Task',
+                        description: 'New Description',
+                        label: 'Bug',
+                        assignedMembers: [{ id: 'u1' }, { id: 'u2' }]
+                    }
+                }
+            ]);
+        });
+
+        it('handles update with empty assigned members array', async () => {
+            const taskData = {
+                name: 'Updated Task',
+                description: 'New Description',
+                label: 'Idea',
+                assignedMembers: []
+            };
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            // Should only have the column update, no user updates
+            expect(batchOps).toHaveBeenCalledWith('mocked-db-instance', [
+                {
+                    type: 'update',
+                    ref: 'projects/p1/columns/c1/tasks/t1',
+                    data: {
+                        name: 'Updated Task',
+                        description: 'New Description',
+                        label: 'Idea',
+                        assignedMembers: []
+                    }
+                }
+            ]);
+        });
+
+        it('handles update with null/undefined assigned members', async () => {
+            const taskData = {
+                name: 'Updated Task',
+                description: 'Description',
+                label: 'Work'
+            };
+            // assignedMembers is undefined
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            // Should only have the column update
+            expect(batchOps).toHaveBeenCalledWith('mocked-db-instance', [
+                {
+                    type: 'update',
+                    ref: 'projects/p1/columns/c1/tasks/t1',
+                    data: {
+                        name: 'Updated Task',
+                        description: 'Description',
+                        label: 'Work',
+                        assignedMembers: []
+                    }
+                }
+            ]);
+        });
+
+        it('trims whitespace from task fields', async () => {
+            const taskData = {
+                name: '   Task with spaces   ',
+                description: '   Description with spaces   ',
+                label: '   Urgent   ',
+                assignedMembers: [{ id: 'u1' }]
+            };
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            const expectedNormalizedData = {
+                name: 'Task with spaces',
+                description: 'Description with spaces',
+                label: 'Urgent',
+                assignedMembers: [{ id: 'u1' }]
+            };
+
+            expect(batchOps).toHaveBeenCalledWith('mocked-db-instance', [
+                {
+                    type: 'update',
+                    ref: 'projects/p1/columns/c1/tasks/t1',
+                    data: expectedNormalizedData
+                },
+                {
+                    type: 'update',
+                    ref: 'users/u1/tasks/t1',
+                    data: expectedNormalizedData
+                }
+            ]);
+        });
+
+        it('handles update with multiple assigned members', async () => {
+            const taskData = {
+                name: 'Multi-member Task',
+                description: 'Shared task',
+                label: 'Feature',
+                assignedMembers: [{ id: 'u1' }, { id: 'u2' }, { id: 'u3' }]
+            };
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            // Should have 1 column update + 3 user updates = 4 total operations
+            expect(batchOps.mock.calls[0][1]).toHaveLength(4);
+
+            // Verify all user updates are present
+            const operations = batchOps.mock.calls[0][1];
+            const userUpdates = operations.filter(op => op.ref.includes('users/'));
+            expect(userUpdates).toHaveLength(3);
+            expect(userUpdates[0].ref).toContain('users/u1/tasks/t1');
+            expect(userUpdates[1].ref).toContain('users/u2/tasks/t1');
+            expect(userUpdates[2].ref).toContain('users/u3/tasks/t1');
+        });
+
+        it('calls batchOps with correct database instance', async () => {
+            const taskData = {
+                name: 'Task',
+                description: 'Desc',
+                label: 'Bug',
+                assignedMembers: []
+            };
+
+            await taskService.updateTask('p1', 'c1', 't1', taskData);
+
+            expect(batchOps).toHaveBeenCalledWith('mocked-db-instance', expect.any(Array));
+        });
+    });
 });

@@ -248,7 +248,9 @@ describe("CreateTaskModal", () => {
         });
 
         // Toggle it off
-        fireEvent.press(screen.getByText("user1@example.com"));
+        const instances = screen.getAllByText("user1@example.com");
+        fireEvent.press(instances[instances.length - 1]);
+
         
         expect(mockOnChange).toHaveBeenCalledWith(
             "assignedMembers",

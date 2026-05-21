@@ -17,11 +17,11 @@ const ModalHeader = ({heading, iconName, onClose, secondAction, secondActionIcon
                         <ThemedIcon name={iconName} onPrimary/>
                     </View>
                     <Text style={[styles.title, { color: theme.text }]}>{heading}</Text>
-                    <ThemedButton style={styles.closeBtn} onPress={secondAction}>
+                    <ThemedButton testID="modal-header-second-action" style={styles.closeBtn} onPress={secondAction}>
                         <ThemedIcon name={secondActionIcon} />
                     </ThemedButton>
                 </View>
-                <ThemedButton style={styles.closeBtn} onPress={onClose}>
+                <ThemedButton testID="modal-header-close" style={styles.closeBtn} onPress={onClose}>
                     <ThemedIcon name="close" />
                 </ThemedButton>
             </View>

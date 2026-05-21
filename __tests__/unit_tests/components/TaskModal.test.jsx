@@ -1,308 +1,347 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
-import { jest, describe, it, expect, beforeEach } from '@jest/globals';
-import TaskModal from '../../../components/TaskModal'; // Adjust the import path as needed
-import { taskService } from '../../../api/taskService';
+import { jest, beforeEach, describe, test, expect } from "@jest/globals";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
+import TaskModal from "../../../components/TaskModal";
 
-// --- Mocks ---
+// Mocks
 
-// Mock the API service
-jest.mock('../../../api/taskService', () => ({
+jest.mock("../../../api/taskService", () => ({
     taskService: {
-        moveTaskToColumn: jest.fn().mockResolvedValue({}), // Mock as a resolved promise explicitly
+        moveTaskToColumn: jest.fn(),
+        updateTask: jest.fn(),
     },
 }));
 
-// Mock Constants
-jest.mock('../../../constants/Labels', () => ({
-    LABELS: [
-        { name: 'Bug', icon: 'bug-icon' },
-        { name: 'Feature', icon: 'feature-icon' }
-    ]
-}));
-
-jest.mock('../../../constants/Colors', () => ({
-    LabelColors: {
-        Bug: '#FF0000',
-        default: '#808080'
-    }
-}));
-
-// Mocks Otimizados (Evitando render requirements)
-jest.mock('../../../components/AppModal', () => {
-    const { View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ children, visible }) => visible ? <View testID="app-modal">{children}</View> : null
-    };
+jest.mock("../../../components/AssignMembersSection", () => {
+    const React = require("react");
+    const { View } = require("react-native");
+    return () => <View testID="assign-members-section" />;
 });
 
-jest.mock('../../../components/modal/ModalHeader', () => {
-    const { Pressable } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ onClose }) => <Pressable testID="modal-header-close" onPress={onClose} />
-    };
+import { taskService } from "../../../api/taskService";
+
+const mockOnClose = jest.fn();
+const mockDeleteTask = jest.fn();
+const mockOnTaskMoved = jest.fn();
+const mockOnChange = jest.fn();
+const mockGetProjectUsers = jest.fn();
+
+const mockTask = {
+    id: "task-1",
+    name: "Fix bug",
+    description: "Fix the login bug",
+    label: "Bug",
+    assignedMembers: [{ id: "u1", email: "user@example.com" }],
+};
+
+const mockColumns = [
+    { id: "col-1", name: "To Do" },
+    { id: "col-2", name: "In Progress" },
+    { id: "col-3", name: "Done" },
+];
+
+const defaultProps = {
+    visible: true,
+    task: mockTask,
+    projectName: "My Project",
+    columnName: "In Progress",
+    onClose: mockOnClose,
+    deleteTask: mockDeleteTask,
+    projectId: "project-1",
+    columns: mockColumns,
+    columnId: "col-2",
+    onTaskMoved: mockOnTaskMoved,
+    userEmail: "user@example.com",
+    onChange: mockOnChange,
+    getProjectUsers: mockGetProjectUsers,
+};
+
+const renderModal = (overrides = {}) =>
+    render(<TaskModal {...defaultProps} {...overrides} />);
+
+beforeEach(() => {
+    mockOnClose.mockClear();
+    mockDeleteTask.mockClear();
+    mockOnTaskMoved.mockClear();
+    mockOnChange.mockClear();
+    mockGetProjectUsers.mockClear();
+    taskService.moveTaskToColumn.mockClear();
+    taskService.updateTask.mockClear();
 });
 
-jest.mock('../../../components/FormField', () => {
-    const { View, Text } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ labelName, value }) => (
-            <View testID={`form-field-${labelName}`}>
-                <Text>{value}</Text>
-            </View>
-        )
-    };
-});
+describe("TaskModal", () => {
 
-jest.mock('../../../components/modal/ModalBody', () => {
-    const { View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ children }) => <View>{children}</View>
-    };
-});
+    // Rendering
 
-jest.mock('../../../components/PillsContainer', () => {
-    const { View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ children }) => <View>{children}</View>
-    };
-});
+    test("renders modal when visible", () => {
+        renderModal();
 
-jest.mock('../../../components/Pill', () => {
-    const { View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ projectName, columnName, name }) => (
-            <View testID={`pill-${projectName || columnName || name}`} />
-        )
-    };
-});
-
-jest.mock('../../../components/modal/ModalActions', () => {
-    const { Pressable, View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ onPrimaryActionPress, onCancel }) => (
-            <View>
-                <Pressable testID="modal-actions-primary" onPress={onPrimaryActionPress} />
-                <Pressable testID="modal-actions-cancel" onPress={onCancel} />
-            </View>
-        )
-    };
-});
-
-jest.mock('../../../components/AnimatedPressable', () => {
-    const { Pressable } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ onPress, children }) => <Pressable onPress={onPress}>{children}</Pressable>
-    };
-});
-
-jest.mock('../../../components/ThemedView', () => {
-    const { View } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ children }) => <View>{children}</View>
-    };
-});
-
-jest.mock('../../../components/ThemedText', () => {
-    const { Text } = require('react-native');
-    return {
-        __esModule: true,
-        default: ({ children }) => <Text>{children}</Text>
-    };
-});
-
-jest.mock('../../../components/ThemedIcon', () => ({
-    __esModule: true,
-    default: () => null
-}));
-
-jest.mock('../../../components/Spacer', () => ({
-    __esModule: true,
-    default: () => null
-}));
-
-
-// --- Test Suite ---
-
-describe('TaskModal Component', () => {
-    const mockOnClose = jest.fn();
-    const mockDeleteTask = jest.fn();
-    const mockOnTaskMoved = jest.fn();
-
-    const mockColumns = [
-        { id: 'col-1', name: 'To Do' },
-        { id: 'col-2', name: 'In Progress' },
-        { id: 'col-3', name: 'Done' }
-    ];
-
-    const baseProps = {
-        visible: true,
-        projectId: 'proj-123',
-        projectName: 'Test Project',
-        columnName: 'In Progress',
-        columnId: 'col-2', // Middle column
-        columns: mockColumns,
-        onClose: mockOnClose,
-        deleteTask: mockDeleteTask,
-        onTaskMoved: mockOnTaskMoved,
-        userEmail: 'me@example.com',
-        task: {
-            id: 'task-1',
-            name: 'Fix Bug',
-            description: 'This is a nasty bug',
-            label: 'Bug',
-            assignedMembers: [
-                { email: 'me@example.com' },
-                { email: 'other@example.com' }
-            ]
-        }
-    };
-
-    beforeEach(() => {
-        jest.clearAllMocks();
+        expect(screen.getByText("Task Details")).toBeTruthy();
     });
 
-    it('does not render when visible is false', () => {
-        render(<TaskModal {...baseProps} visible={false} />);
-        expect(screen.queryByTestId('app-modal')).toBeNull();
+    test("does not render modal content when visible is false", () => {
+        renderModal({ visible: false });
+
+        expect(screen.queryByText("Task Details")).toBeFalsy();
     });
 
-    it('renders task details correctly', () => {
-        render(<TaskModal {...baseProps} />);
-        
-        expect(screen.getByTestId('app-modal')).toBeTruthy();
-        
-        expect(screen.getByText('Fix Bug')).toBeTruthy();
-        expect(screen.getByText('This is a nasty bug')).toBeTruthy();
-        
-        expect(screen.getByText('Me, other@example.com')).toBeTruthy();
+    test("displays task name and description", () => {
+        renderModal();
 
-        expect(screen.getByTestId('pill-Test Project')).toBeTruthy();
-        expect(screen.getByTestId('pill-In Progress')).toBeTruthy();
-        expect(screen.getByTestId('pill-Bug')).toBeTruthy();
+        expect(screen.getByDisplayValue("Fix bug")).toBeTruthy();
+        expect(screen.getByDisplayValue("Fix the login bug")).toBeTruthy();
     });
 
-    describe('Assigned Members Edge Cases', () => {
-        it('renders "No one" when assignedMembers is empty or null', () => {
-            const props = { ...baseProps, task: { ...baseProps.task, assignedMembers: [] } };
-            render(<TaskModal {...props} />);
-            expect(screen.getByText('No one')).toBeTruthy();
-        });
+    test("displays project name and column name as pills", () => {
+        renderModal();
 
-        it('renders "No one" when assignedMembers is undefined', () => {
-            const props = { ...baseProps, task: { ...baseProps.task, assignedMembers: undefined } };
-            render(<TaskModal {...props} />);
-            expect(screen.getByText('No one')).toBeTruthy();
+        expect(screen.getByText("My Project")).toBeTruthy();
+        expect(screen.getByText("In Progress")).toBeTruthy();
+    });
+
+    test("displays label pill when task has a label", () => {
+        renderModal();
+
+        expect(screen.getByText("Bug")).toBeTruthy();
+    });
+
+    test("does not display label pill when task has no label", () => {
+        renderModal({ task: { ...mockTask, label: null } });
+
+        expect(screen.queryByText("Bug")).toBeFalsy();
+    });
+
+    test("displays assigned member as 'Me' when email matches userEmail", () => {
+        renderModal();
+
+        expect(screen.getByDisplayValue("Me")).toBeTruthy();
+    });
+
+    test("displays assigned member email when it does not match userEmail", () => {
+        renderModal({ userEmail: "other@example.com" });
+
+        expect(screen.getByDisplayValue("user@example.com")).toBeTruthy();
+    });
+
+    test("displays 'No one' when task has no assigned members", () => {
+        renderModal({ task: { ...mockTask, assignedMembers: [] } });
+
+        expect(screen.getByDisplayValue("No one")).toBeTruthy();
+    });
+
+    test("renders Finish Task and Cancel buttons in view mode", () => {
+        renderModal();
+
+        expect(screen.getByText("Finish Task")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+    });
+
+    // Column Navigation
+
+    test("renders previous and next column buttons when in a middle column", () => {
+        renderModal();
+
+        expect(screen.getByText("To Do")).toBeTruthy();
+        expect(screen.getByText("Done")).toBeTruthy();
+    });
+
+    test("does not render previous column button on the first column", () => {
+        renderModal({ columnId: "col-1" });
+
+        expect(screen.queryByText("To Do")).toBeFalsy();
+    });
+
+    test("does not render next column button on the last column", () => {
+        renderModal({ columnId: "col-3" });
+
+        expect(screen.queryByText("Done")).toBeFalsy();
+    });
+
+    test("calls moveTaskToColumn and onTaskMoved when next column is pressed", async () => {
+        taskService.moveTaskToColumn.mockResolvedValueOnce();
+        renderModal();
+
+        fireEvent.press(screen.getByText("Done"));
+
+        await waitFor(() => {
+            expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
+                "project-1",
+                mockTask,
+                "col-2",
+                mockColumns[2]
+            );
+            expect(mockOnTaskMoved).toHaveBeenCalled();
         });
     });
 
-    describe('Label Fallback Edge Cases', () => {
-        it('renders without label pill if label is missing', () => {
-            const props = { ...baseProps, task: { ...baseProps.task, label: null } };
-            render(<TaskModal {...props} />);
-            expect(screen.queryByTestId('pill-Bug')).toBeNull();
-        });
+    test("calls moveTaskToColumn and onTaskMoved when previous column is pressed", async () => {
+        taskService.moveTaskToColumn.mockResolvedValueOnce();
+        renderModal();
 
-        it('handles unknown label fallback color gracefully without crashing', () => {
-            const props = { ...baseProps, task: { ...baseProps.task, label: 'Unknown' } };
-            render(<TaskModal {...props} />);
-            expect(screen.getByTestId('pill-Unknown')).toBeTruthy(); 
-        });
-    });
+        fireEvent.press(screen.getByText("To Do"));
 
-    describe('Column Navigation (Move Task)', () => {
-        it('shows both previous and next buttons for a middle column', () => {
-            render(<TaskModal {...baseProps} columnId="col-2" />);
-            expect(screen.getByText('To Do')).toBeTruthy(); 
-            expect(screen.getByText('Done')).toBeTruthy();  
-        });
-
-        it('shows only NEXT button when in the first column', () => {
-            render(<TaskModal {...baseProps} columnId="col-1" />);
-            expect(screen.queryByText('To Do')).toBeNull(); 
-            expect(screen.getByText('In Progress')).toBeTruthy(); 
-        });
-
-        it('shows only PREV button when in the last column', () => {
-            render(<TaskModal {...baseProps} columnId="col-3" />);
-            expect(screen.getByText('In Progress')).toBeTruthy(); 
-            expect(screen.queryByText('Done')).toBeNull(); 
-        });
-
-        it('handles moving task to previous column', async () => {
-            render(<TaskModal {...baseProps} columnId="col-2" />);
-            const prevButton = screen.getByText('To Do');
-            
-            // O waitFor encapsula os event loops, garantindo que o testing library
-            // monitoriza e agrupa todos os React State Updates dentro da promessa do componente
-            fireEvent.press(prevButton);
-
-            await waitFor(() => {
-                expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
-                    'proj-123', 
-                    baseProps.task, 
-                    'col-2', 
-                    { id: 'col-1', name: 'To Do' }
-                );
-                expect(mockOnTaskMoved).toHaveBeenCalled();
-            });
-        });
-
-        it('handles moving task to next column', async () => {
-            render(<TaskModal {...baseProps} columnId="col-2" />);
-            const nextButton = screen.getByText('Done');
-            
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
-                    'proj-123', 
-                    baseProps.task, 
-                    'col-2', 
-                    { id: 'col-3', name: 'Done' }
-                );
-                expect(mockOnTaskMoved).toHaveBeenCalled();
-            });
-        });
-
-        it('does not crash if onTaskMoved is not provided', async () => {
-            const props = { ...baseProps, onTaskMoved: undefined };
-            render(<TaskModal {...props} />);
-            const nextButton = screen.getByText('Done');
-            
-            fireEvent.press(nextButton);
-
-            await waitFor(() => {
-                expect(taskService.moveTaskToColumn).toHaveBeenCalled();
-            });
+        await waitFor(() => {
+            expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
+                "project-1",
+                mockTask,
+                "col-2",
+                mockColumns[0]
+            );
+            expect(mockOnTaskMoved).toHaveBeenCalled();
         });
     });
 
-    describe('Modal Actions', () => {
-        it('calls onClose when header close button or cancel button is pressed', () => {
-            render(<TaskModal {...baseProps} />);
-            
-            fireEvent.press(screen.getByTestId('modal-header-close'));
-            expect(mockOnClose).toHaveBeenCalledTimes(1);
+    // View Mode Actions
 
-            fireEvent.press(screen.getByTestId('modal-actions-cancel'));
-            expect(mockOnClose).toHaveBeenCalledTimes(2);
-        });
+    test("calls deleteTask with task when Finish Task is pressed", () => {
+        renderModal();
 
-        it('calls deleteTask with correct task when primary action is pressed', () => {
-            render(<TaskModal {...baseProps} />);
-            
-            fireEvent.press(screen.getByTestId('modal-actions-primary'));
-            expect(mockDeleteTask).toHaveBeenCalledWith(baseProps.task);
+        fireEvent.press(screen.getByText("Finish Task"));
+
+        expect(mockDeleteTask).toHaveBeenCalledWith(mockTask);
+    });
+
+    test("calls onClose when Cancel is pressed in view mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByText("Cancel"));
+
+        expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    // Edit Mode
+
+    test("switches to edit mode when pencil button is pressed", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByText("Task Editing")).toBeTruthy();
+    });
+
+    test("renders Save and Cancel buttons in edit mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByText("Save")).toBeTruthy();
+        expect(screen.getByText("Cancel")).toBeTruthy();
+    });
+
+    test("pre-populates edit fields with current task values", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByDisplayValue("Fix bug")).toBeTruthy();
+        expect(screen.getByDisplayValue("Fix the login bug")).toBeTruthy();
+    });
+
+    test("renders AssignMembersSection in edit mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByTestId("assign-members-section")).toBeTruthy();
+    });
+
+    test("renders label pills in edit mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByText("LABELS")).toBeTruthy();
+    });
+
+    test("updates task name field in edit mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.changeText(screen.getByDisplayValue("Fix bug"), "Fix critical bug");
+
+        expect(screen.getByDisplayValue("Fix critical bug")).toBeTruthy();
+    });
+
+    test("updates description field in edit mode", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.changeText(screen.getByDisplayValue("Fix the login bug"), "Fix the signup bug");
+
+        expect(screen.getByDisplayValue("Fix the signup bug")).toBeTruthy();
+    });
+
+    test("exits edit mode without saving when Cancel is pressed", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.press(screen.getByText("Cancel"));
+
+        expect(screen.getByText("Task Details")).toBeTruthy();
+        expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    test("exits edit mode without saving when pencil button is pressed again", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+
+        expect(screen.getByText("Task Details")).toBeTruthy();
+        expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    test("calls updateTask with correct args when Save is pressed", async () => {
+        taskService.updateTask.mockResolvedValueOnce();
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.changeText(screen.getByDisplayValue("Fix bug"), "Fix critical bug");
+        fireEvent.press(screen.getByText("Save"));
+
+        await waitFor(() => {
+            expect(taskService.updateTask).toHaveBeenCalledWith(
+                "project-1",
+                "col-2",
+                "task-1",
+                expect.objectContaining({ name: "Fix critical bug" })
+            );
         });
+    });
+
+    test("calls all onChange fields after successful save", async () => {
+        taskService.updateTask.mockResolvedValueOnce();
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.press(screen.getByText("Save"));
+
+        await waitFor(() => {
+            expect(mockOnChange).toHaveBeenCalledWith("name", mockTask.name);
+            expect(mockOnChange).toHaveBeenCalledWith("description", mockTask.description);
+            expect(mockOnChange).toHaveBeenCalledWith("label", mockTask.label);
+            expect(mockOnChange).toHaveBeenCalledWith("assignedMembers", mockTask.assignedMembers);
+        });
+    });
+
+    test("exits edit mode after successful save", async () => {
+        taskService.updateTask.mockResolvedValueOnce();
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.press(screen.getByText("Save"));
+
+        await waitFor(() => {
+            expect(screen.getByText("Task Details")).toBeTruthy();
+        });
+    });
+
+    test("resets edit state and calls onClose when header close is pressed", () => {
+        renderModal();
+
+        fireEvent.press(screen.getByTestId("modal-header-second-action"));
+        fireEvent.press(screen.getByTestId("modal-header-close"));
+
+        expect(mockOnClose).toHaveBeenCalled();
     });
 });
