@@ -5,7 +5,7 @@ import { Colors } from '../../constants/Colors';
 import ThemedIcon from '../ThemedIcon';
 import Divider from '../Divider';
 
-const ModalHeader = ({heading, iconName, onClose }) => {
+const ModalHeader = ({heading, iconName, onClose, secondAction, secondActionIcon}) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -17,6 +17,9 @@ const ModalHeader = ({heading, iconName, onClose }) => {
                         <ThemedIcon name={iconName} onPrimary/>
                     </View>
                     <Text style={[styles.title, { color: theme.text }]}>{heading}</Text>
+                    <ThemedButton style={styles.closeBtn} onPress={secondAction}>
+                        <ThemedIcon name={secondActionIcon} />
+                    </ThemedButton>
                 </View>
                 <ThemedButton style={styles.closeBtn} onPress={onClose}>
                     <ThemedIcon name="close" />

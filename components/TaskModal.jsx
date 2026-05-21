@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { StyleSheet } from 'react-native'
 import AppModal from './AppModal'
 import ModalHeader from './modal/ModalHeader'
@@ -15,6 +15,7 @@ import ThemedIcon from './ThemedIcon'
 import Spacer from './Spacer'
 import ThemedView from './ThemedView'
 import {taskService} from '../api/taskService'
+import AssignMembersSection from "./AssignMembersSection";
 
 export default function TaskModal({
     visible,
@@ -27,12 +28,10 @@ export default function TaskModal({
     columns,        
     columnId,       
     onTaskMoved,
-    userEmail
+    userEmail,
+    onChange,
+    getProjectUsers,
 }) {
-    
-
-    const labelIcon = LABELS.find(label => label.name === task?.label)?.icon
-    const labelColor = LabelColors[task?.label] ?? LabelColors.default
 
     const currentIndex = columns?.findIndex(c => c.id === columnId) ?? -1
     const prevColumn = currentIndex > 0 ? columns[currentIndex - 1] : null
@@ -43,12 +42,73 @@ export default function TaskModal({
         onTaskMoved?.()  // close modal after move
     }
 
+    const [isEdit, setIsEdit] = useState(false);
+    const [editedTask, setEditedTask] = useState(null);
+
+    // Calculate labelIcon based on current label (recalculated on each render)
+    const labelIcon = LABELS.find(label => label.name === (isEdit ? editedTask?.label : task?.label))?.icon
+
+    const handleEditToggle = () => {
+        if (!isEdit) {
+            // Entering edit mode - copy current task to edited task
+            setEditedTask({
+                name: task?.name,
+                description: task?.description,
+                label: task?.label,
+                assignedMembers: task?.assignedMembers,
+            });
+            setIsEdit(true);
+        } else {
+            // Exiting edit mode without saving
+            setEditedTask(null);
+            setIsEdit(false);
+        }
+    }
+
+    const handleEditChange = (field, value) => {
+        setEditedTask((prev) => ({ ...prev, [field]: value }));
+    }
+
+    const handleSaveEdit = async () => {
+        try {
+            // Update the task with new values
+            await taskService.updateTask(projectId, columnId, task.id, {
+                name: editedTask.name,
+                description: editedTask.description,
+                label: editedTask.label,
+                assignedMembers: editedTask.assignedMembers,
+            });
+            // Update the displayed task with changes
+            onChange('name', editedTask.name);
+            onChange('description', editedTask.description);
+            onChange('assignedMembers', editedTask.assignedMembers);
+            onChange('label', editedTask.label);
+            setIsEdit(false);
+            setEditedTask(null);
+        } catch (error) {
+            console.error('Error saving task:', error);
+        }
+    }
+
+    const handleCancelEdit = () => {
+        setEditedTask(null);
+        setIsEdit(false);
+    }
+
+    const handleCloseModal = () => {
+        setEditedTask(null);
+        setIsEdit(false);
+        onClose();
+    }
+
     return (
         <AppModal visible={visible} onClose={onClose}>
             <ModalHeader
-                heading="Task Details"
+                heading={!isEdit ? "Task Details" : "Task Editing"}
                 iconName="checkbox-outline"
-                onClose={onClose}
+                onClose={handleCloseModal}
+                secondAction={handleEditToggle}
+                secondActionIcon={"pencil"}
             />
             <ThemedView style={styles.columnNav}>
                 {prevColumn ? (
@@ -91,41 +151,93 @@ export default function TaskModal({
                 <PillsContainer style={{ marginBottom: 15 }}>
                     <Pill projectName={projectName} />
                     <Pill columnName={columnName} />
-                    {task?.label && (
+                    {(isEdit ? editedTask?.label : task?.label) && (
                         <Pill
-                            name={task.label}
+                            name={isEdit ? editedTask?.label : task?.label}
                             iconName={labelIcon}
-                            customStyle={{ backgroundColor: labelColor + '50' }}
+                            pressable={isEdit}
+                            onPress={isEdit ? () => handleEditChange('label', '') : null}
+                            customStyle={{
+                                backgroundColor: LabelColors[isEdit ? editedTask?.label : task?.label] ? LabelColors[isEdit ? editedTask?.label : task?.label] + '50' : LabelColors.default + '50'
+                            }}
                         />
                     )}
                 </PillsContainer>
 
                 <Spacer height={10} />
 
-                <FormField labelName="TASK NAME" value={task?.name} readOnly />
+                <FormField
+                    labelName="TASK NAME"
+                    value={isEdit ? editedTask?.name : task?.name}
+                    readOnly={!isEdit}
+                    onChangeText={isEdit ? (value) => handleEditChange('name', value) : null}
+                />
+
                 <FormField
                     labelName="DESCRIPTION"
                     placeholder="No description provided."
-                    value={task?.description}
+                    value={isEdit ? editedTask?.description : task?.description}
                     multiline
-                    readOnly
+                    readOnly={!isEdit}
+                    onChangeText={isEdit ? (value) => handleEditChange('description', value) : null}
                 />
-                <FormField
-                    labelName="ASSIGNED TO"
-                    value={
-                        task?.assignedMembers && task.assignedMembers.length > 0
-                            ? task.assignedMembers.map(member => member.email === userEmail ? "Me" : member.email).join(', ')
-                            : "No one"
-                    }
-                    readOnly
-                />
+
+                {isEdit ? (
+                    <>
+                        <FormField
+                            labelName="LABELS"
+                            placeholder="Enter or select label"
+                            value={editedTask?.label}
+                            onChangeText={(text) => handleEditChange('label', text)}
+                        />
+                        <PillsContainer style={{ marginBottom: 15 }}>
+                            {LABELS.map((label) => {
+                                const isSelected = (editedTask?.label === label.name)
+                                const labelColorForPill = LabelColors[label.name] || LabelColors.default;
+
+                                return (
+                                    <Pill
+                                        key={label.name}
+                                        name={label.name}
+                                        iconName={label.icon}
+                                        pressable
+                                        onPress={() => handleEditChange('label', isSelected ? '' : label.name)}
+                                        customStyle={isSelected && { backgroundColor: `${labelColorForPill}50` }}
+                                    />
+                                );
+                            })}
+                        </PillsContainer>
+                    </>
+                ): null }
+
+                {!isEdit ? (
+                    <FormField
+                        labelName="ASSIGNED TO"
+                        value={
+                            task?.assignedMembers && task.assignedMembers.length > 0
+                                ? task.assignedMembers.map(member => member.email === userEmail ? "Me" : member.email).join(', ')
+                                : "No one"
+                        }
+                        readOnly
+                    />
+                ) : (
+                    <AssignMembersSection
+                        assignedMembers={editedTask?.assignedMembers}
+                        onAssignedMembersChange={(members) => handleEditChange('assignedMembers', members)}
+                        getProjectUsers={getProjectUsers}
+                        visible={visible}
+                    />
+                )}
+
             </ModalBody>
+
             <ModalActions
-                onCancel={onClose}
-                primaryActionName="Finish Task"
-                primaryActionIconName="check"
-                onPrimaryActionPress={() => deleteTask(task)}
+                onCancel={isEdit ? handleCancelEdit : onClose}
+                primaryActionName={!isEdit ? "Finish Task" : "Save"}
+                primaryActionIconName={!isEdit ? "check" : "check"}
+                onPrimaryActionPress={!isEdit ? () => deleteTask(task) : handleSaveEdit}
             />
+
         </AppModal>
     )
 }
@@ -150,5 +262,11 @@ const styles = StyleSheet.create({
     moveButtonText: {
         fontSize: 13,
         fontWeight: '500',
+    },
+    pillsWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15,
     },
 })
