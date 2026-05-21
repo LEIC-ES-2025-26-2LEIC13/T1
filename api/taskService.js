@@ -171,4 +171,29 @@ export const taskService = {
 
         await batchOps(db, operations)  
     },
+
+    updateTask: async (projectId, columnId, taskId, taskData) => {
+        const normalizedTaskData = normalizeTaskData(taskData)
+        const operations = []
+
+        // Update task in column
+        operations.push({
+            type: OPERATION_TYPES.UPDATE,
+            ref: pathHelper.columnTask(projectId, columnId, taskId),
+            data: normalizedTaskData
+        })
+
+        // Update task in each assigned member's user tasks
+        if (taskData.assignedMembers && taskData.assignedMembers.length > 0) {
+            for (const { id: memberId } of taskData.assignedMembers) {
+                operations.push({
+                    type: OPERATION_TYPES.UPDATE,
+                    ref: pathHelper.userTask(memberId, taskId),
+                    data: normalizedTaskData
+                })
+            }
+        }
+
+        await batchOps(db, operations)
+    },
 }

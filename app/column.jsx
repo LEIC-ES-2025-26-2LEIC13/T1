@@ -79,6 +79,12 @@ export default function Column({ projectId, projectName, columnData, columns }) 
         setTask((prev) => ({ ...prev, [field]: value }));
     };
 
+    const handleSelectedTaskChange = (field, value) => {
+        if (selectedTask) {
+            setSelectedTask((prev) => ({ ...prev, [field]: value }));
+        }
+    };
+
     const openTaskCreationModal = () => setTaskModalCreationVisible(true);
 
     const closeTaskCreationModal = () => {
@@ -241,6 +247,8 @@ export default function Column({ projectId, projectName, columnData, columns }) 
                         columnId={column.id}
                         onTaskMoved={closeTaskDetails} 
                         userEmail={user.email}
+                        onChange={handleSelectedTaskChange}
+                        getProjectUsers={() => projectService.getProjectUsers(projectId)}
                     />
 
                     <ThemedAlert

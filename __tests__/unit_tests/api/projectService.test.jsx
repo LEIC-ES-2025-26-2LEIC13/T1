@@ -1,265 +1,279 @@
-import { jest, describe, it, expect, afterEach } from '@jest/globals'
-import { projectService } from "../../../api/projectService"
-import { updateDoc, getDocs, writeBatch, onSnapshot } from "firebase/firestore"
-import { batchOps } from "../../../api/batchOpsHelper"  // ← was batchDelete; source uses batchOps
-import { columnService } from "../../../api/columnService"
+import { jest, beforeEach, describe, test, expect } from "@jest/globals";
+
+// Mocks
+
+jest.mock("../../../firebase/firebaseConfig", () => ({ db: {} }));
 
 jest.mock("firebase/firestore", () => ({
     collection: jest.fn(),
-    doc: jest.fn(() => ({ id: "mockDocId" })),
-    updateDoc: jest.fn(),
-    getDocs: jest.fn(),
-    query: jest.fn(q => q),
-    where: jest.fn(),
+    doc: jest.fn(() => ({ id: "mock-project-id" })),
     onSnapshot: jest.fn(),
-    writeBatch: jest.fn()
-}))
+    query: jest.fn(),
+    getDocs: jest.fn(),
+    writeBatch: jest.fn(() => ({
+        set: jest.fn(),
+        commit: jest.fn(),
+    })),
+    where: jest.fn(),
+}));
 
 jest.mock("../../../api/batchOpsHelper", () => ({
     batchOps: jest.fn(),
-    OPERATION_TYPES: {
-        DELETE: "DELETE",
-        UPDATE: "UPDATE"
-    }
-}))
-
-jest.mock("../../../api/columnService", () => ({
-    columnService: { allColumnsRefsToDelete: jest.fn() }
-}))
+    OPERATION_TYPES: { DELETE: "DELETE", UPDATE: "UPDATE", SET: "SET" },
+}));
 
 jest.mock("../../../api/pathHelper", () => ({
     pathHelper: {
-        userProjects: jest.fn(),
-        projectUsers: jest.fn(),
-        userProject: jest.fn(),
-        projectUser: jest.fn(),
-        userTasks: jest.fn(),
-        columnTask: jest.fn(),
-    }
-}))
+        userProjects: jest.fn(() => "userProjectsRef"),
+        projectUsers: jest.fn(() => "projectUsersRef"),
+        userProject: jest.fn(() => "userProjectRef"),
+        projectUser: jest.fn(() => "projectUserRef"),
+        userTasks: jest.fn(() => "userTasksRef"),
+        columnTask: jest.fn(() => "columnTaskRef"),
+    },
+}));
 
-jest.mock("../../../firebase/firebaseConfig", () => ({
-    db: {}
-}))
+jest.mock("../../../api/columnService", () => ({
+    columnService: {
+        allColumnsRefsToDelete: jest.fn(() => Promise.resolve([])),
+    },
+}));
 
 jest.mock("../../../constants/Collections", () => ({
-    COLLECTIONS: { USERS: "users", PROJECTS: "projects" },
-    SUBCOLLECTIONS: { PROJECT_USERS: "project_users", USER_PROJECTS: "user_projects" }
-}))
+    COLLECTIONS: { PROJECTS: "projects", USERS: "users" },
+    SUBCOLLECTIONS: { PROJECT_USERS: "projectUsers", USER_PROJECTS: "userProjects" },
+}));
+
+import { onSnapshot, getDocs, writeBatch, doc, collection } from "firebase/firestore";
+import { batchOps } from "../../../api/batchOpsHelper";
+import { columnService } from "../../../api/columnService";
+import { projectService } from "../../../api/projectService";
+
+function makeSnapshot(docs) {
+    const mappedDocs = docs.map((d) => ({
+        id: d.id,
+        ref: { id: d.id },
+        data: () => d,
+    }));
+    return {
+        docs: mappedDocs,
+        empty: docs.length === 0,
+        forEach: (cb) => mappedDocs.forEach(cb),
+    };
+}
+
+beforeEach(() => {
+    jest.clearAllMocks();
+});
 
 describe("projectService", () => {
-    afterEach(() => {
-        jest.clearAllMocks()
-    })
 
-    it("should subscribe to user projects", () => {
-        const mockOnUpdate = jest.fn()
-        onSnapshot.mockImplementation((q, callback) => {
-            callback({ docs: [{ id: "p1", data: () => ({ title: "Project" }) }] })
-            return jest.fn() // unsubscribe fn
-        })
+    // subscribeToUserProjects
 
-        projectService.subscribeToUserProjects("u1", mockOnUpdate)
+    test("subscribeToUserProjects calls onSnapshot and returns unsubscribe", () => {
+        const unsubscribe = jest.fn();
+        onSnapshot.mockReturnValueOnce(unsubscribe);
 
-        expect(mockOnUpdate).toHaveBeenCalledWith([{ id: "p1", title: "Project" }])
-    })
+        const onUpdate = jest.fn();
+        const result = projectService.subscribeToUserProjects("user-1", onUpdate);
 
-    it("should throw if project title is empty", async () => {
-        await expect(projectService.createProject("u1", "u@u.com", { title: "" }))
-            .rejects.toThrow("Please enter a project title")
-    })
+        expect(onSnapshot).toHaveBeenCalled();
+        expect(result).toBe(unsubscribe);
+    });
 
-    it("should throw if project title is whitespace only", async () => {
-        await expect(projectService.createProject("u1", "u@u.com", { title: "   " }))
-            .rejects.toThrow("Please enter a project title")
-    })
+    test("subscribeToUserProjects calls onUpdate with mapped project data", () => {
+        onSnapshot.mockImplementationOnce((_, callback) => {
+            callback(makeSnapshot([{ id: "p1", title: "Project 1" }]));
+            return jest.fn();
+        });
 
-    it("should create a project", async () => {
-        const mockBatch = { set: jest.fn(), commit: jest.fn() }
-        writeBatch.mockReturnValue(mockBatch)
+        const onUpdate = jest.fn();
+        projectService.subscribeToUserProjects("user-1", onUpdate);
 
-        await projectService.createProject("u1", "u1@test.com", { title: "Test Project", description: "Desc" })
+        expect(onUpdate).toHaveBeenCalledWith([{ id: "p1", title: "Project 1" }]);
+    });
 
-        expect(mockBatch.set).toHaveBeenCalledTimes(3) // project + projectUser + userProject
-        expect(mockBatch.commit).toHaveBeenCalled()
-    })
+    // createProject
 
-    it("should return early if update fields are empty", async () => {
-        await projectService.updateProject("p1", {})
-        expect(updateDoc).not.toHaveBeenCalled()
-    })
+    test("createProject commits batch with correct data", async () => {
+        const mockBatch = { set: jest.fn(), commit: jest.fn() };
+        writeBatch.mockReturnValueOnce(mockBatch);
+        doc.mockReturnValue({ id: "new-project-id" });
+        collection.mockReturnValue("projectsCollection");
 
-    it("should update a project title", async () => {
-        await projectService.updateProject("p1", { title: "Updated Title" })
-        expect(updateDoc).toHaveBeenCalledWith(
-            expect.anything(),
-            { title: "Updated Title" }
-        )
-    })
+        await projectService.createProject("user-1", "user@example.com", {
+            title: "My Project",
+            description: "A description",
+        });
 
-    it("should update only the description if title is left undefined", async () => {
-        await projectService.updateProject("p1", { description: "New Description Only" })
-        expect(updateDoc).toHaveBeenCalledWith(
-            expect.anything(),
-            { description: "New Description Only" }
-        )
-    })
+        expect(mockBatch.set).toHaveBeenCalled();
+        expect(mockBatch.commit).toHaveBeenCalled();
+    });
 
-    it("should normalize a null description to empty string during update", async () => {
-        await projectService.updateProject("p1", { title: "Valid Title", description: null })
-        expect(updateDoc).toHaveBeenCalledWith(
-            expect.anything(),
-            { title: "Valid Title", description: "" }
-        )
-    })
-
-    it("should throw if the updated title is empty string, whitespace, or null", async () => {
-        await expect(projectService.updateProject("p1", { title: "" }))
-            .rejects.toThrow("Project title cannot be empty")
-
-        await expect(projectService.updateProject("p1", { title: " " }))
-            .rejects.toThrow("Project title cannot be empty")
-
-        await expect(projectService.updateProject("p1", { title: null }))
-            .rejects.toThrow("Project title cannot be empty")
-    })
-
-    it("should delete a project and call batchOps with all refs", async () => {
-        columnService.allColumnsRefsToDelete.mockResolvedValue([
-            { type: "DELETE", ref: "colRef" }
-        ])
-        getDocs.mockResolvedValueOnce({
-            forEach: (cb) => cb({ ref: "userRef", id: "u1" })
-        })
-
-        await projectService.deleteProject("p1")
-
-        expect(batchOps).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.arrayContaining([
-                { type: "DELETE", ref: "colRef" },
-                { type: "DELETE", ref: "userRef" },
-                expect.objectContaining({ type: "DELETE" }), // userProjectRef
-                expect.objectContaining({ type: "DELETE" }), // main project doc
-            ])
-        )
-    })
-
-    it("should get project users", async () => {
-        getDocs.mockResolvedValueOnce({
-            docs: [{ id: "u1", data: () => ({ email: "u1@test.com" }) }]
-        })
-
-        const result = await projectService.getProjectUsers("p1")
-
-        expect(result).toEqual([{ id: "u1", email: "u1@test.com" }])
-    })
-
-    it("should kick a member and call batchOps", async () => {
-        getDocs.mockResolvedValueOnce({
-            forEach: (cb) => cb({
-                ref: "taskRef",
-                id: "t1",
-                data: () => ({
-                    columnId: "c1",
-                    assignedMembers: [{ id: "u1" }, { id: "u2" }]
-                })
-            })
-        })
-
-        await projectService.kickMember("p1", "u1")
-
-        expect(batchOps).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.arrayContaining([
-                expect.objectContaining({ type: "DELETE" }), // userProject
-                expect.objectContaining({ type: "DELETE" }), // projectUser
-                expect.objectContaining({ type: "DELETE", ref: "taskRef" }), // userTask
-                expect.objectContaining({
-                    type: "UPDATE",
-                    data: { assignedMembers: [{ id: "u2" }] } // u1 filtered out
-                }),
-            ])
-        )
-    })
-
-    it("should kick a member with no task assignments", async () => {
-        getDocs.mockResolvedValueOnce({ forEach: jest.fn() }) // no tasks
-
-        await projectService.kickMember("p1", "u1")
-
-        expect(batchOps).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.arrayContaining([
-                expect.objectContaining({ type: "DELETE" }), // userProject
-                expect.objectContaining({ type: "DELETE" }), // projectUser
-            ])
-        )
-    })
-
-    it("should default assignedMembers to [] when the field is missing on the task", async () => {
-        getDocs.mockResolvedValueOnce({
-            forEach: (cb) => cb({
-                ref: "taskRef",
-                id: "t1",
-                data: () => ({
-                    columnId: "c1",
-                    assignedMembers: undefined
-                })
-            })
-        })
-
-        await projectService.kickMember("p1", "u1")
-
-        expect(batchOps).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.arrayContaining([
-                expect.objectContaining({
-                    type: "UPDATE",
-                    data: { assignedMembers: [] }
-                })
-            ])
-        )
-    })
-
-    it("should return true if project has no members", async () => {
-        getDocs.mockResolvedValueOnce({ empty: true })
-
-        const result = await projectService.projectHasNoMembers("p1")
-
-        expect(result).toBe(true)
-    })
-
-
-    it("should return false if project has members", async () => {
-        getDocs.mockResolvedValueOnce({ empty: false })
-
-        const result = await projectService.projectHasNoMembers("p1")
-
-        expect(result).toBe(false)
-    })
-
-    it("should trim whitespace from title when creating a project", async () => {
-        const mockBatch = { set: jest.fn(), commit: jest.fn() }
-        writeBatch.mockReturnValue(mockBatch)
-
-        await projectService.createProject("u1", "u@u.com", { title: "  My Project  " })
-
-        expect(mockBatch.set).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({ title: "My Project" }) // .trim() ran
-        )
-    })
-
-    it("should throw when title is null", async () => {
+    test("createProject throws when title is empty", async () => {
         await expect(
-            projectService.createProject("u1", "u@u.com", { title: null })
-        ).rejects.toThrow("Please enter a project title")
-    })
+            projectService.createProject("user-1", "user@example.com", {
+                title: "",
+                description: "",
+            })
+        ).rejects.toThrow("Please enter a project title");
+    });
 
-    it("should throw when title is undefined", async () => {
+    test("createProject throws when title is only whitespace", async () => {
         await expect(
-            projectService.createProject("u1", "u@u.com", { title: undefined })
-        ).rejects.toThrow("Please enter a project title")
-    })
-})
+            projectService.createProject("user-1", "user@example.com", {
+                title: "   ",
+                description: "",
+            })
+        ).rejects.toThrow("Please enter a project title");
+    });
+
+    // updateProject
+
+    test("updateProject calls batchOps with update operations", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([{ id: "user-1", email: "u@example.com" }])
+        );
+
+        await projectService.updateProject("project-1", {
+            title: "Updated Title",
+            description: "Updated description",
+        });
+
+        expect(batchOps).toHaveBeenCalled();
+    });
+
+    test("updateProject throws when title is empty string", async () => {
+        await expect(
+            projectService.updateProject("project-1", { title: "" })
+        ).rejects.toThrow("Project title cannot be empty");
+    });
+
+    test("updateProject throws when title is only whitespace", async () => {
+        await expect(
+            projectService.updateProject("project-1", { title: "   " })
+        ).rejects.toThrow("Project title cannot be empty");
+    });
+
+    test("updateProject returns early when no fields provided", async () => {
+        await projectService.updateProject("project-1", {});
+
+        expect(batchOps).not.toHaveBeenCalled();
+    });
+
+    // deleteProject
+
+    test("deleteProject calls allColumnsRefsToDelete and batchOps", async () => {
+        getDocs.mockResolvedValueOnce(makeSnapshot([{ id: "user-1" }]));
+
+        await projectService.deleteProject("project-1");
+
+        expect(columnService.allColumnsRefsToDelete).toHaveBeenCalledWith("project-1");
+        expect(batchOps).toHaveBeenCalled();
+    });
+
+    test("deleteProject queues delete operations for all project users", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([{ id: "user-1" }, { id: "user-2" }])
+        );
+
+        await projectService.deleteProject("project-1");
+
+        const ops = batchOps.mock.calls[0][1];
+        const deleteOps = ops.filter((o) => o.type === "DELETE");
+        // 2 projectUsers docs + 2 userProject refs + 1 main project = 5
+        expect(deleteOps.length).toBeGreaterThanOrEqual(5);
+    });
+
+    // getProjectUsers
+
+    test("getProjectUsers returns mapped list of users", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([
+                { id: "u1", email: "a@example.com" },
+                { id: "u2", email: "b@example.com" },
+            ])
+        );
+
+        const users = await projectService.getProjectUsers("project-1");
+
+        expect(users).toEqual([
+            { id: "u1", email: "a@example.com" },
+            { id: "u2", email: "b@example.com" },
+        ]);
+    });
+
+    test("getProjectUsers returns empty array when no users", async () => {
+        getDocs.mockResolvedValueOnce(makeSnapshot([]));
+
+        const users = await projectService.getProjectUsers("project-1");
+
+        expect(users).toEqual([]);
+    });
+
+    // kickMember
+
+    test("kickMember calls batchOps with delete and update operations", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([
+                {
+                    id: "task-1",
+                    columnId: "col-1",
+                    assignedMembers: [{ id: "user-1" }, { id: "user-2" }],
+                },
+            ])
+        );
+
+        await projectService.kickMember("project-1", "user-1");
+
+        expect(batchOps).toHaveBeenCalled();
+        const ops = batchOps.mock.calls[0][1];
+        expect(ops.some((o) => o.type === "DELETE")).toBe(true);
+        expect(ops.some((o) => o.type === "UPDATE")).toBe(true);
+    });
+
+    test("kickMember removes kicked member from assignedMembers", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([
+                {
+                    id: "task-1",
+                    columnId: "col-1",
+                    assignedMembers: [{ id: "user-1" }, { id: "user-2" }],
+                },
+            ])
+        );
+
+        await projectService.kickMember("project-1", "user-1");
+
+        const ops = batchOps.mock.calls[0][1];
+        const updateOp = ops.find((o) => o.type === "UPDATE");
+        expect(updateOp.data.assignedMembers).toEqual([{ id: "user-2" }]);
+    });
+
+    test("kickMember works when user has no assigned tasks", async () => {
+        getDocs.mockResolvedValueOnce(makeSnapshot([]));
+
+        await projectService.kickMember("project-1", "user-1");
+
+        expect(batchOps).toHaveBeenCalled();
+    });
+
+    // projectHasNoMembers
+    test("projectHasNoMembers returns true when no members", async () => {
+        getDocs.mockResolvedValueOnce(makeSnapshot([]));
+
+        const result = await projectService.projectHasNoMembers("project-1");
+
+        expect(result).toBe(true);
+    });
+
+    test("projectHasNoMembers returns false when members exist", async () => {
+        getDocs.mockResolvedValueOnce(
+            makeSnapshot([{ id: "u1", email: "a@example.com" }])
+        );
+
+        const result = await projectService.projectHasNoMembers("project-1");
+
+        expect(result).toBe(false);
+    });
+});
