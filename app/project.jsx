@@ -18,6 +18,7 @@ import ThemedAlert, { ALERT_TYPES } from '../components/ThemedAlert';
 import SafeAreaPage from '../components/SafeAreaPage';
 import Columns from '../components/Columns';
 import AnimatedPressable from '../components/AnimatedPressable';
+import EditProjectModal from "../components/EditProjectModal";
 
 export default function ProjectScreen() {
   	const router = useRouter()
@@ -35,7 +36,9 @@ export default function ProjectScreen() {
 
   	const { sendInvite } = useInvite()
 	const [ inviteTarget, setInviteTarget ] = useState('')
-	
+
+	const [ editProjectModalVisible, setEditProjectModalVisible ] = useState(false)
+	const [ editProjectData, setEditProjectData ] = useState({ title: '', description: '' })
 	const [ inviteModalVisible, setInviteModalVisible ] = useState(false)
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false)
 
@@ -84,7 +87,32 @@ export default function ProjectScreen() {
 		}
 	}, [router]); // Add router as a dependency
 
-	
+	// Edit Project modal
+	const handleEditProjectPress = () => {
+		setEditProjectData({
+			title: currentProject.title || '',
+			description: currentProject.description || ''
+		})
+		setEditProjectModalVisible(true)
+	}
+
+	const handleCloseEditProjectModal = () => setEditProjectModalVisible(false)
+
+	const handleEditProjectChange = (field, value) => {
+		setEditProjectData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleSaveProject = async (projectData) => {
+		try {
+			await projectService.updateProject(projectId, projectData)
+			showAlert(ALERT_TYPES.SUCCESS, "Success", "Project updated successfully.")
+		}
+		catch (error) {
+			showAlert(ALERT_TYPES.ERROR, "Update Failed", error.message)
+		}
+		setEditProjectModalVisible(false)
+	}
+
   	// Invite modal
   	const handleInvitePress = () => setInviteModalVisible(true)
 
@@ -96,7 +124,6 @@ export default function ProjectScreen() {
 	// See members modal
 	const handleSeeMembersPress = () => setSeeMembersModalVisible(true)
 	const handleCloseMembersModal = () => setSeeMembersModalVisible(false)
-
 
 
 	const handleSendInvite = async () => {
@@ -263,6 +290,13 @@ export default function ProjectScreen() {
 										onPress: () => handleInvitePress(),
 									},
 									{
+										testId: "edit-project-action",
+										id: 'edit-project',
+										title: 'Edit Project',
+										icon: 'cog-outline',
+										onPress: () => handleEditProjectPress(),
+									},
+									{
 										id: 'delete-project',
 										title: 'Delete project',
 										icon: 'delete',
@@ -298,6 +332,14 @@ export default function ProjectScreen() {
 					onCreate={handleCreateColumn}
 					onChange={handleColumnChange}
 					columnData={columnData}
+				/>
+
+				<EditProjectModal
+					visible={editProjectModalVisible}
+					onClose={handleCloseEditProjectModal}
+					project={editProjectData}
+					onChange={handleEditProjectChange}
+					onSave={handleSaveProject}
 				/>
 
 				<InviteProjectModal
