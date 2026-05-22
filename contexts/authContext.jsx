@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useMemo, useCallback } from "react"
+/*import { createContext, useState, useEffect, useMemo, useCallback } from "react"
 import { authService } from "../api/authService"
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
 
@@ -113,6 +113,81 @@ export function AuthProvider({ children }) {
         register,
         logout
     }), [user, isLoading, login, register, logout])
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+            <ThemedAlert 
+                visible={alertVisible} 
+                alert={alert} 
+                onConfirm={closeAlert} 
+            />
+        </AuthContext.Provider>
+    )
+}
+*/
+import { createContext, useState, useEffect, useMemo, useCallback } from "react"
+import { authService } from "../api/authService"
+import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
+
+export const AuthContext = createContext(null)
+
+export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
+
+    const [alertVisible, setAlertVisible] = useState(false)
+    const [alert, setAlert] = useState({ title: '', message: '', type: ALERT_TYPES.ERROR })
+
+    const showAlert = useCallback((type, title, message) => {
+        setAlert({ type, title, message })
+        setAlertVisible(true)
+    }, [])
+
+    const closeAlert = () => setAlertVisible(false)
+
+    // Keep user logged in
+    useEffect(() => {
+        setIsLoading(true)
+        const unsub = authService.subscribeAuthState((currentUser) => {
+            setUser(currentUser)
+            setIsLoading(false)
+        })
+
+        return unsub
+    }, [])
+
+    // Only Google sign-in is supported in this app
+
+    const googleLogin = useCallback(async () => {
+        setIsLoading(true)
+        try {
+            await authService.signInWithGoogle(setUser)
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, "Login Error", error.message || 'Google sign-in failed')
+        } finally {
+            setIsLoading(false)
+        }
+    }, [showAlert])
+
+    const logout = useCallback(async () => {
+        setIsLoading(true)
+        try {
+            await authService.signOut()
+            return true
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, "Logout Error", error.message)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [showAlert])
+
+    const value = useMemo(() => ({
+        user,
+        isLoading,
+        googleLogin,
+        logout
+    }), [user, isLoading, googleLogin, logout])
 
     return (
         <AuthContext.Provider value={value}>

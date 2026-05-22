@@ -12,7 +12,20 @@
           "package_name": "com.anonymous.LEICo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "753470140358-mlrhuqhdum16jlc54nkppk57uvm7irff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.LEICo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "753470140358-bhafuk3b7q4hh4ut9fp111bm2du6ap5l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAVTDkoiOY5T_5sE_cOrL1Sl1deL2U3NNY"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753470140358-bhafuk3b7q4hh4ut9fp111bm2du6ap5l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "753470140358-dmcdtjqmec4capg1sfcko9k4iq4noeju.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.anonymous.LEICo"
+              }
+            }
+          ]
         }
       }
     }

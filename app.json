@@ -37,13 +37,15 @@
       "favicon": "./assets/leico_dark.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-google-signin/google-signin"
     ],
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "cce2998c-70c0-458d-afc0-891900b50eb7"
+        "projectId": "4aacdd25-6a96-4ac0-a1c1-d13b71e1afff"
       }
-    }
+    },
+    "owner": "devpedro19"
   }
 }

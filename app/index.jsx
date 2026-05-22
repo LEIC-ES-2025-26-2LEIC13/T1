@@ -1,15 +1,33 @@
 import { StyleSheet, useColorScheme, View } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
-import { useRouter } from "expo-router"
 import ThemedText from "../components/ThemedText"
-import ThemedButton from "../components/ThemedButton"
 import { Colors } from "../constants/Colors"
 import ThemedLogo from "../components/ThemedLogo"
+import { GoogleSigninButton } from "@react-native-google-signin/google-signin"
+import { useState, useEffect } from "react"
+import { useAuth } from "../hooks/useAuth"
+import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
 
 const Intro = () => {
-    const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
+    const { googleLogin, isLoading} = useAuth()
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
+
+    const handleSignInPress = async () => {
+        try {
+            await googleLogin()
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, "Login Error", error?.message || 'Google sign-in failed')
+        }
+    }
 
     return (
         <>
@@ -35,23 +53,15 @@ const Intro = () => {
                 </ThemedText>
 
                 <View style={styles.actions}>
-                    <ThemedButton
-                        testID="login-button"
-                        style={styles.primaryButton}
-                        onPress={() => router.push("/(auth)/login")}
-                    >
-                        <ThemedText bold onPrimary>Login</ThemedText>
-                    </ThemedButton>
-
-                    <ThemedButton
-                            testID="register-button"
-                            style={[styles.primaryButton, { backgroundColor: theme.borders }]}
-                            onPress={() => router.push("/(auth)/register")}
-                        >
-                            <ThemedText bold onPrimary>Register</ThemedText>
-                    </ThemedButton>
+                    <GoogleSigninButton onPress={handleSignInPress} disabled={isLoading} />
                 </View>
             </View>
+
+            <ThemedAlert
+                visible={alertVisible}
+                alert={alert}
+                onConfirm={() => setAlertVisible(false)}
+            />
         </>
     )
 }
@@ -76,10 +86,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         lineHeight: 22,
         marginBottom: 28,
-    },
-    actions: {
-        width: "100%",
-        gap: 12,
     },
     primaryButton: {
         width: "100%",
