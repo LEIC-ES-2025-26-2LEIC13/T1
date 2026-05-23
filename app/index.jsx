@@ -4,7 +4,7 @@ import ThemedText from "../components/ThemedText"
 import { Colors } from "../constants/Colors"
 import ThemedLogo from "../components/ThemedLogo"
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin"
-import { useState, useEffect } from "react"
+import { useState} from "react"
 import { useAuth } from "../hooks/useAuth"
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
 

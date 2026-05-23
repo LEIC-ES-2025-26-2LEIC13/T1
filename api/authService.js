@@ -39,11 +39,15 @@ export const authService = {
 
     const normalizedEmail = userCredential.user.email?.trim().toLowerCase() ?? "";
 
-    await setDoc(
-      pathHelper.user(userCredential.user.uid),
-      { email: normalizedEmail },
-      { merge: true }
-    );
+    // Before creating the user document, we ensure that the user is not an admin
+    const isAdmin = await authService.isAdmin(userCredential.user);
+    if (!isAdmin) {
+        await setDoc(
+        pathHelper.user(userCredential.user.uid),
+        { email: normalizedEmail },
+        { merge: true }
+        );
+    }
 
     onUpdate(userCredential.user);
     return userCredential.user;
@@ -58,12 +62,7 @@ export const authService = {
   },
 
   isAdmin: async (user) => {
-    const userData = await getDoc(pathHelper.user(user.uid));
-    const userRole = userData?.data()?.role;
-    
-    if (userRole === 'admin') {
-      return true
-    }
-    return false
+    const userData = await getDoc(pathHelper.admin(user.uid));
+    return !!userData.exists()
   }
 };

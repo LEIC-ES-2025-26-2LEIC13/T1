@@ -152,7 +152,6 @@ export function AuthProvider({ children }) {
         setIsLoading(true)
         const unsub = authService.subscribeAuthState((currentUser) => {
             setUser(currentUser)
-
             if (!currentUser) {
                 setIsAdmin(false)
                 setIsLoading(false)

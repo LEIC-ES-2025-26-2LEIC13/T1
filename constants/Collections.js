@@ -2,7 +2,8 @@
 
 export const COLLECTIONS = {
     USERS: 'users',
-    PROJECTS: 'projects'
+    PROJECTS: 'projects',
+    ADMIN: 'admin',
 };
 
 export const SUBCOLLECTIONS = {

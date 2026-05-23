@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import AppModal from './AppModal';
 import ModalHeader from './modal/ModalHeader';
 import Pill from './Pill';
