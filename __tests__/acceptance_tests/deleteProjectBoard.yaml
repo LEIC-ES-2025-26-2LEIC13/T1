@@ -1,0 +1,30 @@
+appId: com.anonymous.LEICo
+tags:
+    - project
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Testing-Delete-Project-Board"
+    PROJECT_DESCRIPTION: "Description"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+
+- tapOn:
+    id: "project-overflow-menu"
+- tapOn:
+    id: "delete-project-action"
+- assertVisible: "Are you sure you want to delete this project? All related data will be lost."
+- tapOn: "OK"
+- assertVisible: "Successfully deleted the project."
+- tapOn: "OK"
+- assertNotVisible: ${PROJECT_TITLE}
+- assertNotVisible: ${PROJECT_DESCRIPTION}

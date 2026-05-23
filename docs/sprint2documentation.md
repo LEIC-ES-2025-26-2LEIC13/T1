@@ -79,6 +79,7 @@ Since the database now includes projectColumns as a subcollection that contains 
                       ├─ description
                       ├─ label
                       ├─ assignedMembers
+                      ├─ order
                       └─ createdAt
 ```
 

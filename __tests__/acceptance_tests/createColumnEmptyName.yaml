@@ -1,0 +1,27 @@
+appId: com.anonymous.LEICo
+tags:
+    - column
+    - project
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Create-Column"
+    PROJECT_DESCRIPTION: "Description"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+        
+- tapOn:
+    id: "open-create-column-modal-button"
+- tapOn:
+    id: "create-column-modal-actions-create"
+- assertVisible:
+    id: "create-column-modal-actions-create" # the modal did not disappear

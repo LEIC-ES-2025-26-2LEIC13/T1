@@ -273,7 +273,7 @@ export default function ProjectScreen() {
 					headerRight: () => (
 						<>
 							<AnimatedPressable onPress={openCreateColumnModal} style={{ paddingHorizontal: 5 }}>
-								<ThemedIcon name="table-column-plus-after" />
+								<ThemedIcon testID="create-column-icon" name="table-column-plus-after" />
 							</AnimatedPressable>
 							<AnimatedPressable onPress={handleSeeMembersPress} style={{ paddingHorizontal: 12 }}>
 								<ThemedIcon testID="see-members-icon" name="account-multiple"/>
@@ -290,13 +290,14 @@ export default function ProjectScreen() {
 										onPress: () => handleInvitePress(),
 									},
 									{
-										testId: "edit-project-action",
+										testID: "edit-project-action",
 										id: 'edit-project',
 										title: 'Edit Project',
 										icon: 'cog-outline',
 										onPress: () => handleEditProjectPress(),
 									},
 									{
+										testID: "delete-project-action",
 										id: 'delete-project',
 										title: 'Delete project',
 										icon: 'delete',

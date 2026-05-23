@@ -2,9 +2,6 @@ appId: com.anonymous.LEICo
 tags:
     - project
 ---
-- launchApp:
-    clearState: true
-
 - runFlow:
     file: openProject.yaml
     env:
