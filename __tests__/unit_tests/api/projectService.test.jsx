@@ -1,6 +1,10 @@
 import { jest, beforeEach, describe, test, expect } from "@jest/globals";
 
-// Mocks
+import { onSnapshot, getDocs, orderBy, writeBatch, doc, collection } from "firebase/firestore";
+import { batchOps } from "../../../api/batchOpsHelper";
+import { columnService } from "../../../api/columnService";
+import { projectService } from "../../../api/projectService";
+import { pathHelper } from "../../../api/pathHelper";
 
 jest.mock("../../../firebase/firebaseConfig", () => ({ db: {} }));
 
@@ -8,10 +12,12 @@ jest.mock("firebase/firestore", () => ({
     collection: jest.fn(),
     doc: jest.fn(() => ({ id: "mock-project-id" })),
     onSnapshot: jest.fn(),
+    orderBy: jest.fn(),
     query: jest.fn(),
     getDocs: jest.fn(),
     writeBatch: jest.fn(() => ({
         set: jest.fn(),
+        update: jest.fn(),
         commit: jest.fn(),
     })),
     where: jest.fn(),
@@ -26,7 +32,7 @@ jest.mock("../../../api/pathHelper", () => ({
     pathHelper: {
         userProjects: jest.fn(() => "userProjectsRef"),
         projectUsers: jest.fn(() => "projectUsersRef"),
-        userProject: jest.fn(() => "userProjectRef"),
+        userProject: jest.fn((userId, projectId) => `userProject:${userId}:${projectId}`),
         projectUser: jest.fn(() => "projectUserRef"),
         userTasks: jest.fn(() => "userTasksRef"),
         columnTask: jest.fn(() => "columnTaskRef"),
@@ -44,10 +50,6 @@ jest.mock("../../../constants/Collections", () => ({
     SUBCOLLECTIONS: { PROJECT_USERS: "projectUsers", USER_PROJECTS: "userProjects" },
 }));
 
-import { onSnapshot, getDocs, writeBatch, doc, collection } from "firebase/firestore";
-import { batchOps } from "../../../api/batchOpsHelper";
-import { columnService } from "../../../api/columnService";
-import { projectService } from "../../../api/projectService";
 
 function makeSnapshot(docs) {
     const mappedDocs = docs.map((d) => ({
@@ -64,6 +66,7 @@ function makeSnapshot(docs) {
 
 beforeEach(() => {
     jest.clearAllMocks();
+    getDocs.mockResolvedValue(makeSnapshot([]));
 });
 
 describe("projectService", () => {
@@ -93,6 +96,22 @@ describe("projectService", () => {
         expect(onUpdate).toHaveBeenCalledWith([{ id: "p1", title: "Project 1" }]);
     });
 
+    test("subscribeToUserProjects queries projects ordered by order", () => {
+        onSnapshot.mockImplementationOnce((_, callback) => {
+            callback(makeSnapshot([
+                { id: "p2", title: "Project 2", order: 2 },
+                { id: "p1", title: "Project 1", order: 1 },
+                { id: "p3", title: "Legacy Project" },
+            ]));
+            return jest.fn();
+        });
+
+        const onUpdate = jest.fn();
+        projectService.subscribeToUserProjects("user-1", onUpdate);
+
+        expect(orderBy).toHaveBeenCalledWith("order", "asc");
+    });
+
     // createProject
 
     test("createProject commits batch with correct data", async () => {
@@ -100,6 +119,7 @@ describe("projectService", () => {
         writeBatch.mockReturnValueOnce(mockBatch);
         doc.mockReturnValue({ id: "new-project-id" });
         collection.mockReturnValue("projectsCollection");
+        getDocs.mockResolvedValueOnce(makeSnapshot([]));
 
         await projectService.createProject("user-1", "user@example.com", {
             title: "My Project",
@@ -126,6 +146,43 @@ describe("projectService", () => {
                 description: "",
             })
         ).rejects.toThrow("Please enter a project title");
+    });
+
+    test("createProject stores the next order in userProjects", async () => {
+        const mockBatch = { set: jest.fn(), commit: jest.fn() };
+        writeBatch.mockReturnValueOnce(mockBatch);
+        doc.mockReturnValue({ id: "new-project-id" });
+        collection.mockReturnValue("projectsCollection");
+        getDocs.mockResolvedValueOnce(makeSnapshot([
+            { id: "p1", title: "Project 1", order: 0 },
+            { id: "p2", title: "Project 2", order: 2 },
+        ]));
+
+        await projectService.createProject("user-1", "user@example.com", {
+            title: "My Project",
+            description: "A description",
+        });
+
+        const userProjectSet = mockBatch.set.mock.calls[2][1];
+        expect(userProjectSet.order).toBe(2);
+    });
+
+    // reorderUserProjects
+
+    test("reorderUserProjects updates order for each user project", async () => {
+        const mockBatch = { update: jest.fn(), commit: jest.fn() };
+        writeBatch.mockReturnValueOnce(mockBatch);
+
+        await projectService.reorderUserProjects("user-1", [
+            { id: "p2" },
+            { id: "p1" },
+        ]);
+
+        expect(pathHelper.userProject).toHaveBeenNthCalledWith(1, "user-1", "p2");
+        expect(pathHelper.userProject).toHaveBeenNthCalledWith(2, "user-1", "p1");
+        expect(mockBatch.update).toHaveBeenNthCalledWith(1, "userProject:user-1:p2", { order: 0 });
+        expect(mockBatch.update).toHaveBeenNthCalledWith(2, "userProject:user-1:p1", { order: 1 });
+        expect(mockBatch.commit).toHaveBeenCalledTimes(1);
     });
 
     // updateProject

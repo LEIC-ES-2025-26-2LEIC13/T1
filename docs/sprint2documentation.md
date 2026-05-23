@@ -35,7 +35,8 @@ Since the database now includes projectColumns as a subcollection that contains 
 │     ├─ userProjects         (subcolletion)
 │     │  └─ {projectId}       (subcolletion document)
 │     │     ├─ title
-│     │     └─ description
+│     │     ├─ description
+│     │     └─ order
 │     │
 │     ├─ userInvites
 │     │  └─ {inviteId}
