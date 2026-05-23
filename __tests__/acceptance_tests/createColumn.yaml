@@ -1,25 +1,25 @@
 appId: com.anonymous.LEICo
 tags:
     - project
+    - column
 env:
     EMAIL: "johndoe@gmail.com"
     PASSWORD: "123456"
     PROJECT_TITLE: "Test-Create-Column"
     PROJECT_DESCRIPTION: "Description"
-    COLUMN_NAME: "Column Name"
+    COLUMN_NAME: "Column-Name"
 
 ---
 - launchApp:
     clearState: true
 
 - runFlow:
-    file: createProject.yaml
+    file: subflows/openProject.yaml
     env:
         EMAIL: ${EMAIL}
         PASSWORD: ${PASSWORD}
         PROJECT_TITLE: ${PROJECT_TITLE}
         PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
-        COLUMN_NAME: ${COLUMN_NAME}
         
 - tapOn:
     id: "open-create-column-modal-button"

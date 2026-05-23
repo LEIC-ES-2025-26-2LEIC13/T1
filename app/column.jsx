@@ -135,11 +135,12 @@ export default function Column({ projectId, projectName, columnData, columns }) 
     }, [projectId, columnData.id]);
 
 
-    const DraggableTask = ({ item, onPress }) => {
+    const DraggableTask = ({ item, onPress, testID }) => {
         const drag = useReorderableDrag();
         return (
             <ThemedTask
                 task={item}
+                testID={testID}
                 onPress={onPress}
                 onBackground={false}
                 onLongPress={drag}
@@ -149,6 +150,7 @@ export default function Column({ projectId, projectName, columnData, columns }) 
 
     const renderItem = useCallback(({ item }) => (
         <DraggableTask
+            testID={`task-${item.name}-${item.order}`}
             item={item}
             onPress={() => openTaskDetails(item)}
         />
