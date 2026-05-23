@@ -134,6 +134,7 @@ export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
+    const [isAdmin, setIsAdmin] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
     const [alertVisible, setAlertVisible] = useState(false)
@@ -151,7 +152,24 @@ export function AuthProvider({ children }) {
         setIsLoading(true)
         const unsub = authService.subscribeAuthState((currentUser) => {
             setUser(currentUser)
-            setIsLoading(false)
+
+            if (!currentUser) {
+                setIsAdmin(false)
+                setIsLoading(false)
+                return
+            }
+
+            // async check for admin role
+            ;(async () => {
+                try {
+                    const admin = await authService.isAdmin(currentUser)
+                    setIsAdmin(!!admin)
+                } catch (e) {
+                    setIsAdmin(false)
+                } finally {
+                    setIsLoading(false)
+                }
+            })()
         })
 
         return unsub
@@ -186,8 +204,9 @@ export function AuthProvider({ children }) {
         user,
         isLoading,
         googleLogin,
-        logout
-    }), [user, isLoading, googleLogin, logout])
+        logout,
+        isAdmin
+    }), [user, isLoading, googleLogin, logout, isAdmin])
 
     return (
         <AuthContext.Provider value={value}>

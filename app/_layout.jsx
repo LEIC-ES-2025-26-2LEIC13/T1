@@ -18,31 +18,47 @@ function RootNavigator() {
   const colorScheme = useColorScheme() // this is either 'dark' or 'light'
   const theme = Colors[colorScheme] ?? Colors.light
 
-  const { user, isLoading } = useAuth() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
+  const { user, isLoading, isAdmin } = useAuth() // use custom hook to get the value of the state variable user (defined (truthy value) -> logged in; undefined (falsy) -> not logged in)
+  if (isLoading) {
+    return (
+      <>
+        <AppToast />
+        <LoadingScreen loadingText="Logging in..." />
+      </>
+    )
+  }
 
   return (
-      <>
-          <Stack 
-            screenOptions={{
-                headerStyle: { backgroundColor: theme.navBackground },
-                headerTintColor: theme.title
-          }}>
-              {/* Unauthenticated: show intro screen and auth stack */}
-              <Stack.Protected guard={!user}>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name='(auth)' options={{ headerShown: false }} /> 
-              </Stack.Protected>
+    <>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: theme.navBackground },
+          headerTintColor: theme.title,
+        }}
+      >
+        {/* Unauthenticated: show intro screen and auth stack */}
+        <Stack.Protected guard={!user}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack.Protected>
 
-              {/* Authenticated: Show drawer-based stack (maybe pass project header logic to here, to avoid overides inside project, which causes inconsistency in its header.*/}
-              <Stack.Protected guard={!!user}>
-                  <Stack.Screen name='(home)/(drawer)' options={{ headerShown: false }} />
-                  <Stack.Screen name='project' options={{ headerShown: true, title:''}} /> 
-              </Stack.Protected>
-          </Stack>
-          <AppToast />
-          
-          {isLoading && (<LoadingScreen loadingText="Logging in..."/>)}
-      </>
+        {/* Authenticated: Show the appropriate shell based on role */}
+        <Stack.Protected guard={!!user}>
+          {isAdmin && (
+            <Stack.Screen name="(admin)/(drawer)" options={{ headerShown: false }} />
+          )}
+
+          {!isAdmin && (
+            <Stack.Screen name="(home)/(drawer)" options={{ headerShown: false }} />
+          )}
+
+          {!isAdmin && (
+            <Stack.Screen name="project" options={{ headerShown: true, title: "" }} />
+          )}
+        </Stack.Protected>
+      </Stack>
+      <AppToast />
+    </>
   )
 }
 
