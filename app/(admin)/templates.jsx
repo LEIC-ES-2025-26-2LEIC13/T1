@@ -1,91 +1,140 @@
 import React, { useState } from 'react';
 import { StyleSheet, FlatList } from 'react-native';
+import { ProjectColors } from '../../constants/Colors';
+import { useTemplate } from "../../hooks/useTemplate";
 import ThemedText from '../../components/ThemedText';
 import ThemedProject from '../../components/ThemedProject';
 import ThemedButton from '../../components/ThemedButton';
-import CreateProjectModal from '../../components/CreateProjectModal';
+import CreateTemplateModal from "../../components/CreateTemplateModal";
 import EmptyState from '../../components/EmptyState';
 import ThemedAlert, { ALERT_TYPES } from '../../components/ThemedAlert';
 import ThemedView from '../../components/ThemedView';
 import ThemedIcon from '../../components/ThemedIcon';
+import LoadingScreen from "../../components/LoadingScreen";
 
 const Templates = () => {
-  const [templates, setTemplates] = useState([])
 
-  const [modalVisible, setModalVisible] = useState(false)
-  const [template, setTemplate] = useState({ title: '', description: '' })
+    const [templateModalVisible, setTemplateModalVisible] = useState(false);
+    const { templates, createTemplate, isLoadingTemplates } = useTemplate();
 
-  // Alert
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
 
-  const showAlert = (type, title, message) => {
-    setAlert({ type, title, message })
-    setAlertVisible(true)
-  }
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
 
-  const openModal = () => setModalVisible(true)
-  const closeModal = () => {
-    setModalVisible(false)
-    setTemplate({ title: '', description: '' })
-  }
+    const [template, setTemplate] = React.useState({
+        title: '',
+        description: '',
+    });
 
-  const handleChange = (field, value) => setTemplate(prev => ({ ...prev, [field]: value }))
+    const handleTemplateChange = (field, value) => {
+        setTemplate((prev) => ({ ...prev, [field]: value }))
+    };
 
-  const handleCreate = async (data) => {
-    try {
-      const newTemplate = {
-        id: `${Date.now()}`,
-        title: (data.title ?? '').trim(),
-        description: (data.description ?? '').trim(),
-        createdAt: new Date(),
-      }
+    // Template modal
+    const openTemplateModal = () => setTemplateModalVisible(true);
 
-      setTemplates(prev => [newTemplate, ...prev])
-      closeModal()
-    } catch (e) {
-      showAlert(ALERT_TYPES.ERROR, 'Create Template Failed', e.message)
-    }
-  }
+    const closeTemplateModal = () => {
+        setTemplateModalVisible(false)
+        setTemplate({
+            title: '',
+            description: '',
+        });
+    };
 
-  return (
-    <ThemedView style={styles.container}>
-      <>
-          <FlatList
-            data={templates}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={[styles.list, (templates.length === 0) && styles.listEmpty]}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={<EmptyState title="No templates" subtitle="Create templates here" iconName="file-document" />}
-            renderItem={({ item, index }) => (
-              <ThemedProject name={item.title} description={item.description} borderColor={'#888'} />
-            )}
-          />
+    const handleCreateTemplate = async (template) => {
+        try {
+            await createTemplate(template)
+            closeTemplateModal()
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, 'Create Template Failed', error.message)
+        }
+    };
 
-          <ThemedButton style={{ marginBottom: 16 }} onPress={openModal}>
-            <ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} />
-            <ThemedText bold onPrimary>Create Template</ThemedText>
-          </ThemedButton>
 
-          <CreateProjectModal
-            visible={modalVisible}
-            onClose={closeModal}
-            onCreate={handleCreate}
-            project={template}
-            onChange={handleChange}
-            // repurpose modal for templates; labels remain generic
-          />
+    return (
+        <ThemedView style={styles.container}>
+            {
+                isLoadingTemplates ?
 
-          <ThemedAlert visible={alertVisible} alert={alert} onConfirm={() => setAlertVisible(false)} />
-        </>
-    </ThemedView>
-  )
+                <LoadingScreen loadingText="Loading Templates..."/>
+
+                :
+                <>
+                    <FlatList
+                        data={templates}
+                        keyExtractor={(item, index) => `${item.title}-${index}`}
+
+                        contentContainerStyle={[
+                            styles.list,
+                            (templates.length === 0) && styles.listEmpty
+                        ]}
+
+                        showsVerticalScrollIndicator={false}
+
+                        ListEmptyComponent={<EmptyState
+                            title="No templates"
+                            subtitle="When you create a template it will appear here"
+                            iconName="folder-open"
+                        />}
+
+                        renderItem={({ item, index }) => (
+                            <ThemedProject
+                                name={item.title}
+                                description={item.description}
+                                borderColor={ProjectColors[index % ProjectColors.length]}
+                            />
+                        )}
+                    />
+
+
+                    <ThemedButton
+                        testID="open-create-template-modal-button"
+                        style={{ marginBottom: 16 }}
+                        disabled={isLoadingTemplates}
+                        onPress={openTemplateModal}>
+                        <ThemedIcon name="plus" onPrimary style={{ marginRight: 6 }} />
+                        <ThemedText bold onPrimary>Create Template</ThemedText>
+                    </ThemedButton>
+
+                    <CreateTemplateModal
+                        visible={templateModalVisible}
+                        onClose={closeTemplateModal}
+                        onCreate={handleCreateTemplate}
+                        project={template}
+                        onChange={handleTemplateChange}
+                    />
+
+                    <ThemedAlert
+                        visible={alertVisible}
+                        alert={alert}
+                        onConfirm={() => setAlertVisible(false)}
+                    />
+                </>
+            }
+
+        </ThemedView>
+    );
 }
 
-export default Templates
+export default Templates;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 16 },
-  list: { paddingVertical: 16 },
-  listEmpty: { flex: 1, marginTop: 50 }
+    container: {
+        flex: 1,
+        paddingHorizontal: 16,
+    },
+
+    list: {
+        paddingVertical: 16,
+    },
+
+    listEmpty: {
+        flex: 1,
+        marginTop: 50
+    }
 })
