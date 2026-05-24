@@ -3,6 +3,7 @@
 export const COLLECTIONS = {
     USERS: 'users',
     PROJECTS: 'projects',
+    TEMPLATES: 'templates',
     ADMIN: 'admin',
 };
 
@@ -13,5 +14,7 @@ export const SUBCOLLECTIONS = {
     PROJECT_USERS: 'projectUsers',
     //PROJECT_TASKS: 'projectTasks',
     PROJECT_COLUMNS: 'projectColumns',
-    COLUMN_TASKS: 'columnTasks',  
+    COLUMN_TASKS: 'columnTasks',
+    TEMPLATE_COLUMNS: 'templateColumns',
+    COLUMN_TEMPLATES: 'columnTemplates',
 };

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar'
 import { Colors } from '../constants/Colors'
 import { AuthProvider } from '../contexts/authContext'
 import { ProjectProvider } from '../contexts/projectContext'
+import { TemplateProvider } from '../contexts/templateContext'
 import { InviteProvider } from '../contexts/inviteContext'
 import { useAuth } from '../hooks/useAuth'
 import { MenuProvider } from 'react-native-popup-menu';
@@ -67,12 +68,14 @@ const RouteLayout = () => {
     <MenuProvider>
       <AuthProvider>
         <ProjectProvider>
-          <ColumnProvider>
-              <InviteProvider>
-                <StatusBar value="auto" />
-                <RootNavigator />
-            </InviteProvider>
-          </ColumnProvider>
+          <TemplateProvider>
+            <ColumnProvider>
+                <InviteProvider>
+                  <StatusBar value="auto" />
+                  <RootNavigator />
+              </InviteProvider>
+            </ColumnProvider>
+          </TemplateProvider>
         </ProjectProvider>
       </AuthProvider>
     </MenuProvider>
