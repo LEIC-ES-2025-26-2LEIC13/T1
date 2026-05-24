@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
-const ThemedProject = ({ name, description, borderColor, href, projectId, testID }) => {
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onPress = null, selected = null }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -43,17 +43,25 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                     </ThemedText>
                 ) : null}
 
+                {selected && ( // flag used in template project selection
+                    <View style={styles.footer}>
+                        <ThemedIcon name="check-circle"/>
+                    </View>
+                )}
+
+                {!selected && (
                 <View style={styles.footer}>
                     <Text style={[styles.openLabel, { color: borderColor }]}>Open</Text>
                     <ThemedIcon name="open-in-new" size={18} style={{ color: borderColor }}/>
                 </View>
+                )}
             </View>
         </View>
     )
 
     return (
         <AnimatedPressable
-            onPress={handlePress}
+            onPress={onPress || handlePress}
             testID={testID}
             style={{ marginVertical: 6 }}
         > 
