@@ -26,38 +26,46 @@ export default function CreateProjectModal({
     const theme = Colors[colorScheme] ?? Colors.light
 
     const [step, setStep] = useState(1); // 1: Choose type, 2: Template, 3: Custom
-    const [templates, setTemplates] = useState([]);
-    const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState(null);
+    const [templates, setTemplates] = useState([])
+    const [isLoadingTemplates, setIsLoadingTemplates] = useState(false)
+    const [selectedTemplate, setSelectedTemplate] = useState(null)
+
+   
 
     // Alert
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+    const [alertVisible, setAlertVisible] = useState(false)
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' })
 
     const showAlert = (type, title, message) => {
-        setAlert({ type, title, message });
-        setAlertVisible(true);
+        setAlert({ type, title, message })
+        setAlertVisible(true)
     };
 
     useEffect(() => {
         if (visible) {
-            setStep(1);
+            setStep(1)
         }
-    }, [visible]);
+    }, [visible])
 
-    const optionTemplate = "Template Project";
-    const optionCustom = "Custom Project";
+    const optionTemplate = "Template Project"
+    const optionCustom = "Custom Project"
 
     const handleChooseType = (optionName) => {
         if (optionName === optionTemplate) {
             setStep(2);
-            setIsLoadingTemplates(true);
+            setIsLoadingTemplates(true)
             try {
-                setTemplates([]); // TODO: Fetch templates from backend
-                setIsLoadingTemplates(false);
+                 setTemplates(
+                    [
+                        { id: '1', title: 'Blog Website', description: 'A simple blog website template with Next.js and Tailwind CSS.' },
+                        { id: '2', title: 'E-commerce Store', description: 'An e-commerce store template built with React and Stripe integration.' },
+                        { id: '3', title: 'Portfolio Website', description: 'A personal portfolio website template using Gatsby and GraphQL.' },
+                    ]
+                )
+                setIsLoadingTemplates(false)
             } catch (error) {
-                showAlert(ALERT_TYPES.ERROR, "Failed to Load Templates", error.message);
-                setIsLoadingTemplates(false);
+                showAlert(ALERT_TYPES.ERROR, "Failed to Load Templates", error.message)
+                setIsLoadingTemplates(false)
             }
 
         } else if (optionName === optionCustom) {
@@ -65,8 +73,8 @@ export default function CreateProjectModal({
         }
     }
 
-    const choice = (title, description, iconName) => (
-        <AnimatedPressable onPress={() => handleChooseType(title)}>
+    const choice = (testID, title, description, iconName) => (
+        <AnimatedPressable testID={testID} onPress={() => handleChooseType(title)}>
             <View style={[styles.choiceContainer, { borderColor: theme.borders }]}>
                 <ThemedIcon name={iconName}/>
                 <ThemedText title bold style={{ marginTop: 10 }}>{title}</ThemedText>
@@ -84,12 +92,31 @@ export default function CreateProjectModal({
             />
 
             <ModalBody>
-                {choice(optionTemplate, "Start with a pre-defined template for a L.EIC project", "lightning-bolt")}
-                {choice(optionCustom, "Create a new project from scratch", "folder-plus")}
+                {choice("choice-template-project", optionTemplate, "Start with a pre-defined template for a L.EIC project", "lightning-bolt")}
+                {choice("choice-custom-project", optionCustom, "Create a new project from scratch", "folder-plus")}
             </ModalBody>
 
         </>
     )
+
+    const handleSelectTemplate = (template) => {
+        if (template === selectedTemplate) {
+            setSelectedTemplate(null)
+            onChange('title', '')
+            onChange('description', '')
+        } else {
+            setSelectedTemplate(template)
+            onChange('title', template.title)
+            onChange('description', template.description)
+        }
+    }
+
+    const handleGoBackToChoice = () => {
+        setStep(1)
+        setSelectedTemplate(null)
+        onChange('title', '')
+        onChange('description', '')
+    }
 
     const templateProject = (
         <>
@@ -103,18 +130,16 @@ export default function CreateProjectModal({
                 <View style={{ height: 300 }}>
 
                     {isLoadingTemplates ?  <LoadingScreen loadingText="Loading template projects..."/> :
-                
-               
+
                     <FlatList
                         data={templates}
                         keyExtractor={item => item.id}
-                        showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
                             <ThemedProject
-                                name={item.name}
+                                name={item.title}
                                 description={item.description}
-                                borderColor={theme.borders}
-                                onPress={() => setSelectedTemplate(item)}
+                                borderColor={Colors.primary}
+                                onPress={() => handleSelectTemplate(item)}
                                 selected={selectedTemplate?.id === item.id}
                             />
                         )}
@@ -125,7 +150,7 @@ export default function CreateProjectModal({
             </ModalBody>
 
             <ModalActions
-                onCancel={() => {setStep(1); setSelectedTemplate(null);}}
+                onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(selectedTemplate)}
@@ -164,7 +189,7 @@ export default function CreateProjectModal({
 
             <ModalActions
                 testID="create-project-modal-actions"
-                onCancel={() => {setStep(1); onChange('title', ''); onChange('description', '');}}
+                onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
                 onPrimaryActionPress={() => onCreate(project)}

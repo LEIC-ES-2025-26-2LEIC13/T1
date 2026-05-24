@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
+// onPress and selected are used together when chossing a project template
 const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onPress = null, selected = null }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
@@ -22,7 +23,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
         }
     }
 
-    const gradientColors = [borderColor, `${borderColor}55`]
+    const gradientColors =  [borderColor, `${borderColor}55`]
 
     const CardContent = (
         <View style={[styles.card, { backgroundColor: theme.navBackground }]}>
@@ -33,9 +34,14 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                 style={styles.accentBar}
             />
             <View style={styles.content}>
-                <ThemedText title bold style={styles.name}>
-                    {name}
-                </ThemedText>
+                
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <ThemedText title bold style={styles.name}>
+                        {name}
+                    </ThemedText>
+
+                    {selected && <ThemedIcon style={{ color: Colors.primary }} name="check-circle"/>} 
+                </View>
 
                 {description ? (
                     <ThemedText style={styles.description}>
@@ -43,13 +49,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                     </ThemedText>
                 ) : null}
 
-                {selected && ( // flag used in template project selection
-                    <View style={styles.footer}>
-                        <ThemedIcon name="check-circle"/>
-                    </View>
-                )}
-
-                {!selected && (
+                {!selected && !onPress && (
                 <View style={styles.footer}>
                     <Text style={[styles.openLabel, { color: borderColor }]}>Open</Text>
                     <ThemedIcon name="open-in-new" size={18} style={{ color: borderColor }}/>
