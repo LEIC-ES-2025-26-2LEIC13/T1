@@ -113,6 +113,7 @@ export default function TaskModal({
             <ThemedView style={styles.columnNav}>
                 {prevColumn ? (
                     <AnimatedPressable
+                        testID="move-task-prev-column-button"
                         style={styles.moveButton}
                         onPress={() => handleMove(prevColumn)}
                     >
@@ -130,6 +131,7 @@ export default function TaskModal({
 
                 {nextColumn ? (
                     <AnimatedPressable
+                        testID="move-task-next-column-button"
                         style={styles.moveButton}
                         onPress={() => handleMove(nextColumn)}
                     >

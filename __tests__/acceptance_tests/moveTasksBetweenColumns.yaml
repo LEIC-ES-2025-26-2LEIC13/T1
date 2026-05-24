@@ -1,0 +1,70 @@
+appId: com.anonymous.LEICo
+tags:
+    - task
+    - column
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    PROJECT_TITLE: "Test-Move-Tasks-Between-Columns"
+    PROJECT_DESCRIPTION: "Description"
+    COLUMN1_NAME: "To-Do"
+    COLUMN2_NAME: "In-Progress"
+    TASK_NAME: "Task-Name"
+    TASK_DESCRIPTION: "Task-Description"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/openProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        PROJECT_TITLE: ${PROJECT_TITLE}
+        PROJECT_DESCRIPTION: ${PROJECT_DESCRIPTION}
+
+# Create first column
+- tapOn:
+    id: "open-create-column-modal-button"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN1_NAME}
+- hideKeyboard
+- tapOn:
+    id: "create-column-modal-actions-create"
+- assertVisible: ${COLUMN1_NAME}
+
+# Create second column
+- tapOn:
+    id: "create-column-icon"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN2_NAME}
+- hideKeyboard
+- tapOn:
+    id: "create-column-modal-actions-create"
+
+# Create task in the first column
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- hideKeyboard
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+- tapOn: 
+    id: "create-task-modal-actions-create"
+
+# Move task to the second column
+- tapOn: "${TASK_NAME}, ${TASK_DESCRIPTION}"
+- tapOn:
+    id: "move-task-next-column-button"
+
+# Assert the task is not in the first column
+- assertVisible: ${COLUMN1_NAME}
+- assertVisible: "No tasks yet"
+
+# Assert the task is in the second column
+- swipe:
+    direction: LEFT
+- assertVisible: ${COLUMN2_NAME}
+- assertVisible: "${TASK_NAME}, ${TASK_DESCRIPTION}"

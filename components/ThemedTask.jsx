@@ -7,7 +7,7 @@ import Pill from './Pill';
 import { LABELS } from '../constants/Labels';
 import AnimatedPressable from './AnimatedPressable';
 
-export default function ThemedTask({ task, onPress, onBackground, onLongPress }) {
+export default function ThemedTask({ task, onPress, onBackground, onLongPress, testID }) {
     
     const colorScheme = useColorScheme();
     const theme = Colors[colorScheme] ?? Colors.light;
@@ -19,6 +19,7 @@ export default function ThemedTask({ task, onPress, onBackground, onLongPress })
             onPress={onPress}
             onLongPress={onLongPress}
             delayLongPress={150}
+            testID={testID}
             style= {{marginVertical: 6}}
         >
             <ThemedView style={[ styles.card, { borderColor: theme.borders }, onBackground && { backgroundColor: theme.navBackground } ]}> 
