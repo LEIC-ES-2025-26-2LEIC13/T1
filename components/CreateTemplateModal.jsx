@@ -17,7 +17,7 @@ export default function CreateTemplateModal({
 
             <ModalHeader
                 heading="New Template"
-                iconName="copy-outline"
+                iconName="content-copy"
                 onClose={onClose}
             />
 
