@@ -4,6 +4,10 @@ import { db } from '../firebase/firebaseConfig';
 
 // Allows to centralize the logic of building document references and collection references, minimizing repetition
 export const pathHelper = {
+    // admin related
+
+    admin: (userId) => doc(db, COLLECTIONS.ADMIN, userId),
+
     // User Related
     user: (userId) => doc(db, COLLECTIONS.USERS, userId),
 

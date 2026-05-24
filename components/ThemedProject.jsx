@@ -12,6 +12,11 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     const theme = Colors[colorScheme] ?? Colors.light
 
     const handlePress = () => {
+        if (href) {
+            router.push(href)
+            return
+        }
+
         if (projectId) {
             router.push({ pathname: '/project', params: { projectId } })
         }

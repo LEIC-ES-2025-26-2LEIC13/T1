@@ -14,7 +14,9 @@
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "api/**/*.{js,jsx,ts,tsx}",
@@ -29,6 +31,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-google-signin/google-signin": "^16.1.2",
     "@react-native-menu/menu": "^2.0.0",
     "@react-navigation/drawer": "^7.9.4",
     "expo": "^55.0.23",

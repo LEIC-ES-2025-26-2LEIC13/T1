@@ -158,5 +158,3 @@ export const columnService = {
         await batchOps(db, operations)
     }
 }
-
-// Reorderable columns could be implmented, similarly to tasks
