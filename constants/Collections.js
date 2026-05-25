@@ -17,4 +17,5 @@ export const SUBCOLLECTIONS = {
     COLUMN_TASKS: 'columnTasks',
     TEMPLATE_COLUMNS: 'templateColumns',
     COLUMN_TEMPLATES: 'columnTemplates',
+    SUGGESTIONS: 'suggestions',
 };

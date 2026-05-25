@@ -62,4 +62,12 @@ export const pathHelper = {
     columnTemplate: (templateId, columnId, taskId) =>
         doc(db, COLLECTIONS.TEMPLATES, templateId,
             SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TEMPLATES, taskId),
+
+    // Suggestion Related
+
+    adminSuggestions: () =>
+        collection(db, COLLECTIONS.ADMIN, 'admin', SUBCOLLECTIONS.SUGGESTIONS),
+
+    adminSuggestion: (suggestionId) =>
+        doc(db, COLLECTIONS.ADMIN, 'admin', SUBCOLLECTIONS.SUGGESTIONS, suggestionId),
 }
