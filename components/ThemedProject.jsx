@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
-const ThemedProject = ({ name, description, borderColor, href, projectId, testID }) => {
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onLongPress }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -54,6 +54,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     return (
         <AnimatedPressable
             onPress={handlePress}
+            onLongPress={onLongPress}
             testID={testID}
             style={{ marginVertical: 6 }}
         > 
