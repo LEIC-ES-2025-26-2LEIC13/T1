@@ -1,4 +1,4 @@
-import { doc, getCountFromServer, onSnapshot, Timestamp, writeBatch, orderBy, query } from "firebase/firestore";
+import { doc, getDoc, getCountFromServer, onSnapshot, Timestamp, writeBatch, orderBy, query } from "firebase/firestore";
 import { pathHelper } from "./pathHelper";
 import { db } from "../firebase/firebaseConfig";
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
@@ -176,22 +176,64 @@ export const taskService = {
         const normalizedTaskData = normalizeTaskData(taskData)
         const operations = []
 
+        const taskRef = pathHelper.columnTask(projectId, columnId, taskId)
+        const taskSnap = await getDoc(taskRef)
+
+        if (!taskSnap.exists()) {
+            throw new Error("Task not found");
+        }
+
+        const oldTaskData = taskSnap.data()
+        const oldAssignedIds = (oldTaskData.assignedMembers || []).map(m => m.id)
+        const newAssignedIds = (taskData.assignedMembers || []).map(m => m.id)
+
+        const addedIds = newAssignedIds.filter(id => !oldAssignedIds.includes(id))
+        const removedIds = oldAssignedIds.filter(id => !newAssignedIds.includes(id))
+        const keptIds = newAssignedIds.filter(id => oldAssignedIds.includes(id))
+
         // Update task in column
         operations.push({
             type: OPERATION_TYPES.UPDATE,
-            ref: pathHelper.columnTask(projectId, columnId, taskId),
+            ref: taskRef,
             data: normalizedTaskData
         })
 
-        // Update task in each assigned member's user tasks
-        if (taskData.assignedMembers && taskData.assignedMembers.length > 0) {
-            for (const { id: memberId } of taskData.assignedMembers) {
+        // Handle newly assigned members
+        if (addedIds.length > 0) {
+            const projectSnap = await getDoc(pathHelper.project(projectId))
+            const columnSnap = await getDoc(pathHelper.projectColumn(projectId, columnId))
+
+            for (const memberId of addedIds) {
                 operations.push({
-                    type: OPERATION_TYPES.UPDATE,
+                    type: OPERATION_TYPES.SET,
                     ref: pathHelper.userTask(memberId, taskId),
-                    data: normalizedTaskData
+                    data: {
+                        ...normalizedTaskData,
+                        projectId: projectId,
+                        projectName: projectSnap.data().title,
+                        columnId: columnId,
+                        columnName: columnSnap.data().name,
+                        createdAt: oldTaskData.createdAt
+                    }
                 })
             }
+        }
+
+        // Handle removed members
+        for (const memberId of removedIds) {
+            operations.push({
+                type: OPERATION_TYPES.DELETE,
+                ref: pathHelper.userTask(memberId, taskId)
+            })
+        }
+
+        // Handle kept members
+        for (const memberId of keptIds) {
+            operations.push({
+                type: OPERATION_TYPES.UPDATE,
+                ref: pathHelper.userTask(memberId, taskId),
+                data: normalizedTaskData
+            })
         }
 
         await batchOps(db, operations)

@@ -14,7 +14,10 @@ env:
     env:
         EMAIL: ${EMAIL}
         PASSWORD: ${PASSWORD}
-- tapOn: "+, Create Project"
+- tapOn:
+    id: "open-create-project-modal-button"
+- tapOn:
+    id: "choice-custom-project"
 - tapOn: "Enter project title"
 - inputText: ${PROJECT_TITLE}
 - tapOn: "Enter project description (optional)"

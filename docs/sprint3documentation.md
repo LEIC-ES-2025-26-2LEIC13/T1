@@ -1,5 +1,82 @@
 # Sprint 3 Documentation
 
+## Updated database structure
+
+``` text
+/
+├─ users                      (collection)
+│  └─ {userId}                (user document)
+│     ├─ email
+│     ├─ userProjects         (subcolletion)
+│     │  └─ {projectId}       (subcolletion document)
+│     │     ├─ title		-
+│     │     └─ description	-
+│     │
+│     ├─ userInvites
+│     │  └─ {inviteId}
+│     │     ├─ createdAt
+│     │     ├─ projectId
+│     │     ├─ projectName
+│     │     ├─ senderId
+│     │     └─ senderEmail
+│     │
+│     └─ userTasks
+│        └─ {taskId}
+│           ├─ name
+│           ├─ description
+│           ├─ label
+|           ├─ assignedMembers
+|           ├─ projectId
+│           ├─ projectName
+|           ├─ columnId
+│           ├─ columnName
+│           └─ createdAt
+│
+├─ projects
+|  └─ {projectId}
+|     ├─ title
+|     ├─ description
+|     ├─ createdBy
+|     ├─ columnCount
+|     │
+|     ├─ projectUsers
+|     │  └─ {userId}
+|     │     └─ email
+|     │
+|     └─ projectColumns
+|         └─ {columnId}
+|             ├─ name
+|             ├─ order
+|             ├─ createdAt
+|             │
+|             └─ columnTasks
+|                 └─ {taskId}
+|                     ├─ name
+|                     ├─ description
+|                     ├─ label
+|                     ├─ assignedMembers
+|                     ├─ order
+|                     └─ createdAt
+|
+└─ templates
+   └─ {templateId}
+      ├─ title
+      ├─ description
+      ├─ columnCount
+      │
+      └─ templateColumns
+          └─ {columnId}
+			 ├─ name
+ 			 ├─ order
+ 			 │
+ 			 └─ templateColumnTasks
+ 			    └─ {taskId}
+ 			       ├─ name
+			       ├─ description
+			       └─ order
+```
+
+
 ## Google Sign-In Update
 
 The login flow was updated so that authentication is now centered around Google Sign-In instead of the previous email/password entry point. The intro page now shows a Google sign-in button and triggers the authentication flow from there, keeping the entry experience simpler for the user.
@@ -67,3 +144,17 @@ These two commits mainly reworked the authentication and navigation entry flow:
 * The app now switches between two different navigation structures depending on the user role.
 
 The result is a cleaner entry point for regular users and a separate space for admin-only functionality.
+## Project Reordering
+
+The project tab now supports drag-and-drop reordering, using the same interaction style as columns and tasks.
+
+### Implementation
+
+* Project order is stored per user inside `userProjects`, so each collaborator can keep a personal project order.
+* Projects are read with `orderBy('order', 'asc')` to keep the list sorted by the saved order field.
+* Reordering updates only the affected `userProjects` documents by writing the new `order` values in a batch.
+* When a project is created, it receives the next available order value for that user, starting at `0`.
+
+### Result
+
+This keeps the project list stable, collaborative, and customizable without changing the shared project data itself.

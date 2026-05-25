@@ -41,6 +41,7 @@ export default function ProjectScreen() {
 	const [ editProjectData, setEditProjectData ] = useState({ title: '', description: '' })
 	const [ inviteModalVisible, setInviteModalVisible ] = useState(false)
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false)
+	const [ isProjectFromTemplate, setIsProjectFromTemplate ] = useState(false)
 
 	// Search for current project in the user's projects
 	const projectId = params.projectId
@@ -58,7 +59,20 @@ export default function ProjectScreen() {
 	
 	// sets projectId for Task context
 	useEffect(() => {
-		setActiveProjectId(projectId ?? '')
+		const fetchTemplateStatus = async () => {
+			setActiveProjectId(projectId ?? '')
+
+			if (projectId) {
+				try {
+					const isFromTemplate = await projectService.isProjectFromTemplate(projectId)
+					setIsProjectFromTemplate(isFromTemplate)
+				} catch (error) {
+					showAlert(ALERT_TYPES.ERROR, "Failed to determine if the project is from a template", error.message)
+				}
+			}
+		}
+
+		fetchTemplateStatus()
 
 		return () => {
 			setActiveProjectId('')
@@ -253,6 +267,77 @@ export default function ProjectScreen() {
 		}
     }
 
+	let actions
+	if (isProjectFromTemplate) {
+		actions = [
+			{	
+				testID: "invite-member-action",
+				id: 'invite-member',
+				title: 'Invite member',
+				icon: 'account-plus',
+				onPress: () => handleInvitePress(),
+			},
+			{
+				testID: "edit-project-action",
+				id: 'edit-project',
+				title: 'Edit Project',
+				icon: 'cog-outline',
+				onPress: () => handleEditProjectPress(),
+			},
+			{
+				testID: "suggest-improvements-action",
+				id: 'suggest-improvements',
+				title: 'Suggest improvements',
+				icon: 'lightbulb',
+				onPress: () => showAlert(ALERT_TYPES.INFO, 'Suggest improvements', 'This feature is not implemented yet.'),
+			},
+			{
+				testID: "delete-project-action",
+				id: 'delete-project',
+				title: 'Delete project',
+				icon: 'delete',
+				confirm: {
+					title: 'Delete Project',
+					message: 'Are you sure you want to delete this project? All related data will be lost.',
+				},
+				destructive: true, // If we place a string of text that is not null, 
+				// it will be marked as a destructive action
+				onPress: () => handleProjectDelete(),
+			}
+		]
+
+	} else {
+		actions = [
+			{	
+				testID: "invite-member-action",
+				id: 'invite-member',
+				title: 'Invite member',
+				icon: 'account-plus',
+				onPress: () => handleInvitePress(),
+			},
+			{
+				testID: "edit-project-action",
+				id: 'edit-project',
+				title: 'Edit Project',
+				icon: 'cog-outline',
+				onPress: () => handleEditProjectPress(),
+			},
+			{
+				testID: "delete-project-action",
+				id: 'delete-project',
+				title: 'Delete project',
+				icon: 'delete',
+				confirm: {
+					title: 'Delete Project',
+					message: 'Are you sure you want to delete this project? All related data will be lost.',
+				},
+				destructive: true, // If we place a string of text that is not null, 
+				// it will be marked as a destructive action
+				onPress: () => handleProjectDelete(),
+			}
+		]
+	}
+
   	return (
 		<>
 			<Stack.Screen
@@ -281,35 +366,7 @@ export default function ProjectScreen() {
 
 							<OverflowMenu
 								testID="project-overflow-menu"
-								actions={[
-									{	
-										testID: "invite-member-action",
-										id: 'invite-member',
-										title: 'Invite member',
-										icon: 'account-plus',
-										onPress: () => handleInvitePress(),
-									},
-									{
-										testID: "edit-project-action",
-										id: 'edit-project',
-										title: 'Edit Project',
-										icon: 'cog-outline',
-										onPress: () => handleEditProjectPress(),
-									},
-									{
-										testID: "delete-project-action",
-										id: 'delete-project',
-										title: 'Delete project',
-										icon: 'delete',
-										confirm: {
-											title: 'Delete Project',
-											message: 'Are you sure you want to delete this project? All related data will be lost.',
-										},
-										destructive: true, // If we place a string of text that is not null, 
-										// it will be marked as a destructive action
-										onPress: () => handleProjectDelete(),
-									}
-								]}
+								actions={actions}
 							/>
 						</>
 					)				

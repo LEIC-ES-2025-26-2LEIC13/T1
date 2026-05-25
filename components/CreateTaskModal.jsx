@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, ScrollView } from 'react-native';
 import AppModal from './AppModal';
 import ModalHeader from './modal/ModalHeader';
@@ -10,7 +10,6 @@ import ModalActions from './modal/ModalActions';
 import { LABELS } from '../constants/Labels';
 import { LabelColors } from '../constants/Colors';
 import AssignMembersSection from './AssignMembersSection';
-import ThemedAlert from "./ThemedAlert";
 
 
 export default function CreateTaskModal({
@@ -22,16 +21,8 @@ export default function CreateTaskModal({
     task,
     onChange,
     getProjectUsers,
+    template = false
 }) {
-    // Alert
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
-
-    const showAlert = (type, title, message) => {
-        setAlert({ type, title, message });
-        setAlertVisible(true);
-    };
-
     const isPreset = LABELS.some(label => label.name === task.label)
 
     const labels = (
@@ -92,21 +83,25 @@ export default function CreateTaskModal({
                                     multiline
                                 />
 
-                                <FormField
-                                    labelName="LABELS"
-                                    placeholder="Enter or select label"
-                                    value={isPreset ? "" : task.label}
-                                    onChangeText={(text) => onChange('label', text)}
-                                />
+                                {!template && (
+                                    <FormField
+                                        labelName="LABELS"
+                                        placeholder="Enter or select label"
+                                        value={isPreset ? "" : task.label}
+                                        onChangeText={(text) => onChange('label', text)}
+                                    />
+                                )}
+                                
+                                {!template && labels}
 
-                                {labels}
-
-                                <AssignMembersSection
-                                    assignedMembers={task.assignedMembers}
-                                    onAssignedMembersChange={(members) => onChange('assignedMembers', members)}
-                                    getProjectUsers={getProjectUsers}
-                                    visible={visible}
-                                />
+                                {!template && (
+                                    <AssignMembersSection
+                                        assignedMembers={task.assignedMembers}
+                                        onAssignedMembersChange={(members) => onChange('assignedMembers', members)}
+                                        getProjectUsers={getProjectUsers}
+                                        visible={visible}
+                                    />
+                                )}
 
                             </ModalBody>
                         </ScrollView>
@@ -123,12 +118,6 @@ export default function CreateTaskModal({
                     />
                 </>
             </AppModal>
-
-            <ThemedAlert
-                visible={alertVisible}
-                alert={alert}
-                onConfirm={() => setAlertVisible(false)} 
-            />
         </>
     );
 }

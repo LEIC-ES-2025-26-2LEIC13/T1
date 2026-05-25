@@ -34,7 +34,7 @@ const Profile = () => {
                     <ThemedText bold style={styles.userName}>
                         {user?.email?.split('@')[0] || 'User'}
                     </ThemedText>
-                    <ThemedText style={[styles.userEmail, { color: theme.textSecondary }]}>
+                    <ThemedText style={[styles.userEmail]}>
                         {user?.email}
                     </ThemedText>
                 </ThemedView>

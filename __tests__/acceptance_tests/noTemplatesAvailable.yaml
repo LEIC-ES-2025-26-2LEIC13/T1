@@ -1,0 +1,28 @@
+appId: com.anonymous.LEICo
+tags:
+    - template
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+
+- tapOn:
+    id: "open-create-project-modal-button"
+- tapOn:
+    id: "choice-template-project"
+- assertVisible: "No template projects available"
+- assertVisible: "When a template project is available, it will appear here"
+
+# Assert Create button is disabled
+- tapOn:
+    id: "template-project-modal-actions-create"
+- assertVisible: "No template projects available"
+

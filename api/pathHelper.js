@@ -55,13 +55,13 @@ export const pathHelper = {
     templateColumn: (templateId, columnId) =>
         doc(db, COLLECTIONS.TEMPLATES, templateId, SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId),
 
-    columnTemplates: (templateId, columnId) =>
+    templateColumnTasks: (templateId, columnId) =>
         collection(db, COLLECTIONS.TEMPLATES, templateId,
-            SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TEMPLATES),
+            SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId, SUBCOLLECTIONS.TEMPLATE_COLUMN_TASKS),
 
-    columnTemplate: (templateId, columnId, taskId) =>
+    templateColumnTask: (templateId, columnId, taskId) =>
         doc(db, COLLECTIONS.TEMPLATES, templateId,
-            SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId, SUBCOLLECTIONS.COLUMN_TEMPLATES, taskId),
+            SUBCOLLECTIONS.TEMPLATE_COLUMNS, columnId, SUBCOLLECTIONS.TEMPLATE_COLUMN_TASKS, taskId),
 
     // Suggestion Related
 
