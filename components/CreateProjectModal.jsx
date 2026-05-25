@@ -55,7 +55,6 @@ export default function CreateProjectModal({
             setIsLoadingTemplates(true)
             try {
                 const templateProjects =  await getTemplateProjects()
-                console.log(templateProjects)
                 setTemplates(templateProjects)
                 setIsLoadingTemplates(false)
             } catch (error) {

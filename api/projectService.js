@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, getDocs, writeBatch, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, getDoc, getDocs, writeBatch, where } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
@@ -12,7 +12,7 @@ function normalizeProjectData({ title, description }) {
     }
 }
 
-function normalizeProjectUpdates( { title, description }) {
+function normalizeProjectUpdates( { title, description, templateId  }) {
     if (title !== undefined) {
         title = (title ?? '').trim();
         if (!title) throw new Error('Project title cannot be empty');
@@ -22,7 +22,7 @@ function normalizeProjectUpdates( { title, description }) {
         description = (description ?? '').trim();
     }
 
-    return { title, description };
+    return { title, description, templateId };
 }
 
 export const projectService = {
@@ -81,14 +81,15 @@ export const projectService = {
     },
 
     updateProject: async (projectId, updates) => {
-        const { title, description } = normalizeProjectUpdates(updates)
-        if (!title && !description) {
+        const { title, description, templateId } = normalizeProjectUpdates(updates)
+        if (!title && !description && !templateId) {
             return // no updates
         }
 
         const dataToUpdate = {}
         if (title !== undefined) dataToUpdate.title = title
         if (description !== undefined) dataToUpdate.description = description
+        if (templateId !== undefined) dataToUpdate.templateId = templateId
         
         const operations = []
 
@@ -193,5 +194,15 @@ export const projectService = {
         const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnap = await getDocs(projectUsersRef)
         return projectUsersSnap.empty
+    },
+
+    isProjectFromTemplate: async (projectId) => {
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
+        const projectSnap = await getDoc(projectRef)
+        if (!projectSnap.exists()) {
+            throw new Error("Project not found")
+        }
+
+        return projectSnap.data().templateId !== undefined
     }
 }

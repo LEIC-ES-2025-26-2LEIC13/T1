@@ -79,6 +79,9 @@ export const templateService = {
 
         const projectRef = await projectService.createProject(userId, userEmail, templateData)
 
+        // Add a field to the project document to keep track of the template it was created from
+        await projectService.updateProject(projectRef.id, { templateId: templateData.id })
+
         // Get all columns of the template to copy
         const templateColumnsQuery = query(pathHelper.templateColumns(templateData.id), orderBy('order', 'asc'))
         const templateColumnsSnap = await getDocs(templateColumnsQuery)

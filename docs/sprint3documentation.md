@@ -34,29 +34,29 @@
 │
 ├─ projects
 |  └─ {projectId}
-|     ├─ title			-
-|     ├─ description	-
-|     ├─ createdBy		-
-|     ├─ columnCount	-
+|     ├─ title
+|     ├─ description
+|     ├─ createdBy
+|     ├─ columnCount
 |     │
 |     ├─ projectUsers
 |     │  └─ {userId}
-|     │     └─ email	-
+|     │     └─ email
 |     │
 |     └─ projectColumns
 |         └─ {columnId}
-|             ├─ name	+
-|             ├─ order	+
-|             ├─ createdAt	+
+|             ├─ name
+|             ├─ order
+|             ├─ createdAt
 |             │
 |             └─ columnTasks
 |                 └─ {taskId}
-|                     ├─ name	+
-|                     ├─ description	+
+|                     ├─ name
+|                     ├─ description
 |                     ├─ label
 |                     ├─ assignedMembers
-|                     ├─ order	+
-|                     └─ createdAt	+
+|                     ├─ order
+|                     └─ createdAt
 |
 └─ templates
    └─ {templateId}
@@ -74,7 +74,6 @@
  			       ├─ name
 			       ├─ description
 			       └─ order
-			
 ```
 
 
