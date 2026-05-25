@@ -19,7 +19,6 @@ export default function ProjectScreen() {
 
   	const { templates, deleteTemplate, columns, setActiveTemplateId, createColumn } = useTemplate();
 	const [deleting, setDeleting] = useState(false) 
-	const [leaving, setLeaving] = useState(false)
 
 	const [ createColumnModalVisible, setCreateColumnModalVisible ] = useState(false)
 
@@ -49,12 +48,12 @@ export default function ProjectScreen() {
 
 
 	useEffect(() => {
-		if (!currentTemplate && !deleting && !leaving) {
+		if (!currentTemplate && !deleting) {
 			showAlert(ALERT_TYPES.INFO, "Access Lost", "This project is not accessible anymore. You may have been removed or the project may have been deleted.", () => {
 				handleGoBack();
 			});
 		}
-	}, [currentTemplate, handleGoBack, deleting, leaving]);
+	}, [currentTemplate, handleGoBack, deleting]);
 
 
 	const handleGoBack = useCallback(() => {

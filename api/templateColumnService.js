@@ -102,7 +102,7 @@ export const templateColumnService = {
 
     subscribeToColumnTasks: (templateId, columnId, onUpdate) => {
         const columnTasksRef = pathHelper.templateColumnTasks(templateId, columnId)
-        const columnTasks = query(columnTasksRef);
+        const columnTasks = query(columnTasksRef, orderBy('order', 'asc'));
 
         return onSnapshot(columnTasks, (snapshot) => {
             const tasksToDisplay = snapshot.docs.map((doc) => ({

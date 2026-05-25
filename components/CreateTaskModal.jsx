@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, ScrollView } from 'react-native';
 import AppModal from './AppModal';
 import ModalHeader from './modal/ModalHeader';
@@ -10,7 +10,6 @@ import ModalActions from './modal/ModalActions';
 import { LABELS } from '../constants/Labels';
 import { LabelColors } from '../constants/Colors';
 import AssignMembersSection from './AssignMembersSection';
-import ThemedAlert from "./ThemedAlert";
 
 
 export default function CreateTaskModal({
