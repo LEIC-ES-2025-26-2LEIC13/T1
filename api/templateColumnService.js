@@ -59,7 +59,6 @@ export const templateColumnService = {
             transaction.set(newColumnRef, {
                 ...normalizedColumnData,
                 order: newColumnOrder,
-                createdAt: Timestamp.now(),
             })
         })
     },

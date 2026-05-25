@@ -9,8 +9,8 @@
 │     ├─ email
 │     ├─ userProjects         (subcolletion)
 │     │  └─ {projectId}       (subcolletion document)
-│     │     ├─ title
-│     │     └─ description
+│     │     ├─ title		-
+│     │     └─ description	-
 │     │
 │     ├─ userInvites
 │     │  └─ {inviteId}
@@ -34,28 +34,29 @@
 │
 ├─ projects
 |  └─ {projectId}
-|     ├─ title
-|     ├─ description
-|     ├─ createdBy
-|     ├─ columnCount
+|     ├─ title			-
+|     ├─ description	-
+|     ├─ createdBy		-
+|     ├─ columnCount	-
 |     │
 |     ├─ projectUsers
 |     │  └─ {userId}
-|     │     └─ email
+|     │     └─ email	-
 |     │
 |     └─ projectColumns
 |         └─ {columnId}
-|             ├─ name
-|             ├─ order
+|             ├─ name	+
+|             ├─ order	+
+|             ├─ createdAt	+
 |             │
 |             └─ columnTasks
 |                 └─ {taskId}
-|                     ├─ name
-|                     ├─ description
+|                     ├─ name	+
+|                     ├─ description	+
 |                     ├─ label
 |                     ├─ assignedMembers
-|                     ├─ order
-|                     └─ createdAt
+|                     ├─ order	+
+|                     └─ createdAt	+
 |
 └─ templates
    └─ {templateId}

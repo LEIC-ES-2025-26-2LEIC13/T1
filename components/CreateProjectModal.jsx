@@ -5,21 +5,22 @@ import ModalBody from './modal/ModalBody';
 import ModalActions from './modal/ModalActions';
 import ThemedIcon from './ThemedIcon';
 import ThemedText from './ThemedText';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
 import { Colors } from '../constants/Colors';
 import AnimatedPressable from './AnimatedPressable';
 import { useEffect, useState } from 'react';
 import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedProject from './ThemedProject';
-import LoadingScreen from './LoadingScreen';
 
 export default function CreateProjectModal({
     visible,
     onClose,
-    onCreate,
+    onCustomCreate,
+    onTemplateCreate,
     project,
     onChange,
+    getTemplateProjects
 }) {
     
     const colorScheme = useColorScheme()
@@ -29,8 +30,6 @@ export default function CreateProjectModal({
     const [templates, setTemplates] = useState([])
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(false)
     const [selectedTemplate, setSelectedTemplate] = useState(null)
-
-   
 
     // Alert
     const [alertVisible, setAlertVisible] = useState(false)
@@ -50,18 +49,14 @@ export default function CreateProjectModal({
     const optionTemplate = "Template Project"
     const optionCustom = "Custom Project"
 
-    const handleChooseType = (optionName) => {
+    const handleChooseType = async (optionName) => {
         if (optionName === optionTemplate) {
             setStep(2);
             setIsLoadingTemplates(true)
             try {
-                 setTemplates(
-                    [
-                        { id: '1', title: 'Blog Website', description: 'A simple blog website template with Next.js and Tailwind CSS.' },
-                        { id: '2', title: 'E-commerce Store', description: 'An e-commerce store template built with React and Stripe integration.' },
-                        { id: '3', title: 'Portfolio Website', description: 'A personal portfolio website template using Gatsby and GraphQL.' },
-                    ]
-                )
+                const templateProjects =  await getTemplateProjects()
+                console.log(templateProjects)
+                setTemplates(templateProjects)
                 setIsLoadingTemplates(false)
             } catch (error) {
                 showAlert(ALERT_TYPES.ERROR, "Failed to Load Templates", error.message)
@@ -127,9 +122,9 @@ export default function CreateProjectModal({
             />
 
             <ModalBody>
-                <View style={{ height: 300 }}>
+                <View style={styles.templateContainer}>
 
-                    {isLoadingTemplates ?  <LoadingScreen loadingText="Loading template projects..."/> :
+                    {isLoadingTemplates ? <ActivityIndicator size='large' color={ Colors.primary } /> :
 
                     <FlatList
                         data={templates}
@@ -153,7 +148,7 @@ export default function CreateProjectModal({
                 onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
-                onPrimaryActionPress={() => onCreate(selectedTemplate)}
+                onPrimaryActionPress={() => onTemplateCreate(selectedTemplate)}
                 primaryActionDisabled={!selectedTemplate}
             />
         </>
@@ -192,7 +187,7 @@ export default function CreateProjectModal({
                 onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
-                onPrimaryActionPress={() => onCreate(project)}
+                onPrimaryActionPress={() => onCustomCreate(project)}
                 primaryActionDisabled={!project.title.trim()} // .trim() to ignore whitespace
             />
         </>
@@ -228,5 +223,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 20,
         marginTop: 5
+    },
+
+    templateContainer: {
+        height: 300,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })

@@ -1,9 +1,12 @@
-import { collection, doc, onSnapshot, query, writeBatch, getDoc } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, writeBatch, getDoc, getDocs, orderBy } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS } from "../constants/Collections";
 import { pathHelper } from "./pathHelper";
 import { templateColumnService } from "./templateColumnService";
+import { projectService } from "./projectService";
+import { columnService } from "./columnService";
+import { taskService } from "./taskService";
 
 // ...existing code...
 
@@ -42,6 +45,16 @@ export const templateService = {
         });
     },
 
+    getTemplateProjects: async () => {
+        const templatesCollection = collection(db, COLLECTIONS.TEMPLATES)
+        const templatesSnap = await getDocs(templatesCollection)
+
+        return templatesSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    },
+
     // Create a new template (admin only)
     createTemplate: async (templateData) => {
         const normalizedTemplateData = normalizeTemplateData(templateData)
@@ -60,6 +73,43 @@ export const templateService = {
         });
 
         await batch.commit();
+    },
+
+    copyTemplate: async (templateData, userId, userEmail) => {
+
+        const projectRef = await projectService.createProject(userId, userEmail, templateData)
+
+        // Get all columns of the template to copy
+        const templateColumnsQuery = query(pathHelper.templateColumns(templateData.id), orderBy('order', 'asc'))
+        const templateColumnsSnap = await getDocs(templateColumnsQuery)
+
+        // For each column, create a new column in the new project with the same data (except for the order, that is determined by the current column count of the project)
+        for (const columnDoc of templateColumnsSnap.docs) {
+            const columnData = columnDoc.data()
+            const columnRef = await columnService.createColumn(projectRef.id, {
+                name: columnData.name,
+            })
+
+            // Get all tasks of the current column to copy
+            const templateColumnTasksQuery = query(pathHelper.templateColumnTasks(templateData.id, columnDoc.id), orderBy('order', 'asc'))
+            const templateColumnTasksSnap = await getDocs(templateColumnTasksQuery)
+
+            for (const taskDoc of templateColumnTasksSnap.docs) {
+                const taskData = taskDoc.data()
+                await taskService.createTask(
+                    projectRef.id,
+                    templateData.title,
+                    columnRef.id,
+                    columnData.name,
+                    {
+                        name: taskData.name,
+                        description: taskData.description,
+                        label: "", // no label at the creation
+                        assignedMembers: [] // no assigned members at the creation
+                    }
+                )
+            }
+        }
     },
 
     // Update template

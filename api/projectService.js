@@ -76,6 +76,8 @@ export const projectService = {
         })
 
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
+
+        return projectRef // for template creation
     },
 
     updateProject: async (projectId, updates) => {
