@@ -39,7 +39,7 @@ const Templates = () => {
 
         return (
             <ThemedProject
-                projectId={item.id}
+                templateId={item.id}
                 name={item.title}
                 description={item.description}
                 borderColor={borderColor}
