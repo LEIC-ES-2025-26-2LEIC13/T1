@@ -35,6 +35,7 @@ const ThemedTextInput = ({
         <View style={[
             { borderColor: theme.borders, backgroundColor: theme.background },
             styles.container,
+            multiline && { alignItems: 'flex-start' },
             containerStyle
             ]}>
         {leftIcon && <ThemedIcon name={leftIcon} style={styles.leftIcon} />}
