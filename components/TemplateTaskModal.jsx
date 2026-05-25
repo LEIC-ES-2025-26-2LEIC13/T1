@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, useColorScheme } from 'react-native'
 import AppModal from './AppModal'
 import ModalHeader from './modal/ModalHeader'
 import FormField from './FormField'
@@ -13,6 +13,8 @@ import ThemedIcon from './ThemedIcon'
 import Spacer from './Spacer'
 import ThemedView from './ThemedView'
 import { templateColumnService } from '../api/templateColumnService'
+import { Colors } from '../constants/Colors'
+import { useRouter } from 'expo-router'
 
 export default function TaskModal({
     visible,
@@ -28,6 +30,11 @@ export default function TaskModal({
     userEmail,
     onChange
 }) {
+
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
+
+    const router = useRouter() // for hints page
 
     const currentIndex = columns?.findIndex(c => c.id === columnId) ?? -1
     const prevColumn = currentIndex > 0 ? columns[currentIndex - 1] : null
@@ -86,6 +93,10 @@ export default function TaskModal({
         setEditedTask(null);
         setIsEdit(false);
         onClose();
+    }
+
+    const handlePressHint = () => {
+        router.push({ pathname: '/hintEditor', params: { taskId: task.id, templateId } })
     }
 
     return (
@@ -160,6 +171,18 @@ export default function TaskModal({
                     onChangeText={isEdit ? (value) => handleEditChange('description', value) : null}
                 />
 
+                <ThemedText style={[styles.label]}>
+                    Hints
+                </ThemedText>
+
+                <AnimatedPressable
+                    testID="hint"
+                    onPress={handlePressHint}
+                    style={[styles.hintButton, { backgroundColor: theme.hint , boxShadow: `0px 0px 5px ${theme.hint}`}]}                >
+                    <ThemedIcon onPrimary name="lightbulb-on-outline"/>
+                    <ThemedText onPrimary style={{ marginLeft: 8 }}>Add Hints</ThemedText>
+                </AnimatedPressable>
+            
             </ModalBody>
 
             <ModalActions
@@ -193,5 +216,23 @@ const styles = StyleSheet.create({
     moveButtonText: {
         fontSize: 13,
         fontWeight: '500',
+    },
+    label: {
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.8,
+        textTransform: 'uppercase',
+        marginBottom: 7,
+        opacity: 0.7
+    },
+    hintButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 10,
+        backgroundColor: '#ffe70c44',
+        boxShadow: "0px 0px 3px #ffe600"
     }
 })
