@@ -1,7 +1,7 @@
-import { collection, doc, onSnapshot, query, getDocs, writeBatch, getDoc } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, writeBatch, getDoc } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
-import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
+import { COLLECTIONS } from "../constants/Collections";
 import { pathHelper } from "./pathHelper";
 import { templateColumnService } from "./templateColumnService";
 
@@ -57,7 +57,6 @@ export const templateService = {
         batch.set(templateRef, {
             ...normalizedTemplateData,
             columnCount: 0, // Initial column count is 0
-            createdAt: new Date(),
         });
 
         await batch.commit();

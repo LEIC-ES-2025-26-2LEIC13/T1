@@ -84,6 +84,7 @@ const Templates = () => {
 
                         renderItem={({ item, index }) => (
                             <ThemedProject
+                                templateId={item.id}
                                 name={item.title}
                                 description={item.description}
                                 borderColor={ProjectColors[index % ProjectColors.length]}
