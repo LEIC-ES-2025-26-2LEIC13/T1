@@ -31,6 +31,8 @@ export default function CreateProjectModal({
     const [isLoadingTemplates, setIsLoadingTemplates] = useState(false)
     const [selectedTemplate, setSelectedTemplate] = useState(null)
 
+    const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
+
     // Alert
     const [alertVisible, setAlertVisible] = useState(false)
     const [alert, setAlert] = useState({ type: '', title: '', message: '' })
@@ -112,6 +114,13 @@ export default function CreateProjectModal({
         onChange('description', '')
     }
 
+    const CustomActivityIndicator = (text) => (
+        <>
+            <ActivityIndicator size='large' color={ Colors.primary } />
+            <ThemedText style={{ marginTop: 10 }}>{text}</ThemedText>
+        </>
+    )
+
     const templateProject = (
         <>
             <ModalHeader
@@ -123,7 +132,8 @@ export default function CreateProjectModal({
             <ModalBody>
                 <View style={styles.templateContainer}>
 
-                    {isLoadingTemplates ? <ActivityIndicator size='large' color={ Colors.primary } /> :
+                    {isLoadingTemplates ? CustomActivityIndicator("Loading templates...") : 
+                    isCreatingTemplate ? CustomActivityIndicator("Creating project from template...") :
 
                     <FlatList
                         data={templates}
@@ -147,7 +157,7 @@ export default function CreateProjectModal({
                 onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
-                onPrimaryActionPress={() => onTemplateCreate(selectedTemplate)}
+                onPrimaryActionPress={async () => { setIsCreatingTemplate(true); await onTemplateCreate(selectedTemplate); setIsCreatingTemplate(false)}}
                 primaryActionDisabled={!selectedTemplate}
             />
         </>
@@ -186,7 +196,7 @@ export default function CreateProjectModal({
                 onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
-                onPrimaryActionPress={() => onCustomCreate(project)}
+                onPrimaryActionPress={async () => await onCustomCreate(project) }
                 primaryActionDisabled={!project.title.trim()} // .trim() to ignore whitespace
             />
         </>
