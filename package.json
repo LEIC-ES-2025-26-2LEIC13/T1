@@ -37,7 +37,7 @@
     "expo": "^55.0.23",
     "expo-linear-gradient": "~55.0.13",
     "expo-linking": "^55.0.15",
-    "expo-modules-core": "~55.0.25",
+    "expo-modules-core": "~56.0.12",
     "expo-navigation-bar": "~55.0.12",
     "expo-router": "^55.0.14",
     "expo-status-bar": "~55.0.6",
