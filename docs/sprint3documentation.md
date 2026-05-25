@@ -1,5 +1,82 @@
 # Sprint 3 Documentation
 
+## Updated database structure
+
+``` text
+/
+├─ users                      (collection)
+│  └─ {userId}                (user document)
+│     ├─ email
+│     ├─ userProjects         (subcolletion)
+│     │  └─ {projectId}       (subcolletion document)
+│     │     ├─ title
+│     │     └─ description
+│     │
+│     ├─ userInvites
+│     │  └─ {inviteId}
+│     │     ├─ createdAt
+│     │     ├─ projectId
+│     │     ├─ projectName
+│     │     ├─ senderId
+│     │     └─ senderEmail
+│     │
+│     └─ userTasks
+│        └─ {taskId}
+│           ├─ name
+│           ├─ description
+│           ├─ label
+|           ├─ assignedMembers
+|           ├─ projectId
+│           ├─ projectName
+|           ├─ columnId
+│           ├─ columnName
+│           └─ createdAt
+│
+├─ projects
+|  └─ {projectId}
+|     ├─ title
+|     ├─ description
+|     ├─ createdBy
+|     ├─ columnCount
+|     │
+|     ├─ projectUsers
+|     │  └─ {userId}
+|     │     └─ email
+|     │
+|     └─ projectColumns
+|         └─ {columnId}
+|             ├─ name
+|             ├─ order
+|             │
+|             └─ columnTasks
+|                 └─ {taskId}
+|                     ├─ name
+|                     ├─ description
+|                     ├─ label
+|                     ├─ assignedMembers
+|                     ├─ order
+|                     └─ createdAt
+|
+└─ templates
+   └─ {templateId}
+      ├─ title
+      ├─ description
+      ├─ columnCount
+      │
+      └─ templateColumns
+          └─ {columnId}
+			 ├─ name
+ 			 ├─ order
+ 			 │
+ 			 └─ templateColumnTasks
+ 			    └─ {taskId}
+ 			       ├─ name
+			       ├─ description
+			       └─ order
+			
+```
+
+
 ## Google Sign-In Update
 
 The login flow was updated so that authentication is now centered around Google Sign-In instead of the previous email/password entry point. The intro page now shows a Google sign-in button and triggers the authentication flow from there, keeping the entry experience simpler for the user.

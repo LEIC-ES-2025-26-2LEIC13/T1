@@ -7,7 +7,7 @@ import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
 // onPress and selected are used together when chossing a project template
-const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onPress = null, selected = null }) => {
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onPress = null, selected = null, templateId = null }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -20,6 +20,8 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
 
         if (projectId) {
             router.push({ pathname: '/project', params: { projectId } })
+        } else if (templateId) {
+            router.push({ pathname: '/(admin)/templateProject', params: { templateId } })
         }
     }
 
