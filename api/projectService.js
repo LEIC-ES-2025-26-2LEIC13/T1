@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, getDoc, getDocs, writeBatch, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, getDoc, getDocs, writeBatch, where, orderBy } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
@@ -29,7 +29,7 @@ export const projectService = {
     subscribeToUserProjects: (userId, onUpdate) => {
         const userProjectsCollection = pathHelper.userProjects(userId)
         // Gets projects in which the current user is envolved
-        const userProjects = query(userProjectsCollection)
+        const userProjects = query(userProjectsCollection, orderBy('order', 'asc'))
         
         return onSnapshot(userProjects, (userProjectsSnap) => {
             const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
@@ -51,6 +51,8 @@ export const projectService = {
         const batch = writeBatch(db); // creates a write batch
 
         const projectRef = doc(collection(db, COLLECTIONS.PROJECTS)); // Generates a new random id for a document that doesnt exist yet
+        const userProjectsSnapshot = await getDocs(pathHelper.userProjects(userId))
+        const nextOrder = userProjectsSnapshot.docs.length
 
         batch.set(projectRef, {
             ...normalizedProjectData,
@@ -72,7 +74,8 @@ export const projectService = {
         // another write operation to perform at commit()
         batch.set(userProjectRef, { 
             title: normalizedProjectData.title,
-            description: normalizedProjectData.description
+            description: normalizedProjectData.description,
+            order: nextOrder
         })
 
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
@@ -194,6 +197,22 @@ export const projectService = {
         const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnap = await getDocs(projectUsersRef)
         return projectUsersSnap.empty
+    },
+
+    reorderUserProjects: async (userId, reorderedProjects) => {
+        if (!userId) {
+            throw new Error('User ID is required to reorder projects')
+        }
+
+        const batch = writeBatch(db)
+
+        reorderedProjects.forEach((project, index) => {
+            batch.update(pathHelper.userProject(userId, project.id), {
+                order: index,
+            })
+        })
+
+        await batch.commit()
     },
 
     isProjectFromTemplate: async (projectId) => {

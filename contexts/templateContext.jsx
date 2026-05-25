@@ -69,6 +69,13 @@ export const TemplateProvider = ({ children }) => {
         await templateService.deleteTemplate(templateId)
     }
 
+    async function reorderTemplates(reorderedTemplates) {
+        if (!isAdmin) {
+            throw new Error("Only administrators can reorder templates");
+        }
+        await templateService.reorderTemplates(reorderedTemplates)
+    }
+
     async function createColumn(columnData){
         await templateColumnService.createColumn(activeTemplateId, columnData)
     }
@@ -90,17 +97,14 @@ export const TemplateProvider = ({ children }) => {
             createTemplate,
             deleteTemplate,
             updateTemplate,
+            reorderTemplates,
 
             columns,
             isLoadingColumns,
             createColumn,
             deleteColumn,
             updateColumn,
-            setActiveTemplateId,
-
-            
-            
-
+            setActiveTemplateId
         }}>
             {children}
         </TemplateContext.Provider>

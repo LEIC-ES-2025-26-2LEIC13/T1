@@ -181,6 +181,20 @@ export const templateService = {
             onUpdate(columns)
         });
     },
+
+    reorderTemplates: async (reorderedTemplates) => {
+
+        const batch = writeBatch(db)
+
+        reorderedTemplates.forEach((template, index) => {
+            batch.update(pathHelper.template(template.id), {
+                order: index,
+            })
+        })
+
+        await batch.commit()
+    }
+
 }
 
 

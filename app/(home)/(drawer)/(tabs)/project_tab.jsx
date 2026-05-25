@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { ProjectColors } from '../../../../constants/Colors';
 import { useProject } from '../../../../hooks/useProject';
 import ThemedText from '../../../../components/ThemedText';
@@ -11,28 +11,67 @@ import ThemedAlert, { ALERT_TYPES } from '../../../../components/ThemedAlert';
 import ThemedView from '../../../../components/ThemedView';
 import ThemedIcon from '../../../../components/ThemedIcon';
 import LoadingScreen from '../../../../components/LoadingScreen'
+import ReorderableList, { reorderItems, useReorderableDrag } from 'react-native-reorderable-list';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { templateService } from '../../../../api/templateService'
 import { useAuth } from '../../../../hooks/useAuth';
 
 const Projects = () => {
 
     const [projectModalVisible, setProjectModalVisible] = useState(false);
-    const { projects, createProject, isLoadingProjects } = useProject();
+    const { projects, setProjects, createProject, reorderProjects, isLoadingProjects } = useProject();
     const { user } = useAuth();
-
+    
     // Alert
-	const [alertVisible, setAlertVisible] = useState(false);
-	const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
 
-	const showAlert = (type, title, message) => { // function to call when an alert needs to be shown
-		setAlert({ type, title, message });
-		setAlertVisible(true);
-	};
+    const showAlert = useCallback((type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    }, []);
 
     const [ project, setProject ] = React.useState({
         title: '',
         description: '',
     });
+
+    const DraggableProject = ({ item, borderColor }) => {
+        const drag = useReorderableDrag();
+
+        return (
+            <ThemedProject
+                projectId={item.id}
+                name={item.title}
+                description={item.description}
+                borderColor={borderColor}
+                onLongPress={drag}
+            />
+        )
+    }
+
+    const handleReorder = useCallback(({ from, to }) => {
+        setProjects((prevProjects) => {
+            const reorderedProjects = reorderItems(prevProjects, from, to)
+
+            reorderProjects(reorderedProjects).catch((error) => {
+                showAlert(ALERT_TYPES.ERROR, 'Reorder Failed', error.message)
+            })
+
+            return reorderedProjects
+        })
+    }, [reorderProjects, setProjects, showAlert])
+
+    const renderItem = useCallback(({ item, index }) => {
+        const colorIndex = index % ProjectColors.length
+
+        return (
+            <DraggableProject
+                item={item}
+                borderColor={ProjectColors[colorIndex]}
+            />
+        )
+    }, []);
 
     const handleProjectChange = (field, value) => {
         setProject((prev) => ({ ...prev, [field]: value }))
@@ -78,32 +117,24 @@ const Projects = () => {
 
                 :
                 <>
-                    <FlatList
-                        data={projects}
-                        keyExtractor={(item, index) => `${item.title}-${index}`}
-
-                        contentContainerStyle={[
-                            styles.list,
-                            (projects.length === 0) && styles.listEmpty
-                        ]}
-
-                        showsVerticalScrollIndicator={false}
-
-                        ListEmptyComponent={<EmptyState
-                            title="No projects"
-                            subtitle="When you create a project or accept an invite to one, it will appear here"
-                            iconName="folder-open"
-                        />}
-
-                        renderItem={({ item, index }) => (
-                            <ThemedProject
-                                projectId={item.id}
-                                name={item.title}
-                                description={item.description}
-                                borderColor={ProjectColors[index % ProjectColors.length]}
-                            />
-                        )}
-                    />
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <ReorderableList
+                            data={projects}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderItem}
+                            onReorder={handleReorder}
+                            contentContainerStyle={[
+                                styles.list,
+                                (projects.length === 0) && styles.listEmpty
+                            ]}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={<EmptyState
+                                title="No projects"
+                                subtitle="When you create a project or accept an invite to one, it will appear here"
+                                iconName="folder-open"
+                            />}
+                        />
+                    </GestureHandlerRootView>
                 
                 
                     <ThemedButton
@@ -124,7 +155,6 @@ const Projects = () => {
                         onChange={handleProjectChange}
                         getTemplateProjects={templateService.getTemplateProjects}
                     />
-                    
 
                     <ThemedAlert
                         visible={alertVisible}

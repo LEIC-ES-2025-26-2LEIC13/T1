@@ -11,7 +11,8 @@ jest.mock('../../../api/projectService', () => ({
         createProject: jest.fn(),
         updateProject: jest.fn(),
         deleteProject: jest.fn(),
-        kickMember: jest.fn()
+        kickMember: jest.fn(),
+        reorderUserProjects: jest.fn()
     }
 }))
 
@@ -92,6 +93,16 @@ describe('ProjectContext', () => {
                 await currentResult.current.kickMember('p1', 'm1')
             })
             expect(projectService.kickMember).toHaveBeenCalledWith('p1', 'm1')
+        })
+
+        it('should call reorderUserProjects API', async () => {
+            const reorderedProjects = [{ id: 'p2' }, { id: 'p1' }]
+
+            await act(async () => {
+                await currentResult.current.reorderProjects(reorderedProjects)
+            })
+
+            expect(projectService.reorderUserProjects).toHaveBeenCalledWith('u1', reorderedProjects)
         })
     })
 })

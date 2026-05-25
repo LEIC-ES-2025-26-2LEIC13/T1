@@ -7,7 +7,7 @@ import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
 // onPress and selected are used together when chossing a project template
-const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onPress = null, selected = null, templateId = null }) => {
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onLongPress, onPress = null, selected = null, templateId = null }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -64,6 +64,7 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
     return (
         <AnimatedPressable
             onPress={onPress || handlePress}
+            onLongPress={onLongPress}
             testID={testID}
             style={{ marginVertical: 6 }}
         > 
