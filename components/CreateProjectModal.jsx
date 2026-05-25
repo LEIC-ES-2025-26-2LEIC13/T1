@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import ThemedAlert, { ALERT_TYPES } from './ThemedAlert';
 import { FlatList } from 'react-native-gesture-handler';
 import ThemedProject from './ThemedProject';
+import EmptyState from './EmptyState';
 
 export default function CreateProjectModal({
     visible,
@@ -138,6 +139,14 @@ export default function CreateProjectModal({
                     <FlatList
                         data={templates}
                         keyExtractor={item => item.id}
+                        contentContainerStyle={{ flex: 1 }}
+
+                        ListEmptyComponent={<EmptyState
+                            title="No template projects available"
+                            subtitle="When a template project is available, it will appear here"
+                            iconName="lightning-bolt"
+                        />}
+
                         renderItem={({ item }) => (
                             <ThemedProject
                                 name={item.title}
@@ -154,6 +163,7 @@ export default function CreateProjectModal({
             </ModalBody>
 
             <ModalActions
+                testID="template-project-modal-actions"
                 onCancel={handleGoBackToChoice}
                 primaryActionName="Create"
                 primaryActionIconName="plus"
