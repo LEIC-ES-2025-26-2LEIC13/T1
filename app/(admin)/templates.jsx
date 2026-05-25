@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { ProjectColors } from '../../constants/Colors';
 import { useTemplate } from "../../hooks/useTemplate";
 import ThemedText from '../../components/ThemedText';
@@ -11,26 +11,67 @@ import ThemedAlert, { ALERT_TYPES } from '../../components/ThemedAlert';
 import ThemedView from '../../components/ThemedView';
 import ThemedIcon from '../../components/ThemedIcon';
 import LoadingScreen from "../../components/LoadingScreen";
+import ReorderableList, { reorderItems, useReorderableDrag } from 'react-native-reorderable-list';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Templates = () => {
 
     const [templateModalVisible, setTemplateModalVisible] = useState(false);
-    const { templates, createTemplate, isLoadingTemplates } = useTemplate();
+    const { templates, setTemplates, createTemplate, reorderTemplates, isLoadingTemplates } = useTemplate();
 
     // Alert
     const [alertVisible, setAlertVisible] = useState(false);
     const [alert, setAlert] = useState({ type: '', title: '', message: '' });
 
-    const showAlert = (type, title, message) => {
+    const showAlert = useCallback((type, title, message) => {
         setAlert({ type, title, message });
         setAlertVisible(true);
-    };
+    }, []);
 
     const [template, setTemplate] = React.useState({
         title: '',
         description: '',
     });
 
+
+     const DraggableTemplate = ({ item, borderColor }) => {
+        const drag = useReorderableDrag();
+
+        return (
+            <ThemedProject
+                projectId={item.id}
+                name={item.title}
+                description={item.description}
+                borderColor={borderColor}
+                onLongPress={drag}
+            />
+        )
+    }
+
+    const handleReorder = useCallback(({ from, to }) => {
+        setTemplates((prevProjects) => {
+            const reorderedProjects = reorderItems(prevProjects, from, to)
+
+            reorderTemplates(reorderedProjects).catch((error) => {
+                showAlert(ALERT_TYPES.ERROR, 'Reorder Failed', error.message)
+            })
+
+            return reorderedProjects
+        })
+    }, [reorderTemplates, setTemplates, showAlert])
+    
+    const renderItem = useCallback(({ item, index }) => {
+        const colorIndex = index % ProjectColors.length
+
+        return (
+            <DraggableTemplate
+                item={item}
+                borderColor={ProjectColors[colorIndex]}
+            />
+        )
+    }, []);
+
+    
     const handleTemplateChange = (field, value) => {
         setTemplate((prev) => ({ ...prev, [field]: value }))
     };
@@ -65,32 +106,24 @@ const Templates = () => {
 
                 :
                 <>
-                    <FlatList
-                        data={templates}
-                        keyExtractor={(item, index) => `${item.title}-${index}`}
-
-                        contentContainerStyle={[
-                            styles.list,
-                            (templates.length === 0) && styles.listEmpty
-                        ]}
-
-                        showsVerticalScrollIndicator={false}
-
-                        ListEmptyComponent={<EmptyState
-                            title="No templates"
-                            subtitle="When you create a template it will appear here"
-                            iconName="folder-open"
-                        />}
-
-                        renderItem={({ item, index }) => (
-                            <ThemedProject
-                                name={item.title}
-                                description={item.description}
-                                borderColor={ProjectColors[index % ProjectColors.length]}
-                            />
-                        )}
-                    />
-
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <ReorderableList
+                            data={templates}
+                            keyExtractor={(item) => item.id}
+                            renderItem={renderItem}
+                            onReorder={handleReorder}
+                            contentContainerStyle={[
+                                styles.list,
+                                (templates.length === 0) && styles.listEmpty
+                            ]}
+                            showsVerticalScrollIndicator={false}
+                            ListEmptyComponent={<EmptyState
+                                title="No templates"
+                                subtitle="When you create a template, it will appear here"
+                                iconName="folder-open"
+                            />}
+                        />
+                    </GestureHandlerRootView>
 
                     <ThemedButton
                         testID="open-create-template-modal-button"

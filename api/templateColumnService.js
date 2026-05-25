@@ -1,4 +1,4 @@
-import { doc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction } from "firebase/firestore";
+import { doc, getDocs, query, orderBy, onSnapshot, runTransaction, getCountFromServer } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 import { pathHelper } from "./pathHelper";
@@ -17,9 +17,9 @@ function normalizeColumnUpdates({ name }) {
     return { name };
 }
 
-function normalizeTemplateTaskData({ title, description }) {
+function normalizeTemplateTaskData({ name, description }) {
     return {
-        title: title?.trim() ?? '',
+        name: name?.trim() ?? '',
         description: description?.trim() ?? '',
     }
 }
@@ -59,7 +59,6 @@ export const templateColumnService = {
             transaction.set(newColumnRef, {
                 ...normalizedColumnData,
                 order: newColumnOrder,
-                createdAt: Timestamp.now(),
             })
         })
     },
@@ -67,7 +66,7 @@ export const templateColumnService = {
     deleteColumn: async (templateId, columnId) => {
         const operations = []
 
-        const columnTasksRef = pathHelper.columnTemplates(templateId, columnId)
+        const columnTasksRef = pathHelper.templateColumnTasks(templateId, columnId)
         const columnTasksSnapshot = await getDocs(columnTasksRef)
 
         columnTasksSnapshot.forEach((taskDoc) => {
@@ -101,8 +100,8 @@ export const templateColumnService = {
     },
 
     subscribeToColumnTasks: (templateId, columnId, onUpdate) => {
-        const columnTasksRef = pathHelper.columnTemplates(templateId, columnId)
-        const columnTasks = query(columnTasksRef, orderBy('createdAt', 'desc'));
+        const columnTasksRef = pathHelper.templateColumnTasks(templateId, columnId)
+        const columnTasks = query(columnTasksRef, orderBy('order', 'asc'));
 
         return onSnapshot(columnTasks, (snapshot) => {
             const tasksToDisplay = snapshot.docs.map((doc) => ({
@@ -121,11 +120,15 @@ export const templateColumnService = {
 
         const normalizedTaskData = normalizeTemplateTaskData(taskData)
 
-        if (!normalizedTaskData.title) {
-            throw new Error('Task title cannot be empty')
+        const existingTasks = await getCountFromServer(pathHelper.templateColumnTasks(templateId, columnId))
+        const taskOrder = existingTasks.data().count
+        
+
+        if (!normalizedTaskData.name) {
+            throw new Error('Task name cannot be empty')
         }
 
-        const newTaskRef = doc(pathHelper.columnTemplates(templateId, columnId))
+        const newTaskRef = doc(pathHelper.templateColumnTasks(templateId, columnId))
 
         const operations = [
             {
@@ -133,7 +136,7 @@ export const templateColumnService = {
                 ref: newTaskRef,
                 data: {
                     ...normalizedTaskData,
-                    createdAt: Timestamp.now(),
+                    order: taskOrder
                 }
             }
         ]
@@ -142,7 +145,7 @@ export const templateColumnService = {
     },
 
     deleteTask: async (templateId, columnId, taskId) => {
-        const taskRef = pathHelper.columnTemplate(templateId, columnId, taskId)
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
 
         const operations = [
             { type: OPERATION_TYPES.DELETE, ref: taskRef }
@@ -152,7 +155,7 @@ export const templateColumnService = {
     },
 
     updateTask: async (templateId, columnId, taskId, updates) => {
-        const taskRef = pathHelper.columnTemplate(templateId, columnId, taskId)
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
 
         const operations = [
             {
@@ -175,7 +178,7 @@ export const templateColumnService = {
             const columnRef = columnDoc.ref
             operations.push({ type: OPERATION_TYPES.DELETE, ref: columnRef })
 
-            const columnTasksRef = pathHelper.columnTemplates(templateId, columnDoc.id)
+            const columnTasksRef = pathHelper.templateColumnTasks(templateId, columnDoc.id)
             const columnTasksSnapshot = await getDocs(columnTasksRef)
             columnTasksSnapshot.forEach((taskDoc) => {
                 operations.push({ type: OPERATION_TYPES.DELETE, ref: taskDoc.ref })
@@ -183,6 +186,46 @@ export const templateColumnService = {
         }
 
         return operations;
+    },
+
+     moveTaskToColumn: async (templateId, task, fromColumnId, toColumn) => {
+        const existingTasks = await getCountFromServer(pathHelper.templateColumnTasks(templateId, toColumn.id))
+        const newOrder = existingTasks.data().count
+
+        const operations = []
+
+        // 1. Delete from old column
+        operations.push({
+            type: OPERATION_TYPES.DELETE,
+            ref: pathHelper.templateColumnTask(templateId, fromColumnId, task.id)
+        })
+
+        // 2. Create in new column, reusing same task ID
+        operations.push({
+            type: OPERATION_TYPES.SET,
+            ref: pathHelper.templateColumnTask(templateId, toColumn.id, task.id),
+            data: {
+                name: task.name,
+                description: task.description,
+                order: newOrder,
+            }
+        })
+
+        await batchOps(db, operations)  
+    },
+
+    reorderColumnTasks: async (templateId, columnId, reorderedTasks, from, to) => {
+        const [start, end] = from < to ? [from, to] : [to, from]; // only considers the affected range (to reduce the number of updates needed)
+        const affected = reorderedTasks.slice(start, end + 1); // finds the new order of the affected tasks
+        // the index starts on start, the ordering is updated from that point onwards, by simply summing with the index, as start represents the lowest
+        // index of the affected range, the index of the lowest task (considering the original order)
+        const operations = affected.map((task, index) => ({
+            type: OPERATION_TYPES.UPDATE,
+            ref: pathHelper.templateColumnTask(templateId, columnId, task.id),
+            data: { order: start + index }
+        }));
+
+        await batchOps(db, operations);
     }
 }
 

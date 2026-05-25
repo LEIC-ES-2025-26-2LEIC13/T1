@@ -13,12 +13,15 @@ import ThemedIcon from '../../../../components/ThemedIcon';
 import LoadingScreen from '../../../../components/LoadingScreen'
 import ReorderableList, { reorderItems, useReorderableDrag } from 'react-native-reorderable-list';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { templateService } from '../../../../api/templateService'
+import { useAuth } from '../../../../hooks/useAuth';
 
 const Projects = () => {
 
     const [projectModalVisible, setProjectModalVisible] = useState(false);
     const { projects, setProjects, createProject, reorderProjects, isLoadingProjects } = useProject();
-
+    const { user } = useAuth();
+    
     // Alert
     const [alertVisible, setAlertVisible] = useState(false);
     const [alert, setAlert] = useState({ type: '', title: '', message: '' });
@@ -92,7 +95,17 @@ const Projects = () => {
         } catch (error) {
             showAlert(ALERT_TYPES.ERROR, 'Create Project Failed', error.message)
         }
-    };
+    }
+
+    const handleCreateTemplate = async (templateData) => {
+        try {
+            await templateService.copyTemplate(templateData, user.uid, user.email)
+            closeProjectModal()
+            showAlert(ALERT_TYPES.SUCCESS, 'Template Created', 'Template project created successfully.')
+        } catch (error) {
+            showAlert(ALERT_TYPES.ERROR, 'Create Template Failed', error.message)
+        }
+    }
 
 
     return (
@@ -136,9 +149,11 @@ const Projects = () => {
                     <CreateProjectModal
                         visible={projectModalVisible}
                         onClose={closeProjectModal}
-                        onCreate={handleCreateProject}
+                        onCustomCreate={handleCreateProject}
+                        onTemplateCreate={handleCreateTemplate}
                         project={project}
                         onChange={handleProjectChange}
+                        getTemplateProjects={templateService.getTemplateProjects}
                     />
 
                     <ThemedAlert

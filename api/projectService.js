@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, getDocs, orderBy, query, writeBatch, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, query, getDoc, getDocs, writeBatch, where, orderBy } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
@@ -12,7 +12,7 @@ function normalizeProjectData({ title, description }) {
     }
 }
 
-function normalizeProjectUpdates( { title, description }) {
+function normalizeProjectUpdates( { title, description, templateId  }) {
     if (title !== undefined) {
         title = (title ?? '').trim();
         if (!title) throw new Error('Project title cannot be empty');
@@ -22,20 +22,20 @@ function normalizeProjectUpdates( { title, description }) {
         description = (description ?? '').trim();
     }
 
-    return { title, description };
+    return { title, description, templateId };
 }
 
 export const projectService = {
     subscribeToUserProjects: (userId, onUpdate) => {
         const userProjectsCollection = pathHelper.userProjects(userId)
-        // Gets projects in which the current user is envolved, ordered by their stored order field
-        const userProjectsQuery = query(userProjectsCollection, orderBy('order', 'asc'))
-
-        return onSnapshot(userProjectsQuery, (userProjectsSnap) => {
+        // Gets projects in which the current user is envolved
+        const userProjects = query(userProjectsCollection, orderBy('order', 'asc'))
+        
+        return onSnapshot(userProjects, (userProjectsSnap) => {
             const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-            }))
+            }));
             
             onUpdate(projectsToDisplay)
         });
@@ -75,37 +75,24 @@ export const projectService = {
         batch.set(userProjectRef, { 
             title: normalizedProjectData.title,
             description: normalizedProjectData.description,
-            order: nextOrder,
+            order: nextOrder
         })
 
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
-    },
 
-    reorderUserProjects: async (userId, reorderedProjects) => {
-        if (!userId) {
-            throw new Error('User ID is required to reorder projects')
-        }
-
-        const batch = writeBatch(db)
-
-        reorderedProjects.forEach((project, index) => {
-            batch.update(pathHelper.userProject(userId, project.id), {
-                order: index,
-            })
-        })
-
-        await batch.commit()
+        return projectRef // for template creation
     },
 
     updateProject: async (projectId, updates) => {
-        const { title, description } = normalizeProjectUpdates(updates)
-        if (!title && !description) {
+        const { title, description, templateId } = normalizeProjectUpdates(updates)
+        if (!title && !description && !templateId) {
             return // no updates
         }
 
         const dataToUpdate = {}
         if (title !== undefined) dataToUpdate.title = title
         if (description !== undefined) dataToUpdate.description = description
+        if (templateId !== undefined) dataToUpdate.templateId = templateId
         
         const operations = []
 
@@ -210,5 +197,31 @@ export const projectService = {
         const projectUsersRef = pathHelper.projectUsers(projectId)
         const projectUsersSnap = await getDocs(projectUsersRef)
         return projectUsersSnap.empty
+    },
+
+    reorderUserProjects: async (userId, reorderedProjects) => {
+        if (!userId) {
+            throw new Error('User ID is required to reorder projects')
+        }
+
+        const batch = writeBatch(db)
+
+        reorderedProjects.forEach((project, index) => {
+            batch.update(pathHelper.userProject(userId, project.id), {
+                order: index,
+            })
+        })
+
+        await batch.commit()
+    },
+
+    isProjectFromTemplate: async (projectId) => {
+        const projectRef = doc(db, COLLECTIONS.PROJECTS, projectId)
+        const projectSnap = await getDoc(projectRef)
+        if (!projectSnap.exists()) {
+            throw new Error("Project not found")
+        }
+
+        return projectSnap.data().templateId !== undefined
     }
 }

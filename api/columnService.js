@@ -44,7 +44,7 @@ export const columnService = {
         const projectRef = pathHelper.project(projectId)
         
         // Will need a run transaction because the column count that is written in the end requires the previous existing value in the database
-        await runTransaction(db, async (transaction) => {
+        const newColumnRef = await runTransaction(db, async (transaction) => {
             const projectSnap = await transaction.get(projectRef)
             const newColumnOrder = projectSnap.data().columnCount + 1 // Increase order of newly created column (considering the preexisting value)
 
@@ -60,7 +60,11 @@ export const columnService = {
                 order: newColumnOrder,
                 createdAt: Timestamp.now(),
             })
+            
+            return newColumnRef // for template-based project creation
         })
+
+        return newColumnRef // for template-based project creation
     },
 
     deleteColumn: async (projectId, columnId) => {

@@ -1,0 +1,33 @@
+appId: com.anonymous.LEICo
+tags:
+    - project
+    - template
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    TEMPLATE_NAME: "Programming Project"
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/login.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+
+- tapOn:
+    id: "open-create-project-modal-button"
+- tapOn:
+    id: "choice-template-project"
+- tapOn: ${TEMPLATE_NAME} # Assuming there is a template Programming Project
+- tapOn:
+    id: "template-project-modal-actions-create"
+- assertVisible: "Template Created"
+- assertVisible: "Template project created successfully."
+- tapOn: "OK"
+- assertVisible: ${TEMPLATE_NAME}
+- tapOn: ${TEMPLATE_NAME}
+- assertVisible: ${TEMPLATE_NAME}
+- assertVisible:
+    id: "project-arrow-back"

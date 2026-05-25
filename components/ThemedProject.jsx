@@ -6,7 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import ThemedIcon from './ThemedIcon';
 import AnimatedPressable from './AnimatedPressable';
 
-const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onLongPress }) => {
+// onPress and selected are used together when chossing a project template
+const ThemedProject = ({ name, description, borderColor, href, projectId, testID, onLongPress, onPress = null, selected = null, templateId = null }) => {
     const router = useRouter()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -19,10 +20,12 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
 
         if (projectId) {
             router.push({ pathname: '/project', params: { projectId } })
+        } else if (templateId) {
+            router.push({ pathname: '/(admin)/templateProject', params: { templateId } })
         }
     }
 
-    const gradientColors = [borderColor, `${borderColor}55`]
+    const gradientColors =  [borderColor, `${borderColor}55`]
 
     const CardContent = (
         <View style={[styles.card, { backgroundColor: theme.navBackground }]}>
@@ -33,9 +36,14 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                 style={styles.accentBar}
             />
             <View style={styles.content}>
-                <ThemedText title bold style={styles.name}>
-                    {name}
-                </ThemedText>
+                
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+                    <ThemedText title bold style={styles.name}>
+                        {name}
+                    </ThemedText>
+
+                    {selected && <ThemedIcon style={{ color: Colors.primary }} name="check-circle"/>} 
+                </View>
 
                 {description ? (
                     <ThemedText style={styles.description}>
@@ -43,17 +51,19 @@ const ThemedProject = ({ name, description, borderColor, href, projectId, testID
                     </ThemedText>
                 ) : null}
 
+                {!selected && !onPress && (
                 <View style={styles.footer}>
                     <Text style={[styles.openLabel, { color: borderColor }]}>Open</Text>
                     <ThemedIcon name="open-in-new" size={18} style={{ color: borderColor }}/>
                 </View>
+                )}
             </View>
         </View>
     )
 
     return (
         <AnimatedPressable
-            onPress={handlePress}
+            onPress={onPress || handlePress}
             onLongPress={onLongPress}
             testID={testID}
             style={{ marginVertical: 6 }}
