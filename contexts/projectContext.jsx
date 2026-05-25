@@ -42,8 +42,12 @@ export const ProjectProvider = ({ children }) => {
         await projectService.kickMember(projectId, memberId);
     }
 
+    async function reorderProjects(reorderedProjects) {
+        await projectService.reorderUserProjects(user.uid, reorderedProjects)
+    }
+
     return (
-        <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject, kickMember }}>
+        <ProjectContext.Provider value={{ projects, isLoadingProjects, setProjects, createProject, deleteProject, updateProject, kickMember, reorderProjects }}>
             {children}
         </ProjectContext.Provider>
     );

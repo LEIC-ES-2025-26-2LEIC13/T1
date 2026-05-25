@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, query, getDocs, writeBatch, where } from "firebase/firestore";
+import { collection, doc, onSnapshot, getDocs, orderBy, query, writeBatch, where } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from './batchOpsHelper';
 import { COLLECTIONS, SUBCOLLECTIONS } from "../constants/Collections";
@@ -28,14 +28,14 @@ function normalizeProjectUpdates( { title, description }) {
 export const projectService = {
     subscribeToUserProjects: (userId, onUpdate) => {
         const userProjectsCollection = pathHelper.userProjects(userId)
-        // Gets projects in which the current user is envolved
-        const userProjects = query(userProjectsCollection)
-        
-        return onSnapshot(userProjects, (userProjectsSnap) => {
+        // Gets projects in which the current user is envolved, ordered by their stored order field
+        const userProjectsQuery = query(userProjectsCollection, orderBy('order', 'asc'))
+
+        return onSnapshot(userProjectsQuery, (userProjectsSnap) => {
             const projectsToDisplay = userProjectsSnap.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-            }));
+            }))
             
             onUpdate(projectsToDisplay)
         });
@@ -51,6 +51,8 @@ export const projectService = {
         const batch = writeBatch(db); // creates a write batch
 
         const projectRef = doc(collection(db, COLLECTIONS.PROJECTS)); // Generates a new random id for a document that doesnt exist yet
+        const userProjectsSnapshot = await getDocs(pathHelper.userProjects(userId))
+        const nextOrder = userProjectsSnapshot.docs.length
 
         batch.set(projectRef, {
             ...normalizedProjectData,
@@ -72,10 +74,27 @@ export const projectService = {
         // another write operation to perform at commit()
         batch.set(userProjectRef, { 
             title: normalizedProjectData.title,
-            description: normalizedProjectData.description
+            description: normalizedProjectData.description,
+            order: nextOrder,
         })
 
         await batch.commit(); // Commits all of the writes in this write batch as a single atomic unit
+    },
+
+    reorderUserProjects: async (userId, reorderedProjects) => {
+        if (!userId) {
+            throw new Error('User ID is required to reorder projects')
+        }
+
+        const batch = writeBatch(db)
+
+        reorderedProjects.forEach((project, index) => {
+            batch.update(pathHelper.userProject(userId, project.id), {
+                order: index,
+            })
+        })
+
+        await batch.commit()
     },
 
     updateProject: async (projectId, updates) => {
