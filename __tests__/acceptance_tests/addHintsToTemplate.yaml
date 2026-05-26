@@ -1,0 +1,70 @@
+appId: com.anonymous.LEICo
+tags:
+    - hints
+    - template
+env: # These must be the credentials of an admin user
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    TEMPLATE_TITLE: "Testing-Add-Hints-To-Template"
+    TEMPLATE_DESCRIPTION: "Description"
+    COLUMN_NAME: "Column-Name"
+    TASK_NAME: "Task-Name"
+    TASK_DESCRIPTION: "Task-Description"
+    HINTS: "This-is-a-sentence."
+---
+- launchApp:
+    clearState: true
+
+- runFlow:
+    file: subflows/adminCreateTemplate.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        TEMPLATE_TITLE: ${TEMPLATE_TITLE}
+        TEMPLATE_DESCRIPTION: ${TEMPLATE_DESCRIPTION}
+
+- tapOn: "${TEMPLATE_TITLE}, ${TEMPLATE_DESCRIPTION}, Open, \udb80\udfcc"
+
+# Create a column
+- tapOn:
+    id: "open-create-column-modal-button"
+- tapOn: "Enter column name"
+- inputText: ${COLUMN_NAME}
+- hideKeyboard
+- tapOn:
+    id: "create-column-modal-actions-create"
+
+# Create a task
+- tapOn:
+    id: "open-create-task-modal-button"
+- tapOn: "Enter task name"
+- inputText: ${TASK_NAME}
+- hideKeyboard
+- tapOn: "Enter task description (optional)"
+- inputText: ${TASK_DESCRIPTION}
+- hideKeyboard
+- tapOn:
+    id: "create-task-modal-actions-create"
+
+# Create hints for that task
+- tapOn: "${TASK_NAME}, ${TASK_DESCRIPTION}"
+- assertVisible: "HINTS"
+- assertVisible: "No hints yet. Add hints."
+- tapOn:
+    id: "hints-button"
+- assertVisible: "Edit Hints"
+- assertVisible: "No Hint Content"
+- tapOn:
+    id: "save-edit-hints-button"
+- tapOn: "Enter hint content in Markdown format..."
+- inputText: ${HINTS}
+- hideKeyboard
+- tapOn:
+    id: "save-edit-hints-button"
+- assertVisible: ${HINTS}
+- tapOn:
+    id: "hint-editor-arrow-back"
+- assertVisible: "See hints" # The task has now hints
+- tapOn:
+    id: "hints-button"
+- assertVisible: ${HINTS} # The hints persisted

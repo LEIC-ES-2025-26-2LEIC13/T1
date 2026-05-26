@@ -16,7 +16,7 @@ import { templateColumnService } from '../api/templateColumnService'
 import { Colors } from '../constants/Colors'
 import { useRouter, useFocusEffect } from 'expo-router'
 
-export default function TaskModal({
+export default function TemplateTaskModal({
     visible,
     task,
     templateName,
@@ -47,25 +47,6 @@ export default function TaskModal({
 
     const [isEdit, setIsEdit] = useState(false);
     const [editedTask, setEditedTask] = useState(null);
-
-    // Refetch task data when returning from hint editor
-    useFocusEffect(
-        useCallback(() => {
-            if (visible && templateId && columnId && task?.id) {
-                const refetchTask = async () => {
-                    try {
-                        const updatedTask = await templateColumnService.getTask(templateId, columnId, task.id)
-                        if (updatedTask) {
-                            onChange('hints', updatedTask.hints)
-                        }
-                    } catch (error) {
-                        console.error('Error refetching task:', error)
-                    }
-                }
-                refetchTask()
-            }
-        }, [visible, templateId, columnId, task?.id, onChange])
-    )
 
     const handleEditToggle = () => {
         if (!isEdit) {
@@ -117,6 +98,25 @@ export default function TaskModal({
     const handlePressHint = () => {
         router.push({ pathname: '/hintEditor', params: { templateId, templateName, columnId, columnName, taskId: task.id, taskName: task.name } })
     }
+
+     // Refetch task data when returning from hint editor
+    useFocusEffect(
+        useCallback(() => {
+            if (visible && templateId && columnId && task?.id) {
+                const refetchTask = async () => {
+                    try {
+                        const updatedTask = await templateColumnService.getTask(templateId, columnId, task.id)
+                        if (updatedTask) {
+                            onChange('hints', updatedTask.hints)
+                        }
+                    } catch (error) {
+                        console.error('Error refetching task:', error)
+                    }
+                }
+                refetchTask()
+            }
+        }, [visible, templateId, columnId, task?.id, onChange])
+    )
 
     const taskHasHints = !!(task?.hints)
 
@@ -197,7 +197,7 @@ export default function TaskModal({
                 </ThemedText>
 
                 <AnimatedPressable
-                    testID="hint"
+                    testID="hints-button"
                     onPress={handlePressHint}
                     style={[styles.hintButton, { backgroundColor: theme.hint , boxShadow: `0px 0px 5px ${theme.hint}`}]}                >
                     <ThemedIcon onPrimary name="lightbulb-on-outline"/>

@@ -5,7 +5,6 @@ import ThemedButton from "../../components/ThemedButton";
 import OverflowMenu from '../../components/OverflowMenu';
 import TemplateTaskModal from '../../components/TemplateTaskModal';
 import { View, StyleSheet, useColorScheme } from 'react-native';
-import CreateTaskModal from '../../components/CreateTaskModal';
 import EditColumnModal from '../../components/EditColumnModal';
 import EmptyState from "../../components/EmptyState";
 import ThemedAlert, { ALERT_TYPES } from "../../components/ThemedAlert";
@@ -18,6 +17,7 @@ import ReorderableList, { reorderItems, useReorderableDrag } from 'react-native-
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTemplate } from "../../hooks/useTemplate";
 import { templateColumnService } from "../../api/templateColumnService";
+import TemplateCreateTaskModal from "../../components/TemplateCreateTaskModal";
 
 export default function TemplateColumn({ templateId, templateName, columnData, columns }) {
     const colorScheme = useColorScheme();
@@ -221,7 +221,7 @@ export default function TemplateColumn({ templateId, templateName, columnData, c
                         columnData={column}
                     />
 
-                    <CreateTaskModal
+                    <TemplateCreateTaskModal
                         visible={taskModalCreationVisible}
                         task={task}
                         projectName={templateName}

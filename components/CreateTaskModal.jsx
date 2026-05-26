@@ -21,7 +21,6 @@ export default function CreateTaskModal({
     task,
     onChange,
     getProjectUsers,
-    template = false
 }) {
     const isPreset = LABELS.some(label => label.name === task.label)
 
@@ -82,27 +81,25 @@ export default function CreateTaskModal({
                                     onChangeText={(value) => onChange('description', value)}
                                     multiline
                                 />
-
-                                {!template && (
-                                    <FormField
-                                        labelName="LABELS"
-                                        placeholder="Enter or select label"
-                                        value={isPreset ? "" : task.label}
-                                        onChangeText={(text) => onChange('label', text)}
-                                    />
-                                )}
+                        
+                            
+                                <FormField
+                                    labelName="LABELS"
+                                    placeholder="Enter or select label"
+                                    value={isPreset ? "" : task.label}
+                                    onChangeText={(text) => onChange('label', text)}
+                                />
                                 
-                                {!template && labels}
+                                
+                                {labels}
 
-                                {!template && (
-                                    <AssignMembersSection
-                                        assignedMembers={task.assignedMembers}
-                                        onAssignedMembersChange={(members) => onChange('assignedMembers', members)}
-                                        getProjectUsers={getProjectUsers}
-                                        visible={visible}
-                                    />
-                                )}
-
+                                <AssignMembersSection
+                                    assignedMembers={task.assignedMembers}
+                                    onAssignedMembersChange={(members) => onChange('assignedMembers', members)}
+                                    getProjectUsers={getProjectUsers}
+                                    visible={visible}
+                                />
+                            
                             </ModalBody>
                         </ScrollView>
                     </View>

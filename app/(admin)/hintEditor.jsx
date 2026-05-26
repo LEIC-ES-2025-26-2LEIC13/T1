@@ -95,7 +95,7 @@ const HintEditor = () => {
                 placeholder="Enter hint content in Markdown format..."
                 onChangeText={setContent}
                 containerStyle={{ flex: 1 }}
-                style={{ flex: 1, textAlignVertical: 'top', fontSize: 16 }}
+                style={styles.hintTextInput}
             >
                 {content}
             </ThemedTextInput>
@@ -125,7 +125,7 @@ const HintEditor = () => {
             
             <EmptyState
                 title="No Hint Content"
-                description="Add hint content clicking on the button below."
+                subtitle="Add hint content clicking on the button below."
                 iconName="lightbulb-on-outline"
             />
 
@@ -141,13 +141,13 @@ const HintEditor = () => {
 
                     headerTitle: () => (
                         <ThemedText title bold style={{ fontSize: 20 }}>
-                            Edit Hint
+                            Edit Hints
                         </ThemedText>
                     ),
 
                     headerLeft: () => (
 						<AnimatedPressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
-							<ThemedIcon testID="project-arrow-back" name="arrow-left"/>
+							<ThemedIcon testID="hint-editor-arrow-back" name="arrow-left"/>
 						</AnimatedPressable>
 					),
                 }}
@@ -165,14 +165,14 @@ const HintEditor = () => {
                 <View style={styles.buttonContrainer}>
                     
                     {!isPreviewing && 
-                    <ThemedButton style={{flex: 1}} onPress={isEditing ? handleSave : handleEdit}>
+                    <ThemedButton testID="save-edit-hints-button" style={{flex: 1}} onPress={isEditing ? handleSave : handleEdit}>
                         <ThemedIcon onPrimary name={isEditing ? "content-save" : "pencil"} style={{ marginRight: 6 }}/>
-                        <ThemedText onPrimary bold>{isEditing ? "Save Hint" : "Edit Hint"}</ThemedText>
+                        <ThemedText onPrimary bold>{isEditing ? "Save Hints" : "Edit Hints"}</ThemedText>
                     </ThemedButton>
                     }
 
                     {isEditing &&
-                    <ThemedButton style={{flex: 1}} onPress={() => setIsPreviewing(!isPreviewing)}>
+                    <ThemedButton testID="toggle-preview-button" style={{flex: 1}} onPress={() => setIsPreviewing(!isPreviewing)}>
                         <ThemedIcon onPrimary name={isPreviewing ? "eye-off" : "eye"} style={{ marginRight: 6 }}/>
                         <ThemedText onPrimary bold>{isPreviewing ? "Hide Preview" : "Show Preview"}</ThemedText>
                     </ThemedButton>
@@ -201,5 +201,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 10,
         marginBottom: 10
+    },
+    hintTextInput: {
+        flex: 1,
+        textAlignVertical: 'top',
+        fontSize: 16,
+        height: '100%'
     }
 })
