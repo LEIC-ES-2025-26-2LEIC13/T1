@@ -1,4 +1,4 @@
-import { doc, getDocs, query, orderBy, onSnapshot, Timestamp, runTransaction } from "firebase/firestore";
+import { doc, getDocs, getDoc, getCountFromServer, query, orderBy, onSnapshot, Timestamp, runTransaction } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 import { pathHelper } from "./pathHelper";
@@ -97,6 +97,82 @@ export const columnService = {
         })
         
         // Execute single batch delete for all operations
+        await batchOps(db, operations)
+    },
+
+    getTask: async (projectId, columnId, taskId) => {
+        const taskRef = pathHelper.columnTask(projectId, columnId, taskId)
+        const taskSnap = await getDoc(taskRef)
+
+        if (!taskSnap.exists()) {
+            return null
+        }
+
+        return { id: taskSnap.id, ...taskSnap.data() }
+    },
+
+    getHint: async (projectId, columnId, taskId) => {
+        const taskRef = pathHelper.columnTask(projectId, columnId, taskId)
+        const taskSnap = await getDoc(taskRef)
+
+        return taskSnap.exists() ? taskSnap.data().hints : ''
+    },
+
+    moveTaskToColumn: async (projectId, task, fromColumnId, toColumn) => {
+        const existingTasks = await getCountFromServer(pathHelper.columnTasks(projectId, toColumn.id))
+        const newOrder = existingTasks.data().count
+
+        const operations = []
+
+        operations.push({
+            type: OPERATION_TYPES.DELETE,
+            ref: pathHelper.columnTask(projectId, fromColumnId, task.id)
+        })
+
+        const newTaskData = {
+            name: task.name,
+            description: task.description,
+            label: task.label,
+            assignedMembers: task.assignedMembers,
+            order: newOrder,
+            createdAt: task.createdAt
+        }
+
+        if (task.hints !== undefined) {
+            newTaskData.hints = task.hints
+        }
+
+        operations.push({
+            type: OPERATION_TYPES.SET,
+            ref: pathHelper.columnTask(projectId, toColumn.id, task.id),
+            data: newTaskData
+        })
+
+        for (const { id: memberId } of (task.assignedMembers ?? [])) {
+            operations.push({
+                type: OPERATION_TYPES.UPDATE,
+                ref: pathHelper.userTask(memberId, task.id),
+                data: {
+                    columnId: toColumn.id,
+                    columnName: toColumn.name
+                }
+            })
+        }
+
+        await batchOps(db, operations)
+    },
+
+    updateTask: async (projectId, columnId, taskId, taskData) => {
+        const taskRef = pathHelper.columnTask(projectId, columnId, taskId)
+
+        const operations = [
+            {
+                type: OPERATION_TYPES.UPDATE,
+                ref: taskRef,
+                data: taskData
+            }
+        ]
+
         await batchOps(db, operations)
     },
 

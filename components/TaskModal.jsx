@@ -1,5 +1,5 @@
-import React, {useState} from 'react'
-import { StyleSheet } from 'react-native'
+import React, {useState, useCallback} from 'react'
+import { StyleSheet, useColorScheme } from 'react-native'
 import AppModal from './AppModal'
 import ModalHeader from './modal/ModalHeader'
 import FormField from './FormField'
@@ -8,14 +8,15 @@ import PillsContainer from './PillsContainer'
 import Pill from './Pill'
 import {LABELS} from '../constants/Labels'
 import ModalActions from './modal/ModalActions'
-import {LabelColors } from '../constants/Colors'
+import { Colors, LabelColors } from '../constants/Colors'
 import AnimatedPressable from './AnimatedPressable'
 import ThemedText from './ThemedText'
 import ThemedIcon from './ThemedIcon'
 import Spacer from './Spacer'
 import ThemedView from './ThemedView'
-import {taskService} from '../api/taskService'
+import {columnService} from '../api/columnService'
 import AssignMembersSection from "./AssignMembersSection";
+import { useRouter, useFocusEffect } from 'expo-router'
 
 export default function TaskModal({
     visible,
@@ -33,12 +34,17 @@ export default function TaskModal({
     getProjectUsers,
 }) {
 
+    const colorScheme = useColorScheme()
+    const theme = Colors[colorScheme] ?? Colors.light
+
+    const router = useRouter() // for hints page
+
     const currentIndex = columns?.findIndex(c => c.id === columnId) ?? -1
     const prevColumn = currentIndex > 0 ? columns[currentIndex - 1] : null
     const nextColumn = currentIndex < (columns?.length - 1) ? columns[currentIndex + 1] : null
 
     const handleMove = async (targetColumn) => {
-        await taskService.moveTaskToColumn(projectId, task, columnId, targetColumn)
+        await columnService.moveTaskToColumn(projectId, task, columnId, targetColumn)
         onTaskMoved?.()  // close modal after move
     }
 
@@ -47,6 +53,8 @@ export default function TaskModal({
 
     // Calculate labelIcon based on current label (recalculated on each render)
     const labelIcon = LABELS.find(label => label.name === (isEdit ? editedTask?.label : task?.label))?.icon
+    
+    const taskHasHints = !!(task?.hints)
 
     const handleEditToggle = () => {
         if (!isEdit) {
@@ -72,7 +80,7 @@ export default function TaskModal({
     const handleSaveEdit = async () => {
         try {
             // Update the task with new values
-            await taskService.updateTask(projectId, columnId, task.id, {
+            await columnService.updateTask(projectId, columnId, task.id, {
                 name: editedTask.name,
                 description: editedTask.description,
                 label: editedTask.label,
@@ -100,6 +108,26 @@ export default function TaskModal({
         setIsEdit(false);
         onClose();
     }
+
+    const handlePressHints = () => {
+        router.push({ pathname: '/hintViewer', params: {projectId, projectName, columnId, columnName, taskId: task.id, taskName: task.name} })
+    }
+
+     useFocusEffect(
+        useCallback(() => {
+            if (visible && projectId && columnId && task?.id) {
+                const refetchTask = async () => {
+                    const updatedTask = await columnService.getTask(projectId, columnId, task.id)
+                    if (updatedTask) {
+                        onChange('hints', updatedTask.hints)
+                    }
+                    // if task not found (moved to another column, e.g.) do nothing.
+                }
+                refetchTask()
+            }
+        }, [visible, projectId, columnId, task?.id, onChange])
+    )
+
 
     return (
         <AppModal visible={visible} onClose={onClose}>
@@ -184,6 +212,28 @@ export default function TaskModal({
                     onChangeText={isEdit ? (value) => handleEditChange('description', value) : null}
                 />
 
+                
+
+                {taskHasHints ? (
+                    <>
+                        <ThemedText style={styles.label}>
+                            Hints
+                        </ThemedText>
+                        <AnimatedPressable
+                            testID="hints-button"
+                            style={[styles.hintButton, { backgroundColor: theme.hint, boxShadow: `0px 0px 5px ${theme.hint}` }]}
+                            onPress={handlePressHints}
+                        >
+                            <ThemedIcon onPrimary name="lightbulb-on-outline" />
+                            <ThemedText onPrimary style={{ marginLeft: 8 }}>
+                                See hints
+                            </ThemedText>
+                        </AnimatedPressable>
+                    </>
+                ) : null}
+
+                
+
                 {isEdit ? (
                     <>
                         <FormField
@@ -264,6 +314,22 @@ const styles = StyleSheet.create({
     moveButtonText: {
         fontSize: 13,
         fontWeight: '500',
+    },
+    label: {
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.8,
+        textTransform: 'uppercase',
+        marginBottom: 7,
+        opacity: 0.7
+    },
+    hintButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 10
     },
     pillsWrapper: {
         flexDirection: 'row',
