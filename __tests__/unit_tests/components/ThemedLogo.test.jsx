@@ -1,6 +1,7 @@
 import { describe, expect, test, jest, beforeEach } from '@jest/globals'
 import React from "react";
 import { render } from "@testing-library/react-native";
+
 import * as ReactNative from "react-native";
 import ThemedLogo from "../../../components/ThemedLogo";
 

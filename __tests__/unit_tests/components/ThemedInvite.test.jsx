@@ -2,11 +2,12 @@ import { describe, expect, test, jest, beforeEach } from '@jest/globals'
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 import * as ReactNative from "react-native";
+
 import ThemedInvite from "../../../components/ThemedInvite";
 import { Colors } from "../../../constants/Colors";
 
 
-// ── Mocks ──────────────────────────────────────────────────────────────────
+// Mocks
 
 jest.mock("../../../components/ThemedText", () => {
     const React = require("react");
@@ -38,7 +39,7 @@ jest.mock("../../../components/modal/ModalActions", () => {
 });
 
 
-// ── Spies e Helpers ────────────────────────────────────────────────────────
+//  Spies e Helpers
 
 const mockUseColorScheme = jest.spyOn(ReactNative, "useColorScheme");
 
@@ -50,7 +51,7 @@ const defaultProps = {
 };
 
 
-// ── Testes ─────────────────────────────────────────────────────────────────
+// Tests
 
 describe("ThemedInvite", () => {
     beforeEach(() => {

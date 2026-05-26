@@ -5,7 +5,7 @@ import * as ReactNative from "react-native";
 import ThemedTextInput from "../../../components/ThemedTextInput";
 import { Colors } from "../../../constants/Colors";
 
-// ── Mocks ──────────────────────────────────────────────────────────────────
+// Mocks
 
 jest.mock("../../../components/ThemedIcon", () => {
     const React = require("react");
@@ -33,7 +33,7 @@ jest.mock("../../../components/AnimatedPressable", () => {
 
 const mockUseColorScheme = jest.spyOn(ReactNative, "useColorScheme");
 
-// ── Tests ──────────────────────────────────────────────────────────────────
+// Tests
 
 describe("ThemedTextInput", () => {
     beforeEach(() => {

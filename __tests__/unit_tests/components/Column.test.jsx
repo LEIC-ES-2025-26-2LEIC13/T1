@@ -1,12 +1,7 @@
-import {
-    jest,
-    beforeEach,
-    describe,
-    test,
-    expect,
-} from "@jest/globals";
+import { jest, beforeEach, describe, test, expect } from "@jest/globals";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
+
 import Columns from "../../../components/Columns";
 
 // Mock Column component

@@ -1,10 +1,4 @@
-import {
-    jest,
-    beforeEach,
-    describe,
-    test,
-    expect,
-} from "@jest/globals";
+import { jest, beforeEach, describe, test, expect } from "@jest/globals";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 
@@ -13,7 +7,7 @@ import EditColumnModal from "../../../components/EditColumnModal";
 const mockOnClose = jest.fn();
 const mockOnEdit = jest.fn();
 
-// Mocks corrigidos para suportar Default Exports (__esModule: true) e evitar requires no render
+// Mocks
 jest.mock("../../../components/AppModal", () => {
     const React = require("react");
     const { View } = require("react-native");
