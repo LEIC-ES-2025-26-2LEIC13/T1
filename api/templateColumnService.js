@@ -148,7 +148,7 @@ export const templateColumnService = {
         const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
         const taskSnap = await getDoc(taskRef)
         if (!taskSnap.exists()) {
-            throw new Error('Task not found')
+            return null
         }
         return { id: taskSnap.id, ...taskSnap.data() }
     },
@@ -210,14 +210,20 @@ export const templateColumnService = {
         })
 
         // 2. Create in new column, reusing same task ID
+        const newTaskData = {
+            name: task.name,
+            description: task.description,
+            order: newOrder,
+        };
+
+        if (task.hints !== undefined) {
+            newTaskData.hints = task.hints;
+        }
+
         operations.push({
             type: OPERATION_TYPES.SET,
             ref: pathHelper.templateColumnTask(templateId, toColumn.id, task.id),
-            data: {
-                name: task.name,
-                description: task.description,
-                order: newOrder,
-            }
+            data: newTaskData
         })
 
         await batchOps(db, operations)  

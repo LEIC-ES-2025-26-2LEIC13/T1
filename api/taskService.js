@@ -3,19 +3,19 @@ import { pathHelper } from "./pathHelper";
 import { db } from "../firebase/firebaseConfig";
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 
-function normalizeTaskData({ name, description, label, assignedMembers, hints = null }) {
-    return hints ? {
+function normalizeTaskData({ name, description, label, assignedMembers, hints }) {
+    const normalized = {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
         label: label?.trim() ?? '',
         assignedMembers: assignedMembers ?? [],
-        hints: hints ?? ''
-    } : {
-        name: name?.trim() ?? '',
-        description: description?.trim() ?? '',
-        label: label?.trim() ?? '',
-        assignedMembers: assignedMembers ?? [],
+    };
+
+    if (hints !== undefined) {
+        normalized.hints = hints;
     }
+
+    return normalized;
 }
 
 export const taskService = {
@@ -150,17 +150,23 @@ export const taskService = {
         })
 
         // 2. Create in new column, reusing same task ID
+        const newTaskData = {
+            name: task.name,
+            description: task.description,
+            label: task.label,
+            assignedMembers: task.assignedMembers,
+            order: newOrder,
+            createdAt: task.createdAt
+        };
+
+        if (task.hints !== undefined) {
+            newTaskData.hints = task.hints;
+        }
+
         operations.push({
             type: OPERATION_TYPES.SET,
             ref: pathHelper.columnTask(projectId, toColumn.id, task.id),
-            data: {
-                name: task.name,
-                description: task.description,
-                label: task.label,
-                assignedMembers: task.assignedMembers,
-                order: newOrder,
-                createdAt: task.createdAt
-            }
+            data: newTaskData
         })
 
         // 3. Update userTask copies to reflect new column

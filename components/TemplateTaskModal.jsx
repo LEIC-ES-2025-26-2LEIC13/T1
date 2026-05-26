@@ -104,14 +104,11 @@ export default function TemplateTaskModal({
         useCallback(() => {
             if (visible && templateId && columnId && task?.id) {
                 const refetchTask = async () => {
-                    try {
-                        const updatedTask = await templateColumnService.getTask(templateId, columnId, task.id)
-                        if (updatedTask) {
-                            onChange('hints', updatedTask.hints)
-                        }
-                    } catch (error) {
-                        console.error('Error refetching task:', error)
+                    const updatedTask = await templateColumnService.getTask(templateId, columnId, task.id)
+                    if (updatedTask) {
+                        onChange('hints', updatedTask.hints)
                     }
+                    // if task not found (moved to another column, e.g.) do nothing.
                 }
                 refetchTask()
             }
