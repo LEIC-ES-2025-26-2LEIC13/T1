@@ -2,10 +2,17 @@
 
 ## Updated database structure
 
+* Now the database structure has two new collections: `admin` and `templates`.
+* The `admin` collection is used to store the list of admin users, with each document representing an admin identified by their UID.
+* The `templates` collection is used to store the list of project templates, with each document representing a template (with all the associated data and subcollections).
+
 ``` text
 /
-├─ users                      (collection)
+├─ admin                      (collection)
 │  └─ {userId}                (user document)
+│
+├─ users
+│  └─ {userId}
 │     ├─ email
 │     ├─ userProjects         (subcolletion)
 │     │  └─ {projectId}       (subcolletion document)
@@ -77,6 +84,24 @@
 			       └─ order
 ```
 
+## Templates
+
+* Now the app has support for project templates for L.EIC projects. These can be used for creating new projects with a predefined structure modelled specifically for certain L.EIC projects, which can be especially useful for students.
+* Each template serves a specific L.EIC project.
+
+### Creation of Template-Based Projects
+
+* When creating a new project, the user can choose between starting with a custom blank project or using one of the available templates.
+* If the user chooses a template, the app creates a new project and populates it with the structure defined in the template, including columns and tasks.
+* Afterwards, that template-based project is fully editable and behaves like any other project, allowing the user to modify it as needed.
+
+### Task Hints
+
+* Certain tasks from template-based projects can have hints associated with them.
+* These hints are written by admin users (authors of the templates) and are meant to provide guidance or suggestions to users working on a task of a L.EIC project.
+* The idea is to have a way of sharing valuable information between students that have already made the project and new students that are just starting it.
+* These hints can be accessed inside the respective task modal and are displayed for the user with Markdown styling.
+* The admin writes the hints in Markdown format.
 
 ## Google Sign-In Update
 
@@ -136,7 +161,7 @@ The new role check changes the way the app boots after authentication:
 
 This prevents the UI from briefly showing the wrong navigation shell while the auth state is still being resolved.
 
-## Summary
+### Summary
 
 These two commits mainly reworked the authentication and navigation entry flow:
 
@@ -145,6 +170,7 @@ These two commits mainly reworked the authentication and navigation entry flow:
 * The app now switches between two different navigation structures depending on the user role.
 
 The result is a cleaner entry point for regular users and a separate space for admin-only functionality.
+
 ## Project Reordering
 
 The project tab now supports drag-and-drop reordering, using the same interaction style as columns and tasks.
