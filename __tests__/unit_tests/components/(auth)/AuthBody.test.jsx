@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals'
 import React from "react";
 import { render } from "@testing-library/react-native";
 import { Keyboard, ScrollView } from "react-native";
+
 import AuthBody from "../../../../components/auth/AuthBody";
 
 describe("AuthBody", () => {

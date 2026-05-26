@@ -1,5 +1,6 @@
 import { jest, describe, expect, test } from '@jest/globals'
 import { render, screen } from '@testing-library/react-native'
+
 import { useColorScheme } from 'react-native'
 import ThemedView from '../../../components/ThemedView'
 import { Colors } from '../../../constants/Colors'

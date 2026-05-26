@@ -1,14 +1,10 @@
 import { useState } from "react";
-import { useColorScheme } from "react-native";
-import { Colors } from "../constants/Colors";
 import AnimatedPressable from "./AnimatedPressable";
 import SuggestionModal from "./SuggestionModal";
 import ThemedCard from "./ThemedCard";
 import ThemedText from "./ThemedText";
 
 export default function ThemedSuggestion({ suggestion, onPress }) {
-    const colorScheme = useColorScheme();
-    const theme = Colors[colorScheme] ?? Colors.light;
     const [modalVisible, setModalVisible] = useState(false);
 
     const handlePress = () => {

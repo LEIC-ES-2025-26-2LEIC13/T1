@@ -8,7 +8,7 @@ const mockOnClose = jest.fn();
 const mockOnInvite = jest.fn();
 const mockOnChangeText = jest.fn();
 
-// Mocks corrigidos e otimizados para Default Exports
+// Mocks
 jest.mock("../../../components/AppModal", () => {
     const React = require("react");
     const { View } = require("react-native");

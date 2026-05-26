@@ -10,7 +10,6 @@ import Spacer from "./Spacer";
 import { Colors } from "../constants/Colors";
 import ThemedAlert, { ALERT_TYPES } from "./ThemedAlert";
 
-
 function putCurrUserFirst(userEmail, members) {
     let res = []
     let curUser = null

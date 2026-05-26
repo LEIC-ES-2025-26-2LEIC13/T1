@@ -1,9 +1,10 @@
 import { describe, expect, test, jest, beforeEach } from '@jest/globals'
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+
 import ThemedAlert, { ALERT_TYPES } from "../../../components/ThemedAlert";
 
-// ── Mocks ──────────────────────────────────────────────────────────────────
+// Mocks
 
 jest.mock("../../../components/AppModal", () => {
     const React = require("react");
@@ -52,7 +53,7 @@ jest.mock("../../../components/Spacer", () => ({
 }));
 
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// Helpers
 
 const defaultAlert = {
     type: ALERT_TYPES.INFO,
@@ -68,7 +69,7 @@ const defaultProps = {
 };
 
 
-// ── Tests ──────────────────────────────────────────────────────────────────
+// Tests
 
 describe("ALERT_TYPES", () => {
     test("exports the correct icon names", () => {

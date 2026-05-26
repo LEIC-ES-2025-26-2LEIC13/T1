@@ -2,8 +2,8 @@ import { describe, expect, test, jest, beforeEach } from '@jest/globals'
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import * as ReactNative from "react-native";
+
 import AuthFooter from "../../../../components/auth/AuthFooter";
-import { Colors } from "../../../../constants/Colors";
 
 // Mocks
 

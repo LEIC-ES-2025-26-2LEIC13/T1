@@ -1,6 +1,7 @@
 import { jest, beforeEach, describe, test, expect } from "@jest/globals";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
+
 import CreateTemplateModal from "../../../components/CreateTemplateModal";
 
 const mockOnClose = jest.fn();
