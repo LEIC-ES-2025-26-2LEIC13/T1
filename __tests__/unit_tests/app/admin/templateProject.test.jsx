@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import ProjectScreen from '../../app/(admin)/templateProject';
-import { useTemplate } from '../../hooks/useTemplate';
-import { templateService } from '../../api/templateService';
+import ProjectScreen from '../../../../app/(admin)/templateProject';
+import { useTemplate } from '../../../../hooks/useTemplate';
+import { templateService } from '../../../../api/templateService';
 
 // Mocks
 
@@ -24,7 +24,7 @@ jest.mock('firebase/firestore', () => ({
     writeBatch: jest.fn(),
 }));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
+jest.mock('../../../../firebase/firebaseConfig', () => ({
     db: {},
     auth: {},
 }));
@@ -37,28 +37,28 @@ jest.mock('firebase/auth', () => ({
     getAuth: jest.fn(),
 }));
 
-jest.mock('../../api/authService', () => ({
+jest.mock('../../../../api/authService', () => ({
     authService: {
         signOut: jest.fn(),
         onAuthStateChanged: jest.fn(),
     },
 }));
 
-jest.mock('../../contexts/authContext', () => ({
+jest.mock('../../../../contexts/authContext', () => ({
     AuthProvider: ({ children }) => children,
     useAuthContext: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../hooks/useAuth', () => ({
+jest.mock('../../../../hooks/useAuth', () => ({
     useAuth: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../contexts/templateContext', () => ({
+jest.mock('../../../../contexts/templateContext', () => ({
     TemplateProvider: ({ children }) => children,
     useTemplateContext: jest.fn(() => ({})),
 }));
 
-jest.mock('../../api/templateService', () => ({
+jest.mock('../../../../api/templateService', () => ({
     templateService: {
         updateTemplate: jest.fn(),
         deleteTemplate: jest.fn(),
@@ -67,7 +67,7 @@ jest.mock('../../api/templateService', () => ({
     },
 }));
 
-jest.mock('../../api/templateColumnService', () => ({
+jest.mock('../../../../api/templateColumnService', () => ({
     templateColumnService: {
         getHint: jest.fn(),
         saveHint: jest.fn(),
@@ -104,10 +104,10 @@ jest.mock('expo-router', () => ({
     },
 }));
 
-jest.mock('../../hooks/useTemplate');
-jest.mock('../../api/templateService');
+jest.mock('../../../../hooks/useTemplate');
+jest.mock('../../../../api/templateService');
 
-jest.mock('../../app/(admin)/templateColumns', () => {
+jest.mock('../../../../app/(admin)/templateColumns', () => {
     const { View } = require('react-native');
     return ({ columns, openCreateColumnModal }) => (
         <View testID="template-columns">
@@ -116,29 +116,29 @@ jest.mock('../../app/(admin)/templateColumns', () => {
     );
 });
 
-jest.mock('../../components/ThemedText', () => {
+jest.mock('../../../../components/ThemedText', () => {
     const { Text } = require('react-native');
     return ({ children, ...props }) => <Text {...props}>{children}</Text>;
 });
 
-jest.mock('../../components/ThemedIcon', () => {
+jest.mock('../../../../components/ThemedIcon', () => {
     const { View } = require('react-native');
     return (props) => <View {...props} />;
 });
 
-jest.mock('../../components/AnimatedPressable', () => {
+jest.mock('../../../../components/AnimatedPressable', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, ...props }) => (
         <TouchableOpacity onPress={onPress} {...props}>{children}</TouchableOpacity>
     );
 });
 
-jest.mock('../../components/SafeAreaPage', () => {
+jest.mock('../../../../components/SafeAreaPage', () => {
     const { View } = require('react-native');
     return ({ children, ...props }) => <View {...props}>{children}</View>;
 });
 
-jest.mock('../../components/OverflowMenu', () => {
+jest.mock('../../../../components/OverflowMenu', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     return ({ actions, testID }) => (
         <View testID={testID}>
@@ -151,7 +151,7 @@ jest.mock('../../components/OverflowMenu', () => {
     );
 });
 
-jest.mock('../../components/CreateColumnModal', () => {
+jest.mock('../../../../components/CreateColumnModal', () => {
     const { View, TouchableOpacity } = require('react-native');
     return ({ visible, onClose, onCreate, onChange }) =>
         visible ? (
@@ -169,7 +169,7 @@ jest.mock('../../components/CreateColumnModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/EditProjectModal', () => {
+jest.mock('../../../../components/EditProjectModal', () => {
     const { View, TouchableOpacity } = require('react-native');
     return ({ visible, onClose, onSave, onChange }) =>
         visible ? (
@@ -187,7 +187,7 @@ jest.mock('../../components/EditProjectModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/ThemedAlert', () => {
+jest.mock('../../../../components/ThemedAlert', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     const mock = ({ visible, alert, onConfirm }) =>
         visible ? (

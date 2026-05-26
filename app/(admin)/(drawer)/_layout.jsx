@@ -39,16 +39,6 @@ export default function AdminDrawerLayout() {
           ),
         }}
       />
-
-      <Drawer.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          drawerIcon: ({ focused, color }) => (
-            <ThemedIcon name={focused ? "cog" : "cog-outline"} color={color} />
-          ),
-        }}
-      />
     </Drawer>
   );
 }

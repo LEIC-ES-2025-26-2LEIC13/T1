@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import TemplateColumn from '../../app/(admin)/templateColumn';
-import { useTemplate } from '../../hooks/useTemplate';
-import { templateColumnService } from '../../api/templateColumnService';
+import TemplateColumn from '../../../../app/(admin)/templateColumn';
+import { useTemplate } from '../../../../hooks/useTemplate';
+import { templateColumnService } from '../../../../api/templateColumnService';
 
 // Mocks
 
@@ -24,7 +24,7 @@ jest.mock('firebase/firestore', () => ({
     writeBatch: jest.fn(),
 }));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
+jest.mock('../../../../firebase/firebaseConfig', () => ({
     db: {},
     auth: {},
 }));
@@ -37,28 +37,28 @@ jest.mock('firebase/auth', () => ({
     getAuth: jest.fn(),
 }));
 
-jest.mock('../../api/authService', () => ({
+jest.mock('../../../../api/authService', () => ({
     authService: {
         signOut: jest.fn(),
         onAuthStateChanged: jest.fn(),
     },
 }));
 
-jest.mock('../../contexts/authContext', () => ({
+jest.mock('../../../../contexts/authContext', () => ({
     AuthProvider: ({ children }) => children,
     useAuthContext: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../hooks/useAuth', () => ({
+jest.mock('../../../../hooks/useAuth', () => ({
     useAuth: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../contexts/templateContext', () => ({
+jest.mock('../../../../contexts/templateContext', () => ({
     TemplateProvider: ({ children }) => children,
     useTemplateContext: jest.fn(() => ({})),
 }));
 
-jest.mock('../../api/templateService', () => ({
+jest.mock('../../../../api/templateService', () => ({
     templateService: {
         updateTemplate: jest.fn(),
         deleteTemplate: jest.fn(),
@@ -67,8 +67,8 @@ jest.mock('../../api/templateService', () => ({
     },
 }));
 
-jest.mock('../../hooks/useTemplate');
-jest.mock('../../api/templateColumnService');
+jest.mock('../../../../hooks/useTemplate');
+jest.mock('../../../../api/templateColumnService');
 
 jest.mock('react-native/Libraries/Utilities/useColorScheme', () => ({
     __esModule: true,
@@ -108,7 +108,7 @@ jest.mock('react-native-gesture-handler', () => ({
     GestureHandlerRootView: ({ children }) => children,
 }));
 
-jest.mock('../../components/ThemedTask', () => {
+jest.mock('../../../../components/ThemedTask', () => {
     const { TouchableOpacity, Text } = require('react-native');
     return ({ task, onPress, testID, onLongPress }) => (
         <TouchableOpacity testID={testID} onPress={onPress} onLongPress={onLongPress}>
@@ -117,24 +117,24 @@ jest.mock('../../components/ThemedTask', () => {
     );
 });
 
-jest.mock('../../components/ThemedText', () => {
+jest.mock('../../../../components/ThemedText', () => {
     const { Text } = require('react-native');
     return ({ children, ...props }) => <Text {...props}>{children}</Text>;
 });
 
-jest.mock('../../components/ThemedButton', () => {
+jest.mock('../../../../components/ThemedButton', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, testID }) => (
         <TouchableOpacity testID={testID} onPress={onPress}>{children}</TouchableOpacity>
     );
 });
 
-jest.mock('../../components/ThemedIcon', () => {
+jest.mock('../../../../components/ThemedIcon', () => {
     const { View } = require('react-native');
     return (props) => <View {...props} />;
 });
 
-jest.mock('../../components/OverflowMenu', () => {
+jest.mock('../../../../components/OverflowMenu', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     return ({ actions }) => (
         <View testID="overflow-menu">
@@ -147,7 +147,7 @@ jest.mock('../../components/OverflowMenu', () => {
     );
 });
 
-jest.mock('../../components/EditColumnModal', () => {
+jest.mock('../../../../components/EditColumnModal', () => {
     const { View, TouchableOpacity } = require('react-native');
     return ({ visible, onClose, onEdit, columnData }) =>
         visible ? (
@@ -161,7 +161,7 @@ jest.mock('../../components/EditColumnModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/TemplateCreateTaskModal', () => {
+jest.mock('../../../../components/TemplateCreateTaskModal', () => {
     const { View, TouchableOpacity } = require('react-native');
     return ({ visible, onClose, onCreate, onChange }) =>
         visible ? (
@@ -179,7 +179,7 @@ jest.mock('../../components/TemplateCreateTaskModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/TemplateTaskModal', () => {
+jest.mock('../../../../components/TemplateTaskModal', () => {
     const { View, TouchableOpacity } = require('react-native');
     return ({ visible, onClose, deleteTask, onTaskMoved, onChange, task }) =>
         visible ? (
@@ -195,14 +195,14 @@ jest.mock('../../components/TemplateTaskModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/EmptyState', () => {
+jest.mock('../../../../components/EmptyState', () => {
     const { View, Text } = require('react-native');
     return ({ title }) => (
         <View testID="empty-state"><Text>{title}</Text></View>
     );
 });
 
-jest.mock('../../components/ThemedAlert', () => {
+jest.mock('../../../../components/ThemedAlert', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     const mock = ({ visible, alert, onConfirm }) =>
         visible ? (
@@ -217,22 +217,22 @@ jest.mock('../../components/ThemedAlert', () => {
     return mock;
 });
 
-jest.mock('../../components/LoadingScreen', () => {
+jest.mock('../../../../components/LoadingScreen', () => {
     const { View, Text } = require('react-native');
     return ({ loadingText }) => <View testID="loading-screen"><Text>{loadingText}</Text></View>;
 });
 
-jest.mock('../../components/Divider', () => {
+jest.mock('../../../../components/Divider', () => {
     const { View } = require('react-native');
     return () => <View testID="divider" />;
 });
 
-jest.mock('../../components/Spacer', () => {
+jest.mock('../../../../components/Spacer', () => {
     const { View } = require('react-native');
     return () => <View testID="spacer" />;
 });
 
-jest.mock('../../constants/Colors', () => ({
+jest.mock('../../../../constants/Colors', () => ({
     Colors: {
         light: { navBackground: '#fff', borders: '#ccc', background: '#f5f5f5', text: '#000', title: '#111' },
         dark: { navBackground: '#111', borders: '#333', background: '#000', text: '#fff', title: '#eee' },

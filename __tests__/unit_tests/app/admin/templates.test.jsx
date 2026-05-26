@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import Templates from '../../app/(admin)/templates';
-import { useTemplate } from '../../hooks/useTemplate';
-import { ALERT_TYPES } from '../../components/ThemedAlert';
+import Templates from '../../../../app/(admin)/templates';
+import { useTemplate } from '../../../../hooks/useTemplate';
+import { ALERT_TYPES } from '../../../../components/ThemedAlert';
 import { reorderItems } from 'react-native-reorderable-list';
 
 jest.mock('firebase/firestore', () => ({
@@ -22,13 +22,13 @@ jest.mock('firebase/firestore', () => ({
     collection: jest.fn(),
 }));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
+jest.mock('../../../../firebase/firebaseConfig', () => ({
     db: {},
     auth: {},
 }));
 
-// Replace jest.mock('../../api/templateColumnService') with a manual factory:
-jest.mock('../../api/templateColumnService', () => ({
+// Replace jest.mock('../../../../api/templateColumnService') with a manual factory:
+jest.mock('../../../../api/templateColumnService', () => ({
     templateColumnService: {
         getHint: jest.fn(),
         saveHint: jest.fn(),
@@ -48,30 +48,30 @@ jest.mock('firebase/auth', () => ({
     getAuth: jest.fn(),
 }));
 
-jest.mock('../../api/authService', () => ({
+jest.mock('../../../../api/authService', () => ({
     authService: {
         signOut: jest.fn(),
         onAuthStateChanged: jest.fn(),
     },
 }));
 
-jest.mock('../../contexts/authContext', () => ({
+jest.mock('../../../../contexts/authContext', () => ({
     AuthProvider: ({ children }) => children,
     useAuthContext: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../hooks/useAuth', () => ({
+jest.mock('../../../../hooks/useAuth', () => ({
     useAuth: jest.fn(() => ({ user: null })),
 }));
 
-jest.mock('../../contexts/templateContext', () => ({
+jest.mock('../../../../contexts/templateContext', () => ({
     TemplateProvider: ({ children }) => children,
     useTemplateContext: jest.fn(() => ({})),
 }));
 
 // Mocks 
 
-jest.mock('../../hooks/useTemplate');
+jest.mock('../../../../hooks/useTemplate');
 
 jest.mock('react-native-reorderable-list', () => ({
     __esModule: true,
@@ -106,17 +106,17 @@ jest.mock('react-native-gesture-handler', () => ({
     GestureHandlerRootView: ({ children }) => children,
 }));
 
-jest.mock('../../components/ThemedView', () => {
+jest.mock('../../../../components/ThemedView', () => {
     const { View } = require('react-native');
     return ({ children, ...props }) => <View {...props}>{children}</View>;
 });
 
-jest.mock('../../components/ThemedText', () => {
+jest.mock('../../../../components/ThemedText', () => {
     const { Text } = require('react-native');
     return ({ children, ...props }) => <Text {...props}>{children}</Text>;
 });
 
-jest.mock('../../components/ThemedProject', () => {
+jest.mock('../../../../components/ThemedProject', () => {
     const { TouchableOpacity, Text } = require('react-native');
     return ({ name, templateId, onLongPress }) => (
         <TouchableOpacity testID={`project-${templateId}`} onLongPress={onLongPress}>
@@ -125,7 +125,7 @@ jest.mock('../../components/ThemedProject', () => {
     );
 });
 
-jest.mock('../../components/ThemedButton', () => {
+jest.mock('../../../../components/ThemedButton', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, testID, disabled }) => (
         <TouchableOpacity testID={testID} onPress={onPress} disabled={disabled}>
@@ -134,12 +134,12 @@ jest.mock('../../components/ThemedButton', () => {
     );
 });
 
-jest.mock('../../components/ThemedIcon', () => {
+jest.mock('../../../../components/ThemedIcon', () => {
     const { View } = require('react-native');
     return (props) => <View {...props} />;
 });
 
-jest.mock('../../components/CreateTemplateModal', () => {
+jest.mock('../../../../components/CreateTemplateModal', () => {
     const { View, TouchableOpacity, Text, TextInput } = require('react-native');
     return ({ visible, onClose, onCreate, onChange }) =>
         visible ? (
@@ -157,7 +157,7 @@ jest.mock('../../components/CreateTemplateModal', () => {
         ) : null;
 });
 
-jest.mock('../../components/EmptyState', () => {
+jest.mock('../../../../components/EmptyState', () => {
     const { View, Text } = require('react-native');
     return ({ title, subtitle }) => (
         <View testID="empty-state">
@@ -167,7 +167,7 @@ jest.mock('../../components/EmptyState', () => {
     );
 });
 
-jest.mock('../../components/ThemedAlert', () => {
+jest.mock('../../../../components/ThemedAlert', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     const mock = ({ visible, alert, onConfirm }) =>
         visible ? (
@@ -183,7 +183,7 @@ jest.mock('../../components/ThemedAlert', () => {
     return mock;
 });
 
-jest.mock('../../components/LoadingScreen', () => {
+jest.mock('../../../../components/LoadingScreen', () => {
     const { View, Text } = require('react-native');
     return ({ loadingText }) => (
         <View testID="loading-screen">
@@ -192,7 +192,7 @@ jest.mock('../../components/LoadingScreen', () => {
     );
 });
 
-jest.mock('../../constants/Colors', () => ({
+jest.mock('../../../../constants/Colors', () => ({
     ProjectColors: ['#FF0000', '#00FF00', '#0000FF'],
 }));
 

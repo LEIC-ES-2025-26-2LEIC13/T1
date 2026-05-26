@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import TemplateColumns from '../../app/(admin)/templateColumns';
+import TemplateColumns from '../../../../app/(admin)/templateColumns';
 
 // Mocks
 
@@ -10,7 +10,7 @@ jest.mock('react-native', () => {
     return rn;
 });
 
-jest.mock('../../app/(admin)/templateColumn', () => {
+jest.mock('../../../../app/(admin)/templateColumn', () => {
     const { View, Text } = require('react-native');
     return ({ columnData }) => (
         <View testID={`template-column-${columnData.id}`}>
@@ -19,7 +19,7 @@ jest.mock('../../app/(admin)/templateColumn', () => {
     );
 });
 
-jest.mock('../../components/ThemedButton', () => {
+jest.mock('../../../../components/ThemedButton', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, testID }) => (
         <TouchableOpacity testID={testID} onPress={onPress}>
@@ -28,17 +28,17 @@ jest.mock('../../components/ThemedButton', () => {
     );
 });
 
-jest.mock('../../components/ThemedIcon', () => {
+jest.mock('../../../../components/ThemedIcon', () => {
     const { View } = require('react-native');
     return (props) => <View {...props} />;
 });
 
-jest.mock('../../components/ThemedText', () => {
+jest.mock('../../../../components/ThemedText', () => {
     const { Text } = require('react-native');
     return ({ children, ...props }) => <Text {...props}>{children}</Text>;
 });
 
-jest.mock('../../components/EmptyState', () => {
+jest.mock('../../../../components/EmptyState', () => {
     const { View, Text } = require('react-native');
     return ({ title, subtitle, iconName }) => (
         <View testID="empty-state">

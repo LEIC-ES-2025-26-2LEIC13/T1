@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
-import HintEditor from '../../app/(admin)/hintEditor';
-import { templateColumnService } from '../../api/templateColumnService';
+import HintEditor from '../../../../app/(admin)/hintEditor';
+import { templateColumnService } from '../../../../api/templateColumnService';
 
 // Mocks
 
@@ -22,13 +22,13 @@ jest.mock('firebase/firestore', () => ({
     collection: jest.fn(),
 }));
 
-jest.mock('../../firebase/firebaseConfig', () => ({
+jest.mock('../../../../firebase/firebaseConfig', () => ({
     db: {},
     auth: {},
 }));
 
-// Replace jest.mock('../../api/templateColumnService') with a manual factory:
-jest.mock('../../api/templateColumnService', () => ({
+// Replace jest.mock('../../../../api/templateColumnService') with a manual factory:
+jest.mock('../../../../api/templateColumnService', () => ({
     templateColumnService: {
         getHint: jest.fn(),
         saveHint: jest.fn(),
@@ -69,36 +69,36 @@ jest.mock('expo-router', () => ({
     },
 }));
 
-jest.mock('../../api/templateColumnService');
+jest.mock('../../../../api/templateColumnService');
 
 jest.mock('react-native/Libraries/Utilities/useColorScheme', () => ({
     __esModule: true,
     default: jest.fn(() => 'light'),
 }));
 
-jest.mock('../../components/SafeAreaPage', () => {
+jest.mock('../../../../components/SafeAreaPage', () => {
     const { View } = require('react-native');
     return ({ children, ...props }) => <View {...props}>{children}</View>;
 });
 
-jest.mock('../../components/ThemedButton', () => {
+jest.mock('../../../../components/ThemedButton', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, testID }) => (
         <TouchableOpacity testID={testID} onPress={onPress}>{children}</TouchableOpacity>
     );
 });
 
-jest.mock('../../components/ThemedIcon', () => {
+jest.mock('../../../../components/ThemedIcon', () => {
     const { View } = require('react-native');
     return (props) => <View {...props} />;
 });
 
-jest.mock('../../components/ThemedText', () => {
+jest.mock('../../../../components/ThemedText', () => {
     const { Text } = require('react-native');
     return ({ children, ...props }) => <Text {...props}>{children}</Text>;
 });
 
-jest.mock('../../components/ThemedTextInput', () => {
+jest.mock('../../../../components/ThemedTextInput', () => {
     const { TextInput } = require('react-native');
     return ({ children, onChangeText, placeholder, containerStyle, style }) => (
         <TextInput
@@ -117,12 +117,12 @@ jest.mock('react-native-markdown-display', () => {
     return ({ children }) => <Text testID="markdown-display">{children}</Text>;
 });
 
-jest.mock('../../components/PillsContainer', () => {
+jest.mock('../../../../components/PillsContainer', () => {
     const { View } = require('react-native');
     return ({ children }) => <View testID="pills-container">{children}</View>;
 });
 
-jest.mock('../../components/Pill', () => {
+jest.mock('../../../../components/Pill', () => {
     const { Text } = require('react-native');
     return (props) => {
         const label = props.projectName || props.columnName || props.taskName || '';
@@ -130,14 +130,14 @@ jest.mock('../../components/Pill', () => {
     };
 });
 
-jest.mock('../../components/AnimatedPressable', () => {
+jest.mock('../../../../components/AnimatedPressable', () => {
     const { TouchableOpacity } = require('react-native');
     return ({ children, onPress, ...props }) => (
         <TouchableOpacity onPress={onPress} {...props}>{children}</TouchableOpacity>
     );
 });
 
-jest.mock('../../components/ThemedAlert', () => {
+jest.mock('../../../../components/ThemedAlert', () => {
     const { View, TouchableOpacity, Text } = require('react-native');
     const mock = ({ visible, alert, onConfirm }) =>
         visible ? (
@@ -153,7 +153,7 @@ jest.mock('../../components/ThemedAlert', () => {
     return mock;
 });
 
-jest.mock('../../components/EmptyState', () => {
+jest.mock('../../../../components/EmptyState', () => {
     const { View, Text } = require('react-native');
     return ({ title, subtitle }) => (
         <View testID="empty-state">
@@ -162,7 +162,7 @@ jest.mock('../../components/EmptyState', () => {
     );
 });
 
-jest.mock('../../constants/Colors', () => ({
+jest.mock('../../../../constants/Colors', () => ({
     Colors: {
         light: { text: '#000', title: '#111', background: '#fff' },
         dark: { text: '#fff', title: '#eee', background: '#000' },
