@@ -1,80 +1,201 @@
-import { jest, describe, it, expect, afterEach } from '@jest/globals'
-import { authService } from "../../../api/authService"
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth"
-import { setDoc } from "firebase/firestore"
-import { auth } from "../../../firebase/firebaseConfig"
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+
+jest.mock("@react-native-google-signin/google-signin", () => ({
+    GoogleSignin: {
+        configure: jest.fn(),
+        hasPlayServices: jest.fn(),
+        signIn: jest.fn(),
+        signOut: jest.fn(),
+    },
+}));
 
 jest.mock("firebase/auth", () => ({
-    signInWithEmailAndPassword: jest.fn(),
-    createUserWithEmailAndPassword: jest.fn(),
+    onAuthStateChanged: jest.fn(),
+    GoogleAuthProvider: {
+        credential: jest.fn(() => "mock-credential"),
+    },
+    signInWithCredential: jest.fn(),
     signOut: jest.fn(),
-    onAuthStateChanged: jest.fn()
-}))
+}));
 
 jest.mock("firebase/firestore", () => ({
-    doc: jest.fn(),
-    setDoc: jest.fn()
-}))
+    setDoc: jest.fn(),
+    getDoc: jest.fn(),
+}));
 
-jest.mock("../../../firebase/firebaseConfig", () => ({
-    db: {},
-    auth: { currentUser: { uid: "testUid" } }
-}))
+jest.mock("../../../firebase/firebaseConfig.js", () => ({
+    auth: {},
+}));
+
+jest.mock("../../../api/pathHelper.js", () => ({
+    pathHelper: {
+        user: jest.fn((uid) => `users/${uid}`),
+        admin: jest.fn((uid) => `admins/${uid}`),
+    },
+}));
+
+import { onAuthStateChanged, GoogleAuthProvider, signInWithCredential, signOut as firebaseSignOut } from "firebase/auth";
+import { setDoc, getDoc } from "firebase/firestore";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { authService } from "../../../api/authService.js";
+
+const mockUser = { uid: "user-1", email: "user@example.com" };
+
+beforeEach(() => {
+    jest.clearAllMocks();
+});
 
 describe("authService", () => {
-    afterEach(() => {
-        jest.clearAllMocks()
-    })
 
-    it("should login user and call onUpdate", async () => {
-        const mockUser = { uid: "testUid", email: "test@test.com" }
-        signInWithEmailAndPassword.mockResolvedValueOnce({ user: mockUser })
-        const mockOnUpdate = jest.fn()
+    // subscribeAuthState
 
-        await authService.login("test@test.com", "password123", mockOnUpdate)
+    describe("subscribeAuthState", () => {
+        it("calls onUpdate with current user when auth state changes", () => {
+            const mockOnUpdate = jest.fn();
+            onAuthStateChanged.mockImplementation((auth, cb) => {
+                cb(mockUser);
+                return jest.fn();
+            });
 
-        expect(signInWithEmailAndPassword).toHaveBeenCalledWith(auth, "test@test.com", "password123")
-        expect(mockOnUpdate).toHaveBeenCalledWith(mockUser)
-    })
+            authService.subscribeAuthState(mockOnUpdate);
 
-    it("should register user and call onUpdate", async () => {
-        const mockUser = { uid: "testUid", email: "test@test.com" }
-        createUserWithEmailAndPassword.mockResolvedValueOnce({ user: mockUser })
-        const mockOnUpdate = jest.fn()
+            expect(mockOnUpdate).toHaveBeenCalledWith(mockUser);
+        });
 
-        await authService.register("test@test.com", "password123", mockOnUpdate)
+        it("returns the unsubscribe function", () => {
+            const unsubscribe = jest.fn();
+            onAuthStateChanged.mockReturnValueOnce(unsubscribe);
 
-        expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(auth, "test@test.com", "password123")
-        expect(mockOnUpdate).toHaveBeenCalledWith(mockUser)
-        expect(setDoc).toHaveBeenCalled()
-    })
+            const result = authService.subscribeAuthState(jest.fn());
 
-    it("should logout user", async () => {
-        await authService.logout()
-        expect(signOut).toHaveBeenCalledWith(auth)
-    })
+            expect(result).toBe(unsubscribe);
+        });
+    });
 
-    it("should subscribe to auth state", () => {
-        const mockOnUpdate = jest.fn()
-        onAuthStateChanged.mockImplementation((auth, cb) => {
-            cb({ uid: "user1" })
-            return "unsubscribe"
-        })
-        
-        const unsub = authService.subscribeAuthState(mockOnUpdate)
-        
-        expect(unsub).toBe("unsubscribe")
-        expect(mockOnUpdate).toHaveBeenCalledWith({ uid: "user1" })
-    })
+    // signInWithGoogle
 
-    it("should skip adding user to database if currentUser is missing after register", async () => {
-        const mockOnUpdate = jest.fn()
-        createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { email: "test@test.com" } })
-        auth.currentUser = null 
+    describe("signInWithGoogle", () => {
+        it("signs in with Google and calls onUpdate with the user", async () => {
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ data: { idToken: "mock-id-token" } });
+            signInWithCredential.mockResolvedValueOnce({ user: mockUser });
+            getDoc.mockResolvedValueOnce({ exists: () => false });
+            setDoc.mockResolvedValueOnce();
 
-        await authService.register("test@test.com", "password123", mockOnUpdate)
+            const mockOnUpdate = jest.fn();
+            const result = await authService.signInWithGoogle(mockOnUpdate);
 
-        expect(setDoc).not.toHaveBeenCalled()
-        auth.currentUser = { uid: "testUid" }
-    })
-})
+            expect(GoogleAuthProvider.credential).toHaveBeenCalledWith("mock-id-token");
+            expect(signInWithCredential).toHaveBeenCalled();
+            expect(mockOnUpdate).toHaveBeenCalledWith(mockUser);
+            expect(result).toBe(mockUser);
+        });
+
+        it("creates user document when user is not an admin", async () => {
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ data: { idToken: "mock-id-token" } });
+            signInWithCredential.mockResolvedValueOnce({ user: mockUser });
+            getDoc.mockResolvedValueOnce({ exists: () => false }); // not admin
+
+            await authService.signInWithGoogle(jest.fn());
+
+            expect(setDoc).toHaveBeenCalledWith(
+                `users/${mockUser.uid}`,
+                { email: mockUser.email },
+                { merge: true }
+            );
+        });
+
+        it("does not create user document when user is an admin", async () => {
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ data: { idToken: "mock-id-token" } });
+            signInWithCredential.mockResolvedValueOnce({ user: mockUser });
+            getDoc.mockResolvedValueOnce({ exists: () => true }); // is admin
+
+            await authService.signInWithGoogle(jest.fn());
+
+            expect(setDoc).not.toHaveBeenCalled();
+        });
+
+        it("throws when idToken is missing from Google Sign-In response", async () => {
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ data: {} }); // no idToken
+
+            await expect(authService.signInWithGoogle(jest.fn())).rejects.toThrow(
+                "Failed to obtain ID token from Google Sign-In."
+            );
+        });
+
+        it("handles legacy response format without data wrapper", async () => {
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ idToken: "legacy-token" }); // legacy format
+            signInWithCredential.mockResolvedValueOnce({ user: mockUser });
+            getDoc.mockResolvedValueOnce({ exists: () => false });
+
+            const mockOnUpdate = jest.fn();
+            await authService.signInWithGoogle(mockOnUpdate);
+
+            expect(GoogleAuthProvider.credential).toHaveBeenCalledWith("legacy-token");
+            expect(mockOnUpdate).toHaveBeenCalledWith(mockUser);
+        });
+
+        it("normalizes email to lowercase before storing", async () => {
+            const userWithUpperEmail = { uid: "user-1", email: "USER@EXAMPLE.COM" };
+            GoogleSignin.hasPlayServices.mockResolvedValueOnce();
+            GoogleSignin.signIn.mockResolvedValueOnce({ data: { idToken: "mock-id-token" } });
+            signInWithCredential.mockResolvedValueOnce({ user: userWithUpperEmail });
+            getDoc.mockResolvedValueOnce({ exists: () => false });
+
+            await authService.signInWithGoogle(jest.fn());
+
+            expect(setDoc).toHaveBeenCalledWith(
+                expect.anything(),
+                { email: "user@example.com" },
+                { merge: true }
+            );
+        });
+    });
+
+    // signOut
+
+    describe("signOut", () => {
+        it("signs out from Google and Firebase", async () => {
+            GoogleSignin.signOut.mockResolvedValueOnce();
+            firebaseSignOut.mockResolvedValueOnce();
+
+            await authService.signOut();
+
+            expect(GoogleSignin.signOut).toHaveBeenCalled();
+            expect(firebaseSignOut).toHaveBeenCalled();
+        });
+
+        it("still signs out from Firebase even if Google sign-out fails", async () => {
+            GoogleSignin.signOut.mockRejectedValueOnce(new Error("Google sign-out failed"));
+            firebaseSignOut.mockResolvedValueOnce();
+
+            await authService.signOut();
+
+            expect(firebaseSignOut).toHaveBeenCalled();
+        });
+    });
+
+    // isAdmin
+
+    describe("isAdmin", () => {
+        it("returns true when admin document exists", async () => {
+            getDoc.mockResolvedValueOnce({ exists: () => true });
+
+            const result = await authService.isAdmin(mockUser);
+
+            expect(result).toBe(true);
+        });
+
+        it("returns false when admin document does not exist", async () => {
+            getDoc.mockResolvedValueOnce({ exists: () => false });
+
+            const result = await authService.isAdmin(mockUser);
+
+            expect(result).toBe(false);
+        });
+    });
+});

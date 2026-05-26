@@ -3,18 +3,17 @@ import { pathHelper } from "./pathHelper";
 import { db } from '../firebase/firebaseConfig';
 import { COLLECTIONS } from '../constants/Collections';
 
-function normalizeSuggestionData({ description, templateId, templateName }) {
+function normalizeSuggestionData({ description, templateName }) {
     return {
         description: description?.trim() ?? '',
-        templateId: templateId ?? '',
         templateName: templateName?.trim() ?? '',
     }
 }
 
 export const suggestionService = {
     createSuggestion: async (projectId, projectName, userId, userEmail, suggestionData) => {
-        if (!projectId || !projectName || !userId || !userEmail || !suggestionData?.description) {
-            throw new Error('Project ID, project name, user ID, user email and suggestion description are required');
+        if (!userEmail || !suggestionData?.description) {
+            throw new Error('User email and suggestion description are required');
         }
 
         const normalizedSuggestionData = normalizeSuggestionData(suggestionData);
@@ -23,7 +22,8 @@ export const suggestionService = {
         const adminsSnapshot = await getDocs(collection(db, COLLECTIONS.ADMIN));
 
         if (adminsSnapshot.empty) {
-            throw new Error('No admins found to send suggestions to');
+            console.warn('No admins found in database');
+            return; // Allow suggestion to be submitted even if no admins exist
         }
 
         // Add suggestion to each admin's suggestions subcollection
@@ -31,9 +31,6 @@ export const suggestionService = {
             const adminId = adminDoc.id;
             return addDoc(pathHelper.adminSuggestions(adminId), {
                 ...normalizedSuggestionData,
-                projectId: projectId,
-                projectName: projectName,
-                userId: userId,
                 userEmail: userEmail,
                 createdAt: Timestamp.now(),
             });

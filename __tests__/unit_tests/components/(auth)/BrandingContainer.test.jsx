@@ -2,6 +2,7 @@ import { describe, expect, test, jest } from '@jest/globals'
 import React from "react";
 import { render } from "@testing-library/react-native";
 import { View } from "react-native";
+
 import BrandingContainer from "../../../../components/auth/BrandingContainer";
 
 // Mocks

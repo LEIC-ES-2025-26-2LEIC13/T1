@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react-native";
 
 import LoadingScreen from "../../../components/LoadingScreen";
 
-// Mocks corrigidos e otimizados para Default Exports
+// Mocks
 jest.mock("../../../components/ThemedView", () => {
     const React = require("react");
     const { View } = require("react-native");

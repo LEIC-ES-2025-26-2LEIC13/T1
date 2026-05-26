@@ -1,7 +1,8 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import React from 'react';
 import { render, screen } from '@testing-library/react-native';
+
 import { Text } from 'react-native';
-import { jest, describe, it, expect, beforeEach } from '@jest/globals'; // ← mover para ANTES dos mocks
 import SafeAreaPage from '../../../components/SafeAreaPage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

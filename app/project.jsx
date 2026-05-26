@@ -155,7 +155,12 @@ export default function ProjectScreen() {
 
 	const handleCreateSuggestion = async (suggestionData) => {
 		try {
-			await suggestionService.createSuggestion(projectId, currentProjectName, user.uid, user.email, suggestionData)
+			// Set templateName to the current project name
+			const suggestionWithTemplate = {
+				...suggestionData,
+				templateName: currentProjectName
+			}
+			await suggestionService.createSuggestion(projectId, currentProjectName, user.uid, user.email, suggestionWithTemplate)
 			handleCloseSuggestionModal()
 			showAlert(ALERT_TYPES.SUCCESS, "Success", "Suggestion submitted successfully.")
 		} catch (error) {
