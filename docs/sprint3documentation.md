@@ -58,23 +58,32 @@
 |                     ├─ order
 |                     └─ createdAt
 |
-└─ templates
-   └─ {templateId}
-      ├─ title
-      ├─ description
-      ├─ columnCount
-      │
-      └─ templateColumns
-          └─ {columnId}
-			 ├─ name
- 			 ├─ order
- 			 │
- 			 └─ templateColumnTasks
- 			    └─ {taskId}
- 			       ├─ name
-			       ├─ description
-				   ├─ hints
-			       └─ order
+├─ templates
+|  └─ {templateId}
+|     ├─ title
+|     ├─ description
+|     ├─ columnCount
+|     │
+|     └─ templateColumns
+|         └─ {columnId}
+|			 ├─ name
+|			 ├─ order
+|			 │
+|			 └─ templateColumnTasks
+|			    └─ {taskId}
+|			       ├─ name
+|			       ├─ description
+|				   ├─ hints
+|			       └─ order
+|
+└─ admin
+   └─ {userId}   (admin document used for verification)
+   └─ suggestions
+      └─ {suggestionId}
+         ├─ createdAt
+         ├─ description
+         ├─ templateName 
+         └─ userEmail 
 ```
 
 
@@ -89,6 +98,30 @@ The authentication layer was also adapted to support this change:
 * After a successful sign-in, the user email is normalized before being stored in Firestore.
 
 This change reduces onboarding friction and keeps account creation aligned with the identity provider that is already used by the app.
+
+## Edit Tasks and Projects
+
+The user can now edit the name and description of both projects and tasks. And in tasks, they can reassign members to tasks and change the label.
+
+This was implemented by reusing the existing `TaskModal` component for both creating and editing tasks, and a new `EditProjectModal` for projects. The tasks have a small button, while the projects have an entry in the overflow menu.
+
+This allows users to keep their project and task information up to date as things evolve, which is essential for effective project management. And avoids the need to delete a task or a project if a mistake was made.
+
+## User Profile
+
+In the tab navigation, the `profile.jsx` screen was implemented, which shows the user email and it's username (email splitted at the "@" symbol). This is a simple screen for now, but it establishes a place for user-specific information.
+
+## Suggestions
+
+User can now submit suggestions of a project template to admins. This was implemented by creating a new `suggestions` subcollection in Firestore, where each document contains the suggestion details and the user email.
+
+This was made by creating:
+* `CreateSuggestionModal` component that allows users to enter a new suggestion and creates it in the database.
+* `suggestions.jsx` screen in the admin area that lists all the suggestions with their details.
+* `suggestionService.js` that centralizes the Firestore interactions for suggestions.
+* `SuggestionModal.jsx` component that shows the details of a suggestion when an admin clicks on it and allows the admin to delete suggestions to keep the list of suggestions clean.
+
+This allows users to easily share their ideas for new templates, and gives admins a structured way to review and manage those suggestions.
 
 ## Admin Verification
 
