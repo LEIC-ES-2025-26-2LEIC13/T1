@@ -53,6 +53,7 @@ jest.mock('../../api/projectService', () => ({
         projectHasNoMembers: jest.fn(),
         deleteProject: jest.fn(),
         getProjectUsers: jest.fn(),
+        isProjectFromTemplate: jest.fn(),
     },
 }));
 
@@ -109,8 +110,7 @@ jest.mock('../../components/ThemedAlert', () => {
     function MockThemedAlert({ visible, alert, onConfirm }) {
         useEffect(() => {
             if (visible && onConfirm) {
-                const id = setTimeout(() => onConfirm(), 0);
-                return () => clearTimeout(id);
+                onConfirm();
             }
         }, [visible, alert, onConfirm]);
         return null;
@@ -169,6 +169,7 @@ function setupMocks({
     useProject.mockReturnValue({ projects, deleteProject, kickMember });
     useColumn.mockReturnValue({ columns: [], setActiveProjectId: jest.fn(), createColumn });
     useInvite.mockReturnValue({ sendInvite });
+    projectService.isProjectFromTemplate.mockResolvedValue(false);
 }
 
 describe('ProjectScreen Component', () => {
