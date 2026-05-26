@@ -88,10 +88,8 @@ export default function Suggestions() {
 
                     <ThemedAlert
                         visible={alertVisible}
-                        type={alert.type}
-                        title={alert.title}
-                        message={alert.message}
-                        onClose={() => setAlertVisible(false)}
+                        alert={alert}
+                        onConfirm={() => setAlertVisible(false)}
                     />
                 </>
             )}
