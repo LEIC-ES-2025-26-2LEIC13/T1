@@ -1,4 +1,4 @@
-import { doc, getDocs, query, orderBy, onSnapshot, runTransaction, getCountFromServer } from "firebase/firestore";
+import { doc, getDocs, query, orderBy, onSnapshot, runTransaction, getCountFromServer, getDoc, updateDoc, deleteField } from "firebase/firestore";
 import { db } from '../firebase/firebaseConfig';
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 import { pathHelper } from "./pathHelper";
@@ -144,6 +144,15 @@ export const templateColumnService = {
         await batchOps(db, operations)
     },
 
+    getTask: async (templateId, columnId, taskId) => {
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
+        const taskSnap = await getDoc(taskRef)
+        if (!taskSnap.exists()) {
+            return null
+        }
+        return { id: taskSnap.id, ...taskSnap.data() }
+    },
+
     deleteTask: async (templateId, columnId, taskId) => {
         const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
 
@@ -201,14 +210,20 @@ export const templateColumnService = {
         })
 
         // 2. Create in new column, reusing same task ID
+        const newTaskData = {
+            name: task.name,
+            description: task.description,
+            order: newOrder,
+        };
+
+        if (task.hints !== undefined) {
+            newTaskData.hints = task.hints;
+        }
+
         operations.push({
             type: OPERATION_TYPES.SET,
             ref: pathHelper.templateColumnTask(templateId, toColumn.id, task.id),
-            data: {
-                name: task.name,
-                description: task.description,
-                order: newOrder,
-            }
+            data: newTaskData
         })
 
         await batchOps(db, operations)  
@@ -226,6 +241,29 @@ export const templateColumnService = {
         }));
 
         await batchOps(db, operations);
+    },
+
+    saveHint: async (templateId, columnId, taskId, hintsContent) => {
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
+        await updateDoc(taskRef, { hints: hintsContent })
+    },
+
+    getHint: async (templateId, columnId, taskId) => {
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
+        const taskSnap = await getDoc(taskRef)
+        return taskSnap.exists() ? taskSnap.data().hints : ''
+    },
+
+   hasHints: async (templateId, columnId, taskId) => {
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId);
+        const taskSnap = await getDoc(taskRef);
+        if (!taskSnap.exists()) return false;
+
+        return taskSnap.data().hints !== undefined
+    },
+
+    deleteHint: async (templateId, columnId, taskId) => {
+        const taskRef = pathHelper.templateColumnTask(templateId, columnId, taskId)
+        await updateDoc(taskRef, { hints: deleteField() }) // deletes the hints field if it exists, if it doesn't exist it does nothing
     }
 }
-

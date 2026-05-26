@@ -99,17 +99,23 @@ export const templateService = {
 
             for (const taskDoc of templateColumnTasksSnap.docs) {
                 const taskData = taskDoc.data()
+                const newTaskData = {
+                        name: taskData.name,
+                        description: taskData.description,
+                        label: "", // no label at the creation
+                        assignedMembers: [] // no assigned members at the creation
+                }
+                
+                if (taskData.hints !== undefined) {
+                    newTaskData.hints = taskData.hints
+                }
+
                 await taskService.createTask(
                     projectRef.id,
                     templateData.title,
                     columnRef.id,
                     columnData.name,
-                    {
-                        name: taskData.name,
-                        description: taskData.description,
-                        label: "", // no label at the creation
-                        assignedMembers: [] // no assigned members at the creation
-                    }
+                    newTaskData
                 )
             }
         }

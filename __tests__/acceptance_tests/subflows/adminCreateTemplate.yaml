@@ -1,0 +1,24 @@
+appId: com.anonymous.LEICo
+tags:
+    - template
+---
+
+- runFlow:
+    file: login.yaml
+    env:
+         # These must be the credentials of an admin user
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+
+- tapOn:
+    id: "open-create-template-modal-button"
+- tapOn: "Enter template title"
+- inputText: ${TEMPLATE_TITLE}
+- hideKeyboard
+- tapOn: "Enter template description (optional)"
+- inputText: ${TEMPLATE_DESCRIPTION}
+- hideKeyboard
+- tapOn:
+    id: "create-template-modal-actions-create"
+- assertVisible: ${TEMPLATE_TITLE}
+- assertVisible: ${TEMPLATE_DESCRIPTION}

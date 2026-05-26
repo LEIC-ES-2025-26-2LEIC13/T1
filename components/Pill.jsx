@@ -5,23 +5,23 @@ import ThemedText from './ThemedText'
 import { Colors } from '../constants/Colors'
 import AnimatedPressable from './AnimatedPressable'
 
-const Pill = ({ projectName, columnName, iconName, name, pressable, onPress, isSelected, customStyle }) => {
+const Pill = ({ projectName, columnName, taskName, iconName, name, pressable, onPress, isSelected, customStyle }) => {
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
     const Content = ({ isSelected }) => {
         return (
             <>
-                {(projectName || columnName || iconName) ? (
+                {(projectName || columnName || taskName || iconName) ? (
                     <ThemedIcon onPrimary={isSelected}
-                    name={projectName ? "folder-open-outline" : (columnName ? "table-column" : iconName)}  
+                    name={projectName ? "folder-open-outline" : (columnName ? "table-column" : (taskName ? "checkbox-marked-outline" : iconName))}  
                     size={13}
                     style={{ marginRight: 5 }}
                     />
                 ) : null}
 
                 <ThemedText style={styles.name} onPrimary={isSelected} >
-                    {projectName ?? columnName ?? name}
+                    {projectName ?? columnName ?? taskName ?? name}
                 </ThemedText>
             </>
         )

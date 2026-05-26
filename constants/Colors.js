@@ -10,7 +10,8 @@ export const Colors = {
         iconColor: "#9ca3af",
         iconColorFocused: "#3b82f6",
         onPrimary: "#f9fafb", // color of text/icon onprimary colored background
-        borders: "rgba(255, 255, 255, 0.1)"
+        borders: "rgba(255, 255, 255, 0.1)",
+        hint: "#ffe70c44"
     },
     
     light: {
@@ -21,7 +22,8 @@ export const Colors = {
         iconColor: "#7a7a7a",
         iconColorFocused: "#1d4ed8",
         onPrimary: "#f9fafb", // color of text/icon on primary colored background
-        borders: "rgba(0, 0, 0, 0.1)"
+        borders: "rgba(0, 0, 0, 0.1)",
+        hint: "#c0a00094"
     }
 }
 
