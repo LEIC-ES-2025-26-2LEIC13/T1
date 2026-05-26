@@ -4,13 +4,13 @@ import ModalBody from "./modal/ModalBody";
 import FormField from "./FormField";
 import ModalActions from "./modal/ModalActions";
 
-export default function CreateSuggestionModal(
+export default function CreateSuggestionModal({
     visible,
     onClose,
     onCreate,
     onChange,
     suggestion,
-) {
+}) {
 
     return (
         <AppModal visible={visible} onClose={onClose}>
