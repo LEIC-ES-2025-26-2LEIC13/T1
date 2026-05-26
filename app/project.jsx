@@ -10,6 +10,7 @@ import { useInvite } from '../hooks/useInvite';
 import { useColumn }  from '../hooks/useColumn'
 import { userService } from '../api/userService';
 import { projectService } from '../api/projectService';
+import { suggestionService } from '../api/suggestionService';
 import OverflowMenu from '../components/OverflowMenu';
 import SeeMembersModal from '../components/SeeMembersModal';
 import CreateColumnModal from '../components/CreateColumnModal';
@@ -19,6 +20,7 @@ import SafeAreaPage from '../components/SafeAreaPage';
 import Columns from '../components/Columns';
 import AnimatedPressable from '../components/AnimatedPressable';
 import EditProjectModal from "../components/EditProjectModal";
+import CreateSuggestionModal from "../components/CreateSuggestionModal";
 
 export default function ProjectScreen() {
   	const router = useRouter()
@@ -40,6 +42,7 @@ export default function ProjectScreen() {
 	const [ editProjectModalVisible, setEditProjectModalVisible ] = useState(false)
 	const [ editProjectData, setEditProjectData ] = useState({ title: '', description: '' })
 	const [ inviteModalVisible, setInviteModalVisible ] = useState(false)
+	const [ suggestionModalVisible, setSuggestionModalVisible ] = useState(false)
 	const [ seeMembersModalVisible, setSeeMembersModalVisible ] = useState(false)
 	const [ isProjectFromTemplate, setIsProjectFromTemplate ] = useState(false)
 
@@ -135,6 +138,31 @@ export default function ProjectScreen() {
 		setInviteTarget('')
 	};
 
+	// Create suggestion Modal
+	const [suggestionData, setSuggestionData] = useState({
+		description: '',
+	})
+	const handleSuggestionPress = () => setSuggestionModalVisible(true)
+
+	const handleCloseSuggestionModal = () => {
+		setSuggestionModalVisible(false)
+		setSuggestionData({ description: '' })
+	}
+
+	const handleSuggestionChange= (field, value) => {
+		setSuggestionData((prev) => ({ ...prev, [field]: value }))
+	}
+
+	const handleCreateSuggestion = async (suggestionData) => {
+		try {
+			await suggestionService.createSuggestion(projectId, currentProjectName, user.uid, user.email, suggestionData)
+			handleCloseSuggestionModal()
+			showAlert(ALERT_TYPES.SUCCESS, "Success", "Suggestion submitted successfully.")
+		} catch (error) {
+			showAlert(ALERT_TYPES.ERROR, "Suggestion Creation Failed", error.message)
+		}
+	}
+
 	// See members modal
 	const handleSeeMembersPress = () => setSeeMembersModalVisible(true)
 	const handleCloseMembersModal = () => setSeeMembersModalVisible(false)
@@ -206,15 +234,15 @@ export default function ProjectScreen() {
 	}
 
 	// Column related modals
+	const [columnData, setColumnData] = useState({
+		name: ''
+	})
+
 	const openCreateColumnModal = () => setCreateColumnModalVisible(true)
 	const closeCreateColumnModal = () => {
 		setCreateColumnModalVisible(false)
 		setColumnData({ name: '' })
 	}
-
-	const [columnData, setColumnData] = useState({
-		name: ''
-	})
 
 	const handleColumnChange = (field, value) => {
 		setColumnData((prev) => ({ ...prev, [field]: value }))
@@ -289,7 +317,7 @@ export default function ProjectScreen() {
 				id: 'suggest-improvements',
 				title: 'Suggest improvements',
 				icon: 'lightbulb',
-				onPress: () => showAlert(ALERT_TYPES.INFO, 'Suggest improvements', 'This feature is not implemented yet.'),
+				onPress: () => handleSuggestionPress(),
 			},
 			{
 				testID: "delete-project-action",
@@ -390,6 +418,14 @@ export default function ProjectScreen() {
 					onCreate={handleCreateColumn}
 					onChange={handleColumnChange}
 					columnData={columnData}
+				/>
+
+				<CreateSuggestionModal
+					visible={suggestionModalVisible}
+					onClose={handleCloseSuggestionModal}
+					onCreate={handleCreateSuggestion}
+					onChange={handleSuggestionChange}
+					suggestion={suggestionData}
 				/>
 
 				<EditProjectModal
