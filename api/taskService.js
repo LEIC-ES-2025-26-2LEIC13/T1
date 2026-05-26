@@ -3,12 +3,18 @@ import { pathHelper } from "./pathHelper";
 import { db } from "../firebase/firebaseConfig";
 import { batchOps, OPERATION_TYPES } from "./batchOpsHelper";
 
-function normalizeTaskData({ name, description, label, assignedMembers }) {
-    return {
+function normalizeTaskData({ name, description, label, assignedMembers, hints = null }) {
+    return hints ? {
         name: name?.trim() ?? '',
         description: description?.trim() ?? '',
         label: label?.trim() ?? '',
-        assignedMembers: assignedMembers ?? []
+        assignedMembers: assignedMembers ?? [],
+        hints: hints ?? ''
+    } : {
+        name: name?.trim() ?? '',
+        description: description?.trim() ?? '',
+        label: label?.trim() ?? '',
+        assignedMembers: assignedMembers ?? [],
     }
 }
 

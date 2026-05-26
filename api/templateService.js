@@ -107,6 +107,7 @@ export const templateService = {
                     {
                         name: taskData.name,
                         description: taskData.description,
+                        hints: taskData.hints,
                         label: "", // no label at the creation
                         assignedMembers: [] // no assigned members at the creation
                     }

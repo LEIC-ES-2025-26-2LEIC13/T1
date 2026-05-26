@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import { StyleSheet, useColorScheme } from 'react-native'
 import AppModal from './AppModal'
 import ModalHeader from './modal/ModalHeader'
@@ -14,7 +14,7 @@ import Spacer from './Spacer'
 import ThemedView from './ThemedView'
 import { templateColumnService } from '../api/templateColumnService'
 import { Colors } from '../constants/Colors'
-import { useRouter } from 'expo-router'
+import { useRouter, useFocusEffect } from 'expo-router'
 
 export default function TaskModal({
     visible,
@@ -47,6 +47,25 @@ export default function TaskModal({
 
     const [isEdit, setIsEdit] = useState(false);
     const [editedTask, setEditedTask] = useState(null);
+
+    // Refetch task data when returning from hint editor
+    useFocusEffect(
+        useCallback(() => {
+            if (visible && templateId && columnId && task?.id) {
+                const refetchTask = async () => {
+                    try {
+                        const updatedTask = await templateColumnService.getTask(templateId, columnId, task.id)
+                        if (updatedTask) {
+                            onChange('hints', updatedTask.hints)
+                        }
+                    } catch (error) {
+                        console.error('Error refetching task:', error)
+                    }
+                }
+                refetchTask()
+            }
+        }, [visible, templateId, columnId, task?.id, onChange])
+    )
 
     const handleEditToggle = () => {
         if (!isEdit) {
@@ -96,8 +115,10 @@ export default function TaskModal({
     }
 
     const handlePressHint = () => {
-        router.push({ pathname: '/hintEditor', params: { taskId: task.id, templateId } })
+        router.push({ pathname: '/hintEditor', params: { templateId, templateName, columnId, columnName, taskId: task.id, taskName: task.name } })
     }
+
+    const taskHasHints = !!(task?.hints)
 
     return (
         <AppModal visible={visible} onClose={onClose}>
@@ -180,7 +201,7 @@ export default function TaskModal({
                     onPress={handlePressHint}
                     style={[styles.hintButton, { backgroundColor: theme.hint , boxShadow: `0px 0px 5px ${theme.hint}`}]}                >
                     <ThemedIcon onPrimary name="lightbulb-on-outline"/>
-                    <ThemedText onPrimary style={{ marginLeft: 8 }}>Add Hints</ThemedText>
+                    <ThemedText onPrimary style={{ marginLeft: 8 }}>{taskHasHints ? "See hints" : "No hints yet. Add hints."}</ThemedText>
                 </AnimatedPressable>
             
             </ModalBody>
@@ -231,8 +252,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 12,
         borderRadius: 8,
-        marginBottom: 10,
-        backgroundColor: '#ffe70c44',
-        boxShadow: "0px 0px 3px #ffe600"
+        marginBottom: 10
     }
 })

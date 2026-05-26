@@ -1,11 +1,16 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 
 const PillsContainer = ({ style, children }) => {
   return (
-    <View style={[styles.pillsContainer, style]}>
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false}
+      style={[styles.pillsContainer, style]}
+      contentContainerStyle={styles.contentContainer}
+    >
       {children}    
-    </View>
+    </ScrollView>
   )
 }
 
@@ -13,8 +18,10 @@ export default PillsContainer
 
 const styles = StyleSheet.create({
     pillsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 10
+        flexGrow: 0,
+    },
+    contentContainer: {
+        gap: 10,
+        paddingHorizontal: 0
     }
 })

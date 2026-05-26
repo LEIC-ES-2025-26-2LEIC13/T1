@@ -84,7 +84,7 @@ export default function TemplateColumn({ templateId, templateName, columnData, c
 
     const closeTaskCreationModal = () => {
         setTaskModalCreationVisible(false);
-        setTask({ name: '', description: '', label: '' });
+        setTask({ name: '', description: '' });
     };
 
     const openTaskDetails = (taskItem) => {

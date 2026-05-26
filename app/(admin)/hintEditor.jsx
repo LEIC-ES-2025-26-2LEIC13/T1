@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View, useColorScheme } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import SafeAreaPage from '../../components/SafeAreaPage'
 import ThemedButton from '../../components/ThemedButton'
 import ThemedIcon from '../../components/ThemedIcon'
@@ -7,8 +7,20 @@ import ThemedText from '../../components/ThemedText'
 import Markdown from 'react-native-markdown-display';
 import ThemedTextInput from '../../components/ThemedTextInput'
 import { Colors } from '../../constants/Colors'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
+import { templateColumnService } from '../../api/templateColumnService'
+import PillsContainer from '../../components/PillsContainer'
+import Pill from '../../components/Pill'
+import AnimatedPressable from '../../components/AnimatedPressable'
+import ThemedAlert, { ALERT_TYPES } from '../../components/ThemedAlert'
+import EmptyState from '../../components/EmptyState'
 
 const HintEditor = () => {
+
+    const params = useLocalSearchParams()
+    const templateId = params.templateId
+    const columnId = params.columnId
+    const taskId = params.taskId
 
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
@@ -16,15 +28,65 @@ const HintEditor = () => {
     const [isEditing, setIsEditing] = useState(false)
     const [isPreviewing, setIsPreviewing] = useState(false)
 
+    const router = useRouter()
+
     const handleEdit = () => {
         setIsEditing(true)
     }
 
-    const handleSave = () => {
+    const [content, setContent] = useState('')
+
+    useEffect(() => {
+        const fetchHint = async () => {
+            const hint = await templateColumnService.getHint(templateId, columnId, taskId)
+            setContent(hint)
+        }
+        fetchHint()
+    }, [templateId, columnId, taskId])
+
+    // Alert
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState({ type: '', title: '', message: '' });
+
+    const showAlert = (type, title, message) => {
+        setAlert({ type, title, message });
+        setAlertVisible(true);
+    };
+
+    const handleSave = async () => {
+
+        if (!content?.trim()) {
+            // If content is empty, delete the hint
+            try {
+                await templateColumnService.deleteHint(templateId, columnId, taskId)
+            }
+            catch (error) {
+                showAlert(ALERT_TYPES.ERROR, 'Delete Hint Failed', error.message)
+            }
+            setIsEditing(false)
+            return
+        }
+
+        try {
+            await templateColumnService.saveHint(templateId, columnId, taskId, content)
+        }
+        catch (error) {
+            showAlert(ALERT_TYPES.ERROR, 'Save Hint Failed', error.message)
+        }
         setIsEditing(false)
     }
 
-    const [content, setContent] = useState('')
+    const handleGoBack = useCallback(() => {
+        try {
+            if (router.canGoBack()) {
+            router.back()
+            return
+            }
+            router.replace('/')
+        } catch {
+            router.replace('/')
+        }
+    }, [router]);
 
     const editor = () => (
         <View style={{ flex: 1, marginBottom: 20 }}>
@@ -41,7 +103,12 @@ const HintEditor = () => {
     )
 
     const preview = () => (
-         <ScrollView style={{ flex: 1, marginBottom: 20 }}>
+         <ScrollView 
+            style={{ flex: 1, marginBottom: 20 }}
+            contentContainerStyle={!content?.trim() && { flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}
+         >
+            {content?.trim() ? 
+
             <Markdown style={{
                 body: { color: theme.text, fontSize: 16 },
                 heading1: { color: theme.title },
@@ -53,34 +120,72 @@ const HintEditor = () => {
             }}>
                 {content}
             </Markdown>
+
+            :
+            
+            <EmptyState
+                title="No Hint Content"
+                description="Add hint content clicking on the button below."
+                iconName="lightbulb-on-outline"
+            />
+
+        }
         </ScrollView>
     )
 
-    console.log("Is Editing:", isEditing)
-    console.log("Is Previewing:", isPreviewing)
     return (
-        <SafeAreaPage style={styles.container}>
 
-            {isEditing && !isPreviewing ? editor() : preview()}
-            
-            <View style={styles.buttonContrainer}>
+        <>
+            <Stack.Screen
+                options={{
+
+                    headerTitle: () => (
+                        <ThemedText title bold style={{ fontSize: 20 }}>
+                            Edit Hint
+                        </ThemedText>
+                    ),
+
+                    headerLeft: () => (
+						<AnimatedPressable onPress={handleGoBack} style={{ paddingLeft: 5, paddingRight: 10 }}>
+							<ThemedIcon testID="project-arrow-back" name="arrow-left"/>
+						</AnimatedPressable>
+					),
+                }}
+            />
+            <SafeAreaPage style={styles.container}>
+
+                <PillsContainer style={{ marginBottom: 20 }}>
+                    <Pill projectName={params.templateName}/>
+                    <Pill columnName={params.columnName}/>
+                    <Pill taskName={params.taskName}/>
+                </PillsContainer>
+
+                {isEditing && !isPreviewing ? editor() : preview()}
                 
-                {!isPreviewing && 
-                <ThemedButton style={{flex: 1}} onPress={isEditing ? handleSave : handleEdit}>
-                    <ThemedIcon onPrimary name={isEditing ? "content-save" : "pencil"} style={{ marginRight: 6 }}/>
-                    <ThemedText onPrimary bold>{isEditing ? "Save Hint" : "Edit Hint"}</ThemedText>
-                </ThemedButton>
-                }
+                <View style={styles.buttonContrainer}>
+                    
+                    {!isPreviewing && 
+                    <ThemedButton style={{flex: 1}} onPress={isEditing ? handleSave : handleEdit}>
+                        <ThemedIcon onPrimary name={isEditing ? "content-save" : "pencil"} style={{ marginRight: 6 }}/>
+                        <ThemedText onPrimary bold>{isEditing ? "Save Hint" : "Edit Hint"}</ThemedText>
+                    </ThemedButton>
+                    }
 
-                {isEditing &&
-                <ThemedButton style={{flex: 1}} onPress={() => setIsPreviewing(!isPreviewing)}>
-                    <ThemedIcon onPrimary name={isPreviewing ? "eye-off" : "eye"} style={{ marginRight: 6 }}/>
-                    <ThemedText onPrimary bold>{isPreviewing ? "Hide Preview" : "Show Preview"}</ThemedText>
-                </ThemedButton>
-                }   
-            </View>
-            
-        </SafeAreaPage>
+                    {isEditing &&
+                    <ThemedButton style={{flex: 1}} onPress={() => setIsPreviewing(!isPreviewing)}>
+                        <ThemedIcon onPrimary name={isPreviewing ? "eye-off" : "eye"} style={{ marginRight: 6 }}/>
+                        <ThemedText onPrimary bold>{isPreviewing ? "Hide Preview" : "Show Preview"}</ThemedText>
+                    </ThemedButton>
+                    }   
+                </View>
+
+                 <ThemedAlert
+                    visible={alertVisible}
+                    alert={alert}
+                    onConfirm={() => setAlertVisible(false)} 
+                />
+            </SafeAreaPage>
+        </>
     )
 }
 

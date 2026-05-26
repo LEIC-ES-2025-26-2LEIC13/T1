@@ -9,8 +9,8 @@
 │     ├─ email
 │     ├─ userProjects         (subcolletion)
 │     │  └─ {projectId}       (subcolletion document)
-│     │     ├─ title		-
-│     │     └─ description	-
+│     │     ├─ title
+│     │     └─ description
 │     │
 │     ├─ userInvites
 │     │  └─ {inviteId}
@@ -73,6 +73,7 @@
  			    └─ {taskId}
  			       ├─ name
 			       ├─ description
+				   ├─ hints
 			       └─ order
 ```
 
