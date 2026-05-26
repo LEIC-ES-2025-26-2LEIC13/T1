@@ -65,9 +65,9 @@ export const pathHelper = {
 
     // Suggestion Related
 
-    adminSuggestions: () =>
-        collection(db, COLLECTIONS.ADMIN, 'admin', SUBCOLLECTIONS.SUGGESTIONS),
+    adminSuggestions: (adminId) =>
+        collection(db, COLLECTIONS.ADMIN, adminId, SUBCOLLECTIONS.SUGGESTIONS),
 
-    adminSuggestion: (suggestionId) =>
-        doc(db, COLLECTIONS.ADMIN, 'admin', SUBCOLLECTIONS.SUGGESTIONS, suggestionId),
+    adminSuggestion: (adminId, suggestionId) =>
+        doc(db, COLLECTIONS.ADMIN, adminId, SUBCOLLECTIONS.SUGGESTIONS, suggestionId),
 }
