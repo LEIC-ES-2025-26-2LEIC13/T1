@@ -4,13 +4,13 @@ import ModalBody from "./modal/ModalBody";
 import FormField from "./FormField";
 import ModalActions from "./modal/ModalActions";
 
-export default function CreateSuggestionModal(
+export default function CreateSuggestionModal({
     visible,
     onClose,
     onCreate,
     onChange,
     suggestion,
-) {
+}) {
 
     return (
         <AppModal visible={visible} onClose={onClose}>
@@ -28,6 +28,7 @@ export default function CreateSuggestionModal(
                     placeholder="Enter suggestion description"
                     value={suggestion.description}
                     onChangeText={(value) => onChange('description', value)}
+                    multiline={true}
                 />
 
             </ModalBody>
