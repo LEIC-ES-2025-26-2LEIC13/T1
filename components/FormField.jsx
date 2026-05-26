@@ -55,6 +55,6 @@ const styles = StyleSheet.create({
     },
     textArea: {
         textAlignVertical: 'top',
-        height: 80
+        height: 150
     }
 })

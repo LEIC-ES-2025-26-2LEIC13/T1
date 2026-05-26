@@ -28,6 +28,7 @@ export default function CreateSuggestionModal({
                     placeholder="Enter suggestion description"
                     value={suggestion.description}
                     onChangeText={(value) => onChange('description', value)}
+                    multiline={true}
                 />
 
             </ModalBody>
