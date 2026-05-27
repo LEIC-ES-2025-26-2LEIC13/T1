@@ -1,6 +1,7 @@
 import {FlatList, StyleSheet} from "react-native";
 import {useEffect, useState} from "react";
 import {suggestionService} from "../../../api/suggestionService";
+import {useAuth} from "../../../hooks/useAuth";
 import SafeAreaPage from "../../../components/SafeAreaPage";
 import EmptyState from "../../../components/EmptyState";
 import ThemedSuggestion from "../../../components/ThemedSuggestion";
@@ -9,6 +10,7 @@ import ThemedAlert from "../../../components/ThemedAlert";
 import LoadingScreen from "../../../components/LoadingScreen";
 
 export default function Suggestions() {
+    const { user } = useAuth();
     const [suggestions, setSuggestions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [suggestionModalVisible, setSuggestionModalVisible] = useState(false);
@@ -24,12 +26,14 @@ export default function Suggestions() {
 
     // Subscribe to all suggestions
     useEffect(() => {
-        const unsub = suggestionService.subscribeToAllSuggestions((suggestionsToDisplay) => {
+        if (!user?.uid) return;
+
+        const unsub = suggestionService.subscribeToAllSuggestions(user.uid, (suggestionsToDisplay) => {
             setSuggestions(suggestionsToDisplay);
             setIsLoading(false);
         });
         return () => unsub();
-    }, []);
+    }, [user?.uid]);
 
     const openSuggestion = (suggestion) => {
         setSelectedSuggestion(suggestion);
@@ -62,12 +66,12 @@ export default function Suggestions() {
                         data={suggestions}
                         keyExtractor={(item) => item.id}
                         contentContainerStyle={styles.listContent}
-                        showScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
                         scrollEnabled={!suggestionModalVisible}
-                        listEmptyComponent={
+                        ListEmptyComponent={
                             <EmptyState
                                 title="No suggestions yet"
-                                description="Users can submit suggestions for new templates here. Check back later!"
+                                subtitle="Users can submit suggestions for new templates here. Check back later!"
                                 iconName="beach"
                             />
                         }
