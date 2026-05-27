@@ -60,6 +60,8 @@ It is organised by the following activities:
       - [Logs and documentation](#logs-and-documentation-1)
       - [AI usage documentation](#ai-usage-documentation-1)
       - [Setup environment documentation](#setup-environment-documentation-1)
+      - [Sprint 3 Release](#sprint-3-release)
+      - [Final backlog](#final-backlog-1)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
 
@@ -551,6 +553,14 @@ _Sprint 3 Backlog (5/5)_
 #### Setup environment documentation
 
 - Continuous documentation for setting up the development environment [here](docs/setupEnvironment.md).
+
+#### Sprint 3 Release
+
+- Release of Sprint 3 [here](https://github.com/LEIC-ES-2025-26-2LEIC13/T1/releases/tag/v2.1.0).
+
+#### Final backlog
+
+- Yet to be completed.
 
 ### Sprint 4
 
