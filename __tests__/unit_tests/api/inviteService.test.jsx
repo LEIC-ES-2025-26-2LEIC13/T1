@@ -24,6 +24,7 @@ jest.mock("../../../api/pathHelper", () => ({
         projectUser: jest.fn((projectId, userId) => `projects/${projectId}/users/${userId}`),
         project: jest.fn((projectId) => `projects/${projectId}`),
         userProject: jest.fn((userId, projectId) => `users/${userId}/projects/${projectId}`),
+        userProjects: jest.fn((userId) => `users/${userId}/projects`),
     },
 }));
 
@@ -133,6 +134,7 @@ describe("inviteService", () => {
         });
 
         it("adds user to project and project to user, deleting the invite", async () => {
+            getDocs.mockResolvedValueOnce({ docs: [] });
             const txn = {
                 get: jest.fn().mockResolvedValue({
                     exists: () => true,
@@ -155,6 +157,7 @@ describe("inviteService", () => {
             expect(txn.set).toHaveBeenCalledWith("users/u1/projects/p1", {
                 title: "Proj",
                 description: "Desc",
+                order: 0,
             });
             expect(txn.set).toHaveBeenCalledWith("projects/p1/users/u1", {
                 email: "u1@test.com",

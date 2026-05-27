@@ -13,12 +13,25 @@ jest.mock("../../../api/taskService", () => ({
     },
 }));
 
+jest.mock("../../../api/columnService", () => ({
+    columnService: {
+        moveTaskToColumn: jest.fn(),
+        getTask: jest.fn(),
+    },
+}));
+
+jest.mock("expo-router", () => ({
+    useRouter: () => ({ push: jest.fn() }),
+    useFocusEffect: (cb) => cb(),
+}));
+
 jest.mock("../../../components/AssignMembersSection", () => {
     const React = require("react");
     const { View } = require("react-native");
     return () => <View testID="assign-members-section" />;
 });
 
+import { columnService } from "../../../api/columnService";
 import { taskService } from "../../../api/taskService";
 
 const mockOnClose = jest.fn();
@@ -68,6 +81,9 @@ beforeEach(() => {
     mockGetProjectUsers.mockClear();
     taskService.moveTaskToColumn.mockClear();
     taskService.updateTask.mockClear();
+    columnService.moveTaskToColumn.mockClear();
+    columnService.getTask.mockClear();
+    columnService.getTask.mockResolvedValue(null);
 });
 
 describe("TaskModal", () => {
@@ -172,13 +188,13 @@ describe("TaskModal", () => {
     });
 
     test("calls moveTaskToColumn and onTaskMoved when next column is pressed", async () => {
-        taskService.moveTaskToColumn.mockResolvedValueOnce();
+        columnService.moveTaskToColumn.mockResolvedValueOnce();
         renderModal();
 
         fireEvent.press(screen.getByText("Done"));
 
         await waitFor(() => {
-            expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
+            expect(columnService.moveTaskToColumn).toHaveBeenCalledWith(
                 "project-1",
                 mockTask,
                 "col-2",
@@ -189,13 +205,13 @@ describe("TaskModal", () => {
     });
 
     test("calls moveTaskToColumn and onTaskMoved when previous column is pressed", async () => {
-        taskService.moveTaskToColumn.mockResolvedValueOnce();
+        columnService.moveTaskToColumn.mockResolvedValueOnce();
         renderModal();
 
         fireEvent.press(screen.getByText("To Do"));
 
         await waitFor(() => {
-            expect(taskService.moveTaskToColumn).toHaveBeenCalledWith(
+            expect(columnService.moveTaskToColumn).toHaveBeenCalledWith(
                 "project-1",
                 mockTask,
                 "col-2",
