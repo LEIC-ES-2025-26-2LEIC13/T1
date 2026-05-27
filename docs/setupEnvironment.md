@@ -87,7 +87,11 @@ npx expo run:android
 - Then, it is possible to run the app in an Android emulator or physical device, via USB or Wi-Fi debugging.
 
 ## Running acceptance tests
+- Used a development build in Android to run the acceptance tests. To create a development build, use the following command:
 
+```bash
+npx expo run:android
+```
 - Acceptance tests for this project were written using the Maestro testing framework.
 - To install Maestro, follow the instructions in the official QuickStart guide [here](https://docs.maestro.dev/get-started/quickstart).
 - To run the acceptance tests:
@@ -95,3 +99,9 @@ npx expo run:android
   2. Open the `__tests__/acceptance_tests/` directory.
   3. Select device as emulator or physical device.
   4. Run the desired test file, select it and clicking the "Run test" button in MaestroStudio.
+
+
+## Google Sign In
+- To sign in into the app using Google, simply have a Google account in the phone and click the "Sign in" button with the google logo.
+- This will open a Google Sign In prompt, where you can select the account you want to use to sign in into the app. After selecting the account, you will be signed in and redirected to the home screen of the app.
+- If you don't have a previous account associated with the app, the account is automatically created for you and you are signed in. If you already have an account associated with the app, you are simply signed in and redirected to the home screen of the app. 

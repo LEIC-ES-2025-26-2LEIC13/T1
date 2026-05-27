@@ -7,8 +7,13 @@ import { GoogleSigninButton } from "@react-native-google-signin/google-signin"
 import { useState} from "react"
 import { useAuth } from "../hooks/useAuth"
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
+import ThemedButton from "../components/ThemedButton"
+import { useRouter } from "expo-router"
 
 const Intro = () => {
+    const router = useRouter()
+
+
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
     const { googleLogin, isLoading} = useAuth()
@@ -54,6 +59,26 @@ const Intro = () => {
 
                 <View style={styles.actions}>
                     <GoogleSigninButton onPress={handleSignInPress} disabled={isLoading} />
+                    <View style={styles.authButtons}>
+                        <ThemedText style={styles.authLabel}>
+                            Or login with email and password directly
+                        </ThemedText>
+                        <ThemedButton
+                            testID="login-button"
+                            style={styles.primaryButton}
+                            onPress={() => router.push("/(auth)/login")}
+                        >
+                            <ThemedText bold onPrimary>Login</ThemedText>
+                        </ThemedButton>
+
+                        <ThemedButton
+                            testID="register-button"
+                            style={[styles.primaryButton, { backgroundColor: theme.borders }]}
+                            onPress={() => router.push("/(auth)/register")}
+                        >
+                            <ThemedText bold onPrimary>Register</ThemedText>
+                        </ThemedButton>
+                    </View>
                 </View>
             </View>
 
@@ -74,18 +99,33 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 30,
-    },
+    }, 
     title: {
         fontSize: 32,
         fontWeight: "700",
         textAlign: "center",
-        marginBottom: 10,
     },
     description: {
         fontSize: 16,
         textAlign: "center",
         lineHeight: 22,
-        marginBottom: 28,
+        marginBottom: 10,
+    },
+    actions: {
+        marginTop: 40,
+        width: "100%",
+        alignItems: "center",
+    },
+    authButtons: {
+        width: "100%",
+        gap: 12,
+        marginTop: 150,
+    },
+    authLabel: {
+        textAlign: "center",
+        fontSize: 14,
+        opacity: 0.8,
+        marginBottom: 4,
     },
     primaryButton: {
         width: "100%",

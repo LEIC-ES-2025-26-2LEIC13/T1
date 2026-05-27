@@ -1,0 +1,23 @@
+appId: com.anonymous.LEICo
+tags:
+    - hints
+    - view
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    TASK_NAME: "Planning"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/createTemplateProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        TEMPLATE_NAME: "Programming Project"
+
+- tapOn: ${TASK_NAME}
+
+- assertNotVisible: "Hints"
+
+

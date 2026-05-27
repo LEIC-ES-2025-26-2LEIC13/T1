@@ -1,0 +1,38 @@
+appId: com.anonymous.LEICo
+tags:
+    - hints
+    - view
+env:
+    EMAIL: "johndoe@gmail.com"
+    PASSWORD: "123456"
+    TASK_NAME: "Run tests"
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: subflows/createTemplateProject.yaml
+    env:
+        EMAIL: ${EMAIL}
+        PASSWORD: ${PASSWORD}
+        TEMPLATE_NAME: "Programming Project"
+
+- swipe:
+    direction: LEFT
+- swipe:
+    direction: LEFT
+
+- tapOn: ${TASK_NAME}
+
+- tapOn:
+    id: "hints-button"
+
+- assertVisible:
+    id: "hint-viewer-arrow-back"
+
+- assertVisible: "View Hints"
+
+
+
+
+
+

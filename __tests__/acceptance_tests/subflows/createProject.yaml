@@ -13,8 +13,10 @@ tags:
     id: "choice-custom-project"
 - tapOn: "Enter project title"
 - inputText: ${PROJECT_TITLE}
+- hideKeyboard 
 - tapOn: "Enter project description (optional)"
 - inputText: ${PROJECT_DESCRIPTION}
+- hideKeyboard
 - tapOn:
     id: "create-project-modal-actions-create"
 - assertVisible: ${PROJECT_TITLE}
