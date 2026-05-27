@@ -56,6 +56,10 @@ It is organised by the following activities:
       - [Final backlog](#final-backlog)
       - [Sprint 2 Review](#sprint-2-review)
     - [Sprint 3](#sprint-3)
+      - [Initial backlog](#initial-backlog-1)
+      - [Logs and documentation](#logs-and-documentation-1)
+      - [AI usage documentation](#ai-usage-documentation-1)
+      - [Setup environment documentation](#setup-environment-documentation-1)
     - [Sprint 4](#sprint-4)
     - [Final Release](#final-release)
 
@@ -534,6 +538,19 @@ _Sprint 3 Backlog (3/5)_
 _Sprint 3 Backlog (4/5)_
 ![Sprint3Backlog5](docs/imgs/Sprint3Backlog5.png)
 _Sprint 3 Backlog (5/5)_
+
+#### Logs and documentation
+
+- Documentation of bugs, defects, fixes, and improvements [here](docs/sprint3documentation.md).
+- Summarized change log of Sprint 3 [here](docs/changeLogSprint3.md).
+
+#### AI usage documentation
+
+- AI usage during this sprint documented [here](docs/sprint3AIUsage.md).
+
+#### Setup environment documentation
+
+- Continuous documentation for setting up the development environment [here](docs/setupEnvironment.md).
 
 ### Sprint 4
 

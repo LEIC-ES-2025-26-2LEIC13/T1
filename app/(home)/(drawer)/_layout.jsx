@@ -82,20 +82,6 @@ export default function DrawerLayout() {
                     ),
                 }}
             />
-
-            <Drawer.Screen
-                name="settings"
-                options={{
-                    title: "Settings",
-                    drawerIcon: ({ focused, color }) => (
-                        <ThemedIcon
-                            testID="settings-drawer-screen"
-                            name={focused ? "cog" : "cog-outline"}
-                            color={color}
-                        />
-                    ),
-                }}
-            />
         </Drawer>
     );
 }
