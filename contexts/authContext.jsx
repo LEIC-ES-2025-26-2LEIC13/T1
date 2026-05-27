@@ -1,4 +1,4 @@
-/*import { createContext, useState, useEffect, useMemo, useCallback } from "react"
+import { createContext, useState, useEffect, useMemo, useCallback } from "react"
 import { authService } from "../api/authService"
 import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
 
@@ -6,11 +6,11 @@ export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
+    const [isAdmin, setIsAdmin] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
     const [alertVisible, setAlertVisible] = useState(false)
     const [alert, setAlert] = useState({ title: '', message: '', type: ALERT_TYPES.ERROR })
-
 
     const showAlert = useCallback((type, title, message) => {
         setAlert({ type, title, message })
@@ -22,11 +22,25 @@ export function AuthProvider({ children }) {
     // Keep user logged in
     useEffect(() => {
         setIsLoading(true)
-
-        
         const unsub = authService.subscribeAuthState((currentUser) => {
             setUser(currentUser)
-            setIsLoading(false)
+            if (!currentUser) {
+                setIsAdmin(false)
+                setIsLoading(false)
+                return
+            }
+
+            // async check for admin role
+            (async () => {
+                try {
+                    const admin = await authService.isAdmin(currentUser)
+                    setIsAdmin(!!admin)
+                } catch (e) {
+                    setIsAdmin(false)
+                } finally {
+                    setIsLoading(false)
+                }
+            })()
         })
 
         return unsub
@@ -97,7 +111,7 @@ export function AuthProvider({ children }) {
     const logout = useCallback(async () => {
         setIsLoading(true)
         try {
-            authService.logout()
+            await authService.logout()
             return true
         } catch (error) {
             showAlert(ALERT_TYPES.ERROR, "Logout Error", error.message)
@@ -106,73 +120,6 @@ export function AuthProvider({ children }) {
         }
     }, [showAlert])
 
-    const value = useMemo(() => ({
-        user,
-        isLoading,
-        login,
-        register,
-        logout
-    }), [user, isLoading, login, register, logout])
-
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
-            <ThemedAlert 
-                visible={alertVisible} 
-                alert={alert} 
-                onConfirm={closeAlert} 
-            />
-        </AuthContext.Provider>
-    )
-}
-*/
-import { createContext, useState, useEffect, useMemo, useCallback } from "react"
-import { authService } from "../api/authService"
-import ThemedAlert, { ALERT_TYPES } from "../components/ThemedAlert"
-
-export const AuthContext = createContext(null)
-
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null)
-    const [isAdmin, setIsAdmin] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
-
-    const [alertVisible, setAlertVisible] = useState(false)
-    const [alert, setAlert] = useState({ title: '', message: '', type: ALERT_TYPES.ERROR })
-
-    const showAlert = useCallback((type, title, message) => {
-        setAlert({ type, title, message })
-        setAlertVisible(true)
-    }, [])
-
-    const closeAlert = () => setAlertVisible(false)
-
-    // Keep user logged in
-    useEffect(() => {
-        setIsLoading(true)
-        const unsub = authService.subscribeAuthState((currentUser) => {
-            setUser(currentUser)
-            if (!currentUser) {
-                setIsAdmin(false)
-                setIsLoading(false)
-                return
-            }
-
-            // async check for admin role
-            ;(async () => {
-                try {
-                    const admin = await authService.isAdmin(currentUser)
-                    setIsAdmin(!!admin)
-                } catch (e) {
-                    setIsAdmin(false)
-                } finally {
-                    setIsLoading(false)
-                }
-            })()
-        })
-
-        return unsub
-    }, [])
 
     // Only Google sign-in is supported in this app
 
@@ -187,7 +134,7 @@ export function AuthProvider({ children }) {
         }
     }, [showAlert])
 
-    const logout = useCallback(async () => {
+    const googlelogout = useCallback(async () => {
         setIsLoading(true)
         try {
             await authService.signOut()
@@ -203,9 +150,12 @@ export function AuthProvider({ children }) {
         user,
         isLoading,
         googleLogin,
+        googlelogout,
+        login,
+        register,
         logout,
         isAdmin
-    }), [user, isLoading, googleLogin, logout, isAdmin])
+    }), [user, isLoading, googleLogin, googlelogout, isAdmin, login, register, logout])
 
     return (
         <AuthContext.Provider value={value}>

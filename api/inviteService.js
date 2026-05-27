@@ -66,6 +66,10 @@ export const inviteService = {
             // Get their data as an object
             const { title, description } = projectSnap.data()
 
+            // Compute next order for the user's project list
+            const userProjectsSnapshot = await getDocs(pathHelper.userProjects(userId))
+            const nextOrder = userProjectsSnapshot.docs.length
+
             // Upon invite of a new user for the specified project by projectId, the same id as the global collection, that value must be enforced proper deletion
             const newUserProjectRef = pathHelper.userProject(userId, projectId)
             const newProjectUserRef = pathHelper.projectUser(projectId, userId)
@@ -78,7 +82,8 @@ export const inviteService = {
             // transaction.set() creates a document if it does not exist
             transaction.set(newUserProjectRef, {
                 title: title,
-                description: description
+                description: description,
+                order: nextOrder
             })
 
             // Creates a document for one more user (email only) inside the 'projectUsers' subcollection inside project document
