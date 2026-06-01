@@ -36,7 +36,7 @@
     "@react-navigation/drawer": "^7.9.4",
     "expo": "~55.0.26",
     "expo-linear-gradient": "~55.0.14",
-    "expo-linking": "^55.0.15",
+    "expo-linking": "^56.0.13",
     "expo-modules-core": "~55.0.25",
     "expo-navigation-bar": "~55.0.13",
     "expo-router": "~55.0.16",
