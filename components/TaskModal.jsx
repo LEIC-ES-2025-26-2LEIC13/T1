@@ -15,6 +15,7 @@ import ThemedIcon from './ThemedIcon'
 import Spacer from './Spacer'
 import ThemedView from './ThemedView'
 import {columnService} from '../api/columnService'
+import {taskService} from '../api/taskService'
 import AssignMembersSection from "./AssignMembersSection";
 import { useRouter, useFocusEffect } from 'expo-router'
 
@@ -80,7 +81,7 @@ export default function TaskModal({
     const handleSaveEdit = async () => {
         try {
             // Update the task with new values
-            await columnService.updateTask(projectId, columnId, task.id, {
+            await taskService.updateTask(projectId, columnId, task.id, {
                 name: editedTask.name,
                 description: editedTask.description,
                 label: editedTask.label,
@@ -214,23 +215,29 @@ export default function TaskModal({
 
                 
 
-                {taskHasHints ? (
-                    <>
-                        <ThemedText style={styles.label}>
-                            Hints
-                        </ThemedText>
-                        <AnimatedPressable
-                            testID="hints-button"
-                            style={[styles.hintButton, { backgroundColor: theme.hint, boxShadow: `0px 0px 5px ${theme.hint}` }]}
-                            onPress={handlePressHints}
-                        >
-                            <ThemedIcon onPrimary name="lightbulb-on-outline" />
-                            <ThemedText onPrimary style={{ marginLeft: 8 }}>
-                                See hints
+                <>
+                    <ThemedText style={styles.label}>
+                        Hints
+                    </ThemedText>
+                    <AnimatedPressable
+                        testID="hints-button"
+                        style={[styles.hintButton, { backgroundColor: theme.hint, boxShadow: `0px 0px 5px ${theme.hint}` }]}
+                        onPress={handlePressHints}
+                    >
+                        {taskHasHints ? (
+                            <>
+                                <ThemedIcon onPrimary name="lightbulb-on-outline" />
+                                <ThemedText onPrimary style={{ marginLeft: 8 }}>
+                                    See hints
+                                </ThemedText>
+                            </>
+                        ) : (
+                            <ThemedText onPrimary>
+                                No hints yet. Add hints.
                             </ThemedText>
-                        </AnimatedPressable>
-                    </>
-                ) : null}
+                        )}
+                    </AnimatedPressable>
+                </>
 
                 
 
