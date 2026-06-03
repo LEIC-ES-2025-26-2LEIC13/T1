@@ -62,7 +62,8 @@ It is organised by the following activities:
       - [Setup environment documentation](#setup-environment-documentation-1)
       - [Sprint 3 Release](#sprint-3-release)
       - [Final backlog](#final-backlog-1)
-    - [Sprint 4](#sprint-4)
+      - [Sprint 3 Review](#sprint-3-review)
+    - [Pitch](#pitch)
     - [Final Release](#final-release)
 
 Contributions are expected to be made exclusively by the initial team, but we may open them to the community, after the course, in all areas and topics: requirements, technologies, development, experimentation, testing, etc.
@@ -560,9 +561,28 @@ _Sprint 3 Backlog (5/5)_
 
 #### Final backlog
 
-- Yet to be completed.
+- The following image depicts the scrum boardat the end of Sprint 3.
 
-### Sprint 4
+![Sprint3FinalBacklog](docs/imgs/Sprint3FinalBacklog.png)
+_Sprint 3 Final Backlog_
+
+- Only the PBI of Deadline Tracking was not completed during this sprint, due to the lack of time. All the remaining ones were successfully completed.
+
+#### Sprint 3 Review
+
+- Sprint 3 review [here](docs/sprint3review.md).
+
+### Pitch
+
+Tentar organizar projetos da L.EIC de forma eficiente é fulcral e pode ser bastante demorado.
+Aplicações minimalistas, grátis e especialmente desenhadas para estudantes da LEIC não existem de todo.
+Para isso concebemos a LEICo, onde os estudantes se juntam.
+A LEICo é uma plataforma de templates colaborativos para projetos da licenciatura, com um sistema de dicas: de estudantes para estudantes.
+Todos podem contribuir com melhorias e sugestões de modo a criar um ecossistema de conteúdos de qualidade.
+Ainda que a IA tenha vindo a permitir conteúdos cada vez mais personalizados, a experiência e feedback de quem já concluiu um projeto com sucesso continua a ser incalculável.
+
+![PitchSlide](docs/imgs/slide_pitch.png)
+_Slide Used in Pitch_
 
 ### Final Release
 
