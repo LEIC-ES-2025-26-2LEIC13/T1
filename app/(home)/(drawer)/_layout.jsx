@@ -56,20 +56,6 @@ export default function DrawerLayout() {
             />
 
             <Drawer.Screen
-                name="calendar" 
-                options={{
-                    title: "Calendar",
-                    drawerIcon: ({ focused, color }) => (
-                        <ThemedIcon
-                            testID="calendar-drawer-screen"
-                            name={focused ? "calendar-month" : "calendar-month-outline"}
-                            color={color}
-                        />
-                    ),
-                }}
-            />
-
-            <Drawer.Screen
                 name="invites"
                 options={{
                     title: "Invites",
