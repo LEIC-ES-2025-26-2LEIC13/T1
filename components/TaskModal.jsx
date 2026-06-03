@@ -216,27 +216,23 @@ export default function TaskModal({
                 
 
                 <>
-                    <ThemedText style={styles.label}>
-                        Hints
-                    </ThemedText>
-                    <AnimatedPressable
-                        testID="hints-button"
-                        style={[styles.hintButton, { backgroundColor: theme.hint, boxShadow: `0px 0px 5px ${theme.hint}` }]}
-                        onPress={handlePressHints}
-                    >
-                        {taskHasHints ? (
-                            <>
+                    {taskHasHints && 
+                        <>
+                            <ThemedText style={styles.label}>
+                            Hints
+                            </ThemedText>
+                            <AnimatedPressable
+                                testID="hints-button"
+                                style={[styles.hintButton, { backgroundColor: theme.hint, boxShadow: `0px 0px 5px ${theme.hint}` }]}
+                                onPress={handlePressHints}
+                            >
                                 <ThemedIcon onPrimary name="lightbulb-on-outline" />
                                 <ThemedText onPrimary style={{ marginLeft: 8 }}>
                                     See hints
                                 </ThemedText>
-                            </>
-                        ) : (
-                            <ThemedText onPrimary>
-                                No hints yet. Add hints.
-                            </ThemedText>
-                        )}
-                    </AnimatedPressable>
+                            </AnimatedPressable>
+                        </>
+                    }
                 </>
 
                 
