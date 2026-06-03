@@ -50,6 +50,7 @@ export function AuthProvider({ children }) {
         setIsLoading(true)
         try {
             await authService.login(email, password, setUser)
+            // Success: onAuthStateChanged handles isLoading(false) after admin check
         } catch (error) {
             let errorMessage
 
@@ -73,14 +74,12 @@ export function AuthProvider({ children }) {
                 case 'auth/network-request-failed':
                     errorMessage = "Network error. Please check your internet connection."
                     break
-                default:    
+                default:
                     errorMessage = error.message
             }
 
             showAlert(ALERT_TYPES.ERROR, "Login Error", errorMessage)
-
-        } finally {
-            setIsLoading(false)
+            setIsLoading(false) // auth state unchanged, onAuthStateChanged won't fire
         }
     }, [showAlert])
 
@@ -89,7 +88,7 @@ export function AuthProvider({ children }) {
         try {
             await authService.register(email, password, setUser)
             showAlert(ALERT_TYPES.SUCCESS, "Success", "Account created successfully!")
-
+            // Success: onAuthStateChanged handles isLoading(false) after admin check
         } catch (error) {
             let errorMessage = error.message
             if (error.code === 'auth/email-already-in-use') {
@@ -102,9 +101,7 @@ export function AuthProvider({ children }) {
                 errorMessage = "Account creation is currently disabled. Please try again later."
             }
             showAlert(ALERT_TYPES.ERROR, "Registration Error", errorMessage)
-
-        } finally {
-            setIsLoading(false)
+            setIsLoading(false) // auth state unchanged, onAuthStateChanged won't fire
         }
     }, [showAlert])
 
@@ -127,10 +124,10 @@ export function AuthProvider({ children }) {
         setIsLoading(true)
         try {
             await authService.signInWithGoogle(setUser)
+            // Success: onAuthStateChanged handles isLoading(false) after admin check
         } catch (error) {
             showAlert(ALERT_TYPES.ERROR, "Login Error", error.message || 'Google sign-in failed')
-        } finally {
-            setIsLoading(false)
+            setIsLoading(false) // auth state unchanged, onAuthStateChanged won't fire
         }
     }, [showAlert])
 
