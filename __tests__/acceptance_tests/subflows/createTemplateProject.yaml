@@ -3,9 +3,6 @@ tags:
     - project
     - template
 ---
-- launchApp:
-    clearState: true
-
 - runFlow:
     file: login.yaml
     env:

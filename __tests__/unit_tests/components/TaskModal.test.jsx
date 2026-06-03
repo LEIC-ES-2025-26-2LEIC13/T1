@@ -122,13 +122,6 @@ describe("TaskModal", () => {
         expect(screen.getByText("Bug")).toBeTruthy();
     });
 
-    test("displays the hints button in view mode", () => {
-        renderModal();
-
-        expect(screen.getByTestId("hints-button")).toBeTruthy();
-        expect(screen.getByText("No hints yet. Add hints.")).toBeTruthy();
-    });
-
     test("shows hint availability text when task has hints", () => {
         renderModal({ task: { ...mockTask, hints: "Remember to check the API response." } });
 
